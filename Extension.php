@@ -9,6 +9,11 @@ namespace SocialLogin;
  */
 class Extension extends \Bolt\BaseExtension
 {
+    /**
+     * @var SocialLogin\Controller
+     */
+    private $controller;
+
     public function getName()
     {
         return "SocialLogin";
@@ -22,10 +27,39 @@ class Extension extends \Bolt\BaseExtension
         }
 
         if ($this->app['config']->getWhichEnd() == 'frontend') {
-            $hybridauth = new \Hybrid_Auth(array());
+            // Set up routes
+            $this->setControllers();
+
+            //$hybridauth = new \Hybrid_Auth(array());
         }
     }
 
+    private function setControllers()
+    {
+        // Create
+        $this->controller = new Controller($this->app, $this->config);
+
+        // Build routes
+        $routes = array(
+            array('',          'view',     'getMemberRoot'),
+            array('/login',    'login',    'getMemberLogin'),
+            array('/logout',   'logout',   'getMemberLogout'),
+            array('/endpoint', 'endpoint', 'getMemberEndpoint'),
+        );
+
+
+        foreach ($routes as $route) {
+            list($path, $method, $binding) = $route;
+
+            $this->app['controllers_factory']->match($path, array($this->controller, $method))
+                            ->bind($binding);
+        }
+        $this->app->mount("/{$basepath}", $this->app['controllers_factory']);
+    }
+
+    /**
+     *
+     */
     private function dbCheck()
     {
         // Set up database schema
