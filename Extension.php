@@ -21,6 +21,10 @@ class Extension extends \Bolt\BaseExtension
 
     public function initialize()
     {
+        if (empty($this->config['basepath'])) {
+            $this->config['basepath'] = "visitors";
+        }
+
         if ($this->app['config']->getWhichEnd() == 'backend') {
             // Check & create database tables if required
             $this->dbCheck();
@@ -28,33 +32,36 @@ class Extension extends \Bolt\BaseExtension
 
         if ($this->app['config']->getWhichEnd() == 'frontend') {
             // Set up routes
-            $this->setControllers();
+            $this->setController();
 
             //$hybridauth = new \Hybrid_Auth(array());
         }
     }
 
-    private function setControllers()
+    private function setController()
     {
-        // Create
+        // Create controller object
         $this->controller = new Controller($this->app, $this->config);
 
-        // Build routes
-        $routes = array(
-            array('',          'view',     'getMemberRoot'),
-            array('/login',    'login',    'getMemberLogin'),
-            array('/logout',   'logout',   'getMemberLogout'),
-            array('/endpoint', 'endpoint', 'getMemberEndpoint'),
-        );
+        // Default route
+        $this->app->match("", array($this->controller, 'getMemberRoot'))
+                  ->bind('getMemberRoot')
+                  ->method('GET');
 
+        // Member login
+        $this->app->match("/login", array($this->controller, 'getMemberLogin'))
+                  ->bind('getMemberLogin')
+                  ->method('GET');
 
-        foreach ($routes as $route) {
-            list($path, $method, $binding) = $route;
+        // Member logout
+        $this->app->match("/login", array($this->controller, 'getMemberLogout'))
+                  ->bind('getMemberLogout')
+                  ->method('GET');
 
-            $this->app['controllers_factory']->match($path, array($this->controller, $method))
-                            ->bind($binding);
-        }
-        $this->app->mount("/{$basepath}", $this->app['controllers_factory']);
+        // OAuth callback URI
+        $this->app->match("/login", array($this->controller, 'getMemberEndpoint'))
+                  ->bind('getMemberEndpoint')
+                  ->method('POST');
     }
 
     /**
