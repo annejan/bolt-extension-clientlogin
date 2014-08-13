@@ -1,0 +1,42 @@
+{
+	"name" : "bolt/sociallogin",
+	"description" : "OAuth social login for Bolt frontend",
+	"type" : "bolt-extension",
+	"keywords" : [
+		"social",
+		"oauth",
+		"Google",
+		"Facebook",
+		"Twitter"
+	],
+	"require" : {
+		"bolt/bolt" : ">2.0,<3.0.0"
+	},
+	"license" : "GPL",
+	"authors" : [{
+			"name" : "Gawain Lynch",
+			"email" : "gawain.lynch@gmail.com"
+		}
+	],
+	"autoload" : {
+		"files" : [
+			"init.php"
+		],
+		"psr-4" : {
+			"SocialLogin\\" : [
+				"",
+				"src/"
+			]
+		},
+		"classmap" : [
+			"lib/Hybrid/Auth.php",
+			"lib/Hybrid/Endpoint.php",
+			"lib/Hybrid/User_Profile.php"
+		]
+	},
+	"extra" : {
+		"branch-alias" : {
+			"dev-master" : "1.0.*"
+		}
+	}
+}
