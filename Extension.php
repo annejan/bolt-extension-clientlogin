@@ -1,8 +1,12 @@
 <?php
-// Membership extension for Bolt
 
 namespace SocialLogin;
 
+/**
+ * Social Login with OAuth via HybridAuth
+ *
+ * @author Gawain Lynch <gawain.lynch@gmail.com>
+ */
 class Extension extends \Bolt\BaseExtension
 {
     public function getName()
