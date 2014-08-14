@@ -14,9 +14,20 @@ class Session
      */
     private $isLoggedIn = false;
 
-    public function __construct()
+    /**
+     * @var Silex\Application
+     */
+    private $app;
+
+    /**
+     * @var Extension config array
+     */
+    private $config;
+
+    public function __construct(Silex\Application $app, $config)
     {
-        //
+        $this->app = $app;
+        $this->config = $config;
     }
 
     /**
@@ -72,16 +83,16 @@ class Session
 
                 if($user_profile) {
                     $records = new UserRecords($this->app, $this->config);
+
+
+
+
+
+
+
+
+
                 }
-
-
-
-
-
-
-
-
-
             } catch(Exception $e) {
                 $html =  "<pre>Error: please try again!<pre><br>";
                 $html .= "<pre>Original error message: " . $e->getMessage() . "<pre>";
