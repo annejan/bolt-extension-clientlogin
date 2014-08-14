@@ -31,10 +31,16 @@ class Extension extends \Bolt\BaseExtension
         }
 
         if ($this->app['config']->getWhichEnd() == 'frontend') {
+            // If debug is set, also set the path for the debug log.
+            if ($this->config['debug_mode']) {
+                $this->config['debug_file'] = $this->app['resources']->getPath('cache') . "/authenticate.log";
+                @touch($this->config['debug_file']);
+            }
+
             // Set up routes
             $this->setController();
 
-            // Tig functions
+            // Twig functions
             $this->app['twig']->addExtension(new SocialLoginTwigExtensions($this->app, $this->config));
         }
     }
