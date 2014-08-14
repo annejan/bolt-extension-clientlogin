@@ -51,6 +51,20 @@ class UserInterface
     }
 
     /**
+     * Returns logout button
+     *
+     * @return \Twig_Markup
+     */
+    public function doDisplayLogout($label = "Logout")
+    {
+        $logoutlink = $this->formatButton(
+            $this->app['paths']['root'] . $this->config['basepath'].'/logout',
+            $label);
+
+        return new \Twig_Markup($logoutlink, 'UTF-8');
+    }
+
+    /**
      * Simple function to format the HTML for a button.
      *
      * @param string $link

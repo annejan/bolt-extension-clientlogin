@@ -8,14 +8,9 @@ namespace SocialLogin;
 class SocialLoginTwigExtensions extends \Twig_Extension
 {
     /**
-     * @var \Bolt\Application
+     * @var UserInterface class object
      */
-    private $app;
-
-    /**
-     * @var Extension config array
-     */
-    private $config;
+    private $interface;
 
     /**
      * @var Twig environment
@@ -24,8 +19,7 @@ class SocialLoginTwigExtensions extends \Twig_Extension
 
     public function __construct(\Bolt\Application $app, $config)
     {
-        $this->app = $app;
-        $this->config = $config;
+        $this->interface = new UserInterface($app, $config);
     }
 
     /**
@@ -56,13 +50,18 @@ class SocialLoginTwigExtensions extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'sociallogin' =>  new \Twig_Function_Method($this, 'getSocialLogin'),
+            'sociallogin'  =>  new \Twig_Function_Method($this, 'getSocialLogin'),
+            'sociallogout' =>  new \Twig_Function_Method($this, 'getSocialLogout')
         );
     }
 
     public function getSocialLogin()
     {
-        $interface = new UserInterface($this->app, $this->config);
-        return $interface->doDisplayLogin();
+        return $this->interface->doDisplayLogin();
+    }
+
+    public function getSocialLogin()
+    {
+        return $this->interface->doDisplayLogout();
     }
 }
