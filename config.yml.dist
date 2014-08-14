@@ -1,6 +1,6 @@
 # The basepath for the extension's routes. Do not include the leading slash ('/')
-# This path determines the location used to log in or out, like '/authenticate/login'
-basepath: "authenticate"
+# This path determines the location used to log in or out, like '/sociallogin/login'
+basepath: "sociallogin"
 
 # enabled OpenID providers
 # options are dependent on the values for hybridauth
