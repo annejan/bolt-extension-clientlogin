@@ -35,7 +35,7 @@ class Extension extends \Bolt\BaseExtension
             $this->setController();
 
             // Tig functions
-            $this->app['twig']->addExtension(new SocialLoginTwigExtensions());
+            $this->app['twig']->addExtension(new SocialLoginTwigExtensions($this->app));
 
             //$hybridauth = new \Hybrid_Auth(array());
         }
