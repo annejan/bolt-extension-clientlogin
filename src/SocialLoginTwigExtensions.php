@@ -8,13 +8,18 @@ namespace SocialLogin;
 class SocialLoginTwigExtensions extends \Twig_Extension
 {
     /**
+     * @var \Bolt\Application
+     */
+    private $app;
+
+    /**
      * @var Twig environment
      */
     private $twig = null;
 
-    public function __construct()
+    public function __construct(\Bolt\Application $app)
     {
-        //
+        $this->app = $app;
     }
 
     /**
@@ -51,6 +56,7 @@ class SocialLoginTwigExtensions extends \Twig_Extension
 
     public function getSocialLogin()
     {
-        return '';
+        $interface = new UserInterface($this->app);
+        return $interface->displayLogin();
     }
 }
