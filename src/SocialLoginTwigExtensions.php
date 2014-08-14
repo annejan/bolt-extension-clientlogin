@@ -63,6 +63,6 @@ class SocialLoginTwigExtensions extends \Twig_Extension
     public function getSocialLogin()
     {
         $interface = new UserInterface($this->app, $this->config);
-        return $interface->displayLogin();
+        return $interface->doDisplayLogin();
     }
 }

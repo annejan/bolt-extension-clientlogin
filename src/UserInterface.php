@@ -32,15 +32,15 @@ class UserInterface
      *
      * @return \Twig_Markup
      */
-    public function displayLogin()
+    public function doDisplayLogin()
     {
         $buttons = array();
 
         foreach($this->config['providers'] as $provider => $values) {
             if($values['enabled']==true) {
-                $label = !empty($values['label'])?$values['label']:$provider;
-                $buttons[] = $this->formatButton(
-                    $this->app['paths']['root'] . $this->config['basepath']. '/login?provider='. $provider,
+                $label = !empty($values['label']) ? $values['label'] : $provider;
+                $buttons[] = $this->doFormatButton(
+                    $this->app['paths']['root'] . $this->config['basepath'] . '/login?provider=' . $provider,
                     $label);
             }
         }
@@ -57,7 +57,7 @@ class UserInterface
      * @param string $label
      * @return \Twig_Markup
      */
-    private function formatButton($link, $label)
+    private function doFormatButton($link, $label)
     {
         $template = $this->config['template']['button'];
         $context = array(
