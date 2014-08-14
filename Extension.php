@@ -88,7 +88,7 @@ class Extension extends \Bolt\BaseExtension
                 $table = $schema->createTable($table_prefix . "sociallogin_sessions");
                 $table->addColumn("id", "integer", array('autoincrement' => true));
                 $table->setPrimaryKey(array("id"));
-                $table->addColumn("user_id", "integer");
+                $table->addColumn("userid", "integer");
                 $table->addColumn("sessiontoken", "string", array('length' => 64));
                 $table->addColumn("lastseen", "datetime");
                 $table->addIndex(array("userid"));
