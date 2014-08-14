@@ -47,7 +47,7 @@ class Extension extends \Bolt\BaseExtension
         $this->controller = new Controller($this->app, $this->config);
 
         // Default route
-        $this->app->match("", array($this->controller, 'getMemberRoot'))
+        $this->app->match($this->config['basepath'], array($this->controller, 'getMemberRoot'))
                   ->bind('getMemberRoot')
                   ->method('GET');
 
