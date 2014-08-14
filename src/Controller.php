@@ -3,7 +3,7 @@
 namespace SocialLogin;
 
 /**
- * Membership profiles
+ * Authentication controller
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
@@ -11,40 +11,40 @@ class Controller
 {
     /**
      *
-     * @param Silex\Application $app
+     * @param \Silex\Application $app
      * @return multitype:
      */
-    public function getMemberRoot(Silex\Application $app = null)
+    public function getAuthenticationRoot(\Silex\Application $app = null)
     {
         return array();
     }
 
     /**
      *
-     * @param Silex\Application $app
+     * @param \Silex\Application $app
      * @return multitype:
      */
-    public function getMemberLogin(Silex\Application $app = null)
+    public function getAuthenticationLogin(\Silex\Application $app = null)
     {
         return array();
     }
 
     /**
      *
-     * @param Silex\Application $app
+     * @param \Silex\Application $app
      * @return multitype:
      */
-    public function getMemberLogout(Silex\Application $app = null)
+    public function getAuthenticationLogout(\Silex\Application $app = null)
     {
         return array();
     }
 
     /**
      *
-     * @param Silex\Application $app
+     * @param \Silex\Application $app
      * @return multitype:
      */
-    public function getMemberEndpoint(Silex\Application $app = null)
+    public function getAuthenticationEndpoint(\Silex\Application $app = null)
     {
         return array();
     }

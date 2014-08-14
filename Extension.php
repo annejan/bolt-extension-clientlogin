@@ -47,23 +47,23 @@ class Extension extends \Bolt\BaseExtension
         $this->controller = new Controller($this->app, $this->config);
 
         // Default route
-        $this->app->match($this->config['basepath'], array($this->controller, 'getMemberRoot'))
-                  ->bind('getMemberRoot')
+        $this->app->match($this->config['basepath'], array($this->controller, 'getAuthenticationRoot'))
+                  ->bind('getAuthenticationRoot')
                   ->method('GET');
 
         // Member login
-        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getMemberLogin'))
-                  ->bind('getMemberLogin')
+        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getAuthenticationLogin'))
+                  ->bind('getAuthenticationLogin')
                   ->method('GET');
 
         // Member logout
-        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getMemberLogout'))
-                  ->bind('getMemberLogout')
+        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getAuthenticationLogout'))
+                  ->bind('getAuthenticationLogout')
                   ->method('GET');
 
         // OAuth callback URI
-        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getMemberEndpoint'))
-                  ->bind('getMemberEndpoint')
+        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getAuthenticationEndpoint'))
+                  ->bind('getAuthenticationEndpoint')
                   ->method('POST');
     }
 
