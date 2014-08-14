@@ -2,6 +2,11 @@
 
 namespace SocialLogin;
 
+use Silex;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 /**
  * Authentication controller
  *
@@ -14,7 +19,7 @@ class Controller
      * @param \Silex\Application $app
      * @return multitype:
      */
-    public function getAuthenticationRoot(\Silex\Application $app = null)
+    public function getAuthenticationRoot(\Silex\Application $app, Request $request)
     {
         return array();
     }
@@ -24,7 +29,7 @@ class Controller
      * @param \Silex\Application $app
      * @return multitype:
      */
-    public function getAuthenticationLogin(\Silex\Application $app = null)
+    public function getAuthenticationLogin(\Silex\Application $app, Request $request)
     {
         return array();
     }
@@ -34,7 +39,7 @@ class Controller
      * @param \Silex\Application $app
      * @return multitype:
      */
-    public function getAuthenticationLogout(\Silex\Application $app = null)
+    public function getAuthenticationLogout(\Silex\Application $app, Request $request)
     {
         return array();
     }
@@ -44,7 +49,7 @@ class Controller
      * @param \Silex\Application $app
      * @return multitype:
      */
-    public function getAuthenticationEndpoint(\Silex\Application $app = null)
+    public function getAuthenticationEndpoint(\Silex\Application $app, Request $request)
     {
         return array();
     }
