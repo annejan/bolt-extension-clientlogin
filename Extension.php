@@ -46,11 +46,6 @@ class Extension extends \Bolt\BaseExtension
         // Create controller object
         $this->controller = new Controller($this->app, $this->config);
 
-        // Default route
-        $this->app->match($this->config['basepath'], array($this->controller, 'getAuthenticationRoot'))
-                  ->bind('getAuthenticationRoot')
-                  ->method('GET');
-
         // Member login
         $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getAuthenticationLogin'))
                   ->bind('getAuthenticationLogin')

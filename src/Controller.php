@@ -19,16 +19,6 @@ class Controller
      * @param \Silex\Application $app
      * @return multitype:
      */
-    public function getAuthenticationRoot(\Silex\Application $app, Request $request)
-    {
-        return array();
-    }
-
-    /**
-     *
-     * @param \Silex\Application $app
-     * @return multitype:
-     */
     public function getAuthenticationLogin(\Silex\Application $app, Request $request)
     {
         return array();
