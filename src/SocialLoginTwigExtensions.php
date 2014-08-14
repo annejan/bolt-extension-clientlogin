@@ -13,13 +13,19 @@ class SocialLoginTwigExtensions extends \Twig_Extension
     private $app;
 
     /**
+     * @var Extension config array
+     */
+    private $config;
+
+    /**
      * @var Twig environment
      */
     private $twig = null;
 
-    public function __construct(\Bolt\Application $app)
+    public function __construct(\Bolt\Application $app, $config)
     {
         $this->app = $app;
+        $this->config = $config;
     }
 
     /**
@@ -56,7 +62,7 @@ class SocialLoginTwigExtensions extends \Twig_Extension
 
     public function getSocialLogin()
     {
-        $interface = new UserInterface($this->app);
+        $interface = new UserInterface($this->app, $this->config);
         return $interface->displayLogin();
     }
 }
