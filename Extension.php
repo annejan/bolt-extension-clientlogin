@@ -22,7 +22,7 @@ class Extension extends \Bolt\BaseExtension
     public function initialize()
     {
         if (empty($this->config['basepath'])) {
-            $this->config['basepath'] = "visitors";
+            $this->config['basepath'] = "sociallogin";
         }
 
         if ($this->app['config']->getWhichEnd() == 'backend') {
@@ -52,17 +52,17 @@ class Extension extends \Bolt\BaseExtension
                   ->method('GET');
 
         // Member login
-        $this->app->match("/login", array($this->controller, 'getMemberLogin'))
+        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getMemberLogin'))
                   ->bind('getMemberLogin')
                   ->method('GET');
 
         // Member logout
-        $this->app->match("/login", array($this->controller, 'getMemberLogout'))
+        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getMemberLogout'))
                   ->bind('getMemberLogout')
                   ->method('GET');
 
         // OAuth callback URI
-        $this->app->match("/login", array($this->controller, 'getMemberEndpoint'))
+        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getMemberEndpoint'))
                   ->bind('getMemberEndpoint')
                   ->method('POST');
     }
