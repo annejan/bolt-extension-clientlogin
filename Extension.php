@@ -52,12 +52,12 @@ class Extension extends \Bolt\BaseExtension
                   ->method('GET');
 
         // Member logout
-        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getAuthenticationLogout'))
+        $this->app->match("{$this->config['basepath']}/logout", array($this->controller, 'getAuthenticationLogout'))
                   ->bind('getAuthenticationLogout')
                   ->method('GET');
 
         // OAuth callback URI
-        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getAuthenticationEndpoint'))
+        $this->app->match("{$this->config['basepath']}/endpoint", array($this->controller, 'getAuthenticationEndpoint'))
                   ->bind('getAuthenticationEndpoint')
                   ->method('POST');
     }
