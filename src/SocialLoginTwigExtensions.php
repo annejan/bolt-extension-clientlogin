@@ -60,7 +60,7 @@ class SocialLoginTwigExtensions extends \Twig_Extension
         return $this->interface->doDisplayLogin();
     }
 
-    public function getSocialLogin()
+    public function getSocialLogout()
     {
         return $this->interface->doDisplayLogout();
     }
