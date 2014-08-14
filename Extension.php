@@ -73,7 +73,7 @@ class Extension extends \Bolt\BaseExtension
         // CREATE TABLE 'bolt_visitors'
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_prefix) {
-                $table = $schema->createTable($table_prefix . "visitors");
+                $table = $schema->createTable($table_prefix . "sociallogin_users");
                 $table->addColumn("id", "integer", array('autoincrement' => true));
                 $table->setPrimaryKey(array("id"));
                 $table->addColumn("username", "string", array("length" => 64));
@@ -87,13 +87,13 @@ class Extension extends \Bolt\BaseExtension
         // CREATE TABLE 'bolt_visitors_sessions'
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_prefix) {
-                $table = $schema->createTable($table_prefix . "visitors_sessions");
+                $table = $schema->createTable($table_prefix . "sociallogin_sessions");
                 $table->addColumn("id", "integer", array('autoincrement' => true));
                 $table->setPrimaryKey(array("id"));
-                $table->addColumn("visitor_id", "integer");
+                $table->addColumn("user_id", "integer");
                 $table->addColumn("sessiontoken", "string", array('length' => 64));
                 $table->addColumn("lastseen", "datetime");
-                $table->addIndex(array("visitor_id"));
+                $table->addIndex(array("userid"));
                 $table->addIndex(array("sessiontoken"));
                 return $table;
             }
