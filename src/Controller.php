@@ -46,7 +46,7 @@ class Controller
             $provider = $request->query->get('provider');
 
             if ($provider) {
-                //
+                // Attempt login
                 $result = $auth->doLogin($provider);
 
                 if ($result['result']) {
