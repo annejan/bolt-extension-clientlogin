@@ -24,7 +24,7 @@ class Session
      */
     private $config;
 
-    public function __construct(Bolt\Application $app, $config)
+    public function __construct(\Bolt\Application $app, $config)
     {
         $this->app = $app;
         $this->config = $config;
