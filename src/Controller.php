@@ -41,7 +41,7 @@ class Controller
 
         if ($auth->isLoggedIn()) {
             // User is already logged in, return them... somewhere
-            $this->doRedirect();
+            $this->doRedirect($this->app);
         } else {
             $provider = $request->query->get('provider');
 
@@ -51,7 +51,7 @@ class Controller
 
                 if ($result['result']) {
                     // Login done, redirect
-                    $this->doRedirect();
+                    $this->doRedirect($this->app);
                 } else {
                     return $result['error'];
                 }
@@ -62,7 +62,7 @@ class Controller
             }
         }
 
-        return $this->page($title, $markup);
+        return;
     }
 
     /**
@@ -76,13 +76,14 @@ class Controller
     }
 
     /**
+     * HybridAuth endpoint — passes all login requests to HybridAuth
      *
      * @param \Silex\Application $app
      * @return multitype:
      */
     public function getAuthenticationEndpoint(\Silex\Application $app, Request $request)
     {
-        return array();
+        \Hybrid_Endpoint::process();
     }
 
     /**
