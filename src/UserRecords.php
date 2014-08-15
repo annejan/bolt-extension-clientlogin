@@ -56,7 +56,9 @@ class UserRecords
             );
             $this->user = $this->app['db']->fetchAssoc($query, $map);
 
-            if (!empty($this->user['id'])) {
+            if (empty($this->user['id'])) {
+                return false;
+            } else {
                 // Get the assocaited session
                 $query = "SELECT * FROM " . $this->getTableNameSessions() .
                          " WHERE userid = :userid ORDER BY lastseen DESC";
@@ -64,9 +66,9 @@ class UserRecords
                     ':userid' => $this->user['id']
                 );
                 $this->session = $this->app['db']->fetchAssoc($query, $map);
-            }
 
-            return true;
+                return true;
+            }
         }
     }
 
@@ -172,7 +174,7 @@ return $this->app['db']->lastInsertId();
                 $table->addColumn("username", "string", array("length" => 64));
                 $table->addColumn("provider", "string", array("length" => 64));
                 $table->addColumn("providerdata", "text");
-                $table->addColumn("apptoken", "string", array("length" => 64, 'notnull' => false));
+                //$table->addColumn("apptoken", "string", array("length" => 64, 'notnull' => false));
                 return $table;
             }
         );
