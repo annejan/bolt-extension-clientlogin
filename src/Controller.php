@@ -31,8 +31,10 @@ class Controller
     }
 
     /**
+     * Logout controller
      *
      * @param \Silex\Application $app
+     * @param Request $request
      * @return multitype:
      */
     public function getAuthenticationLogin(\Silex\Application $app, Request $request)
@@ -64,13 +66,19 @@ class Controller
     }
 
     /**
+     * Logout controller
      *
      * @param \Silex\Application $app
-     * @return multitype:
+     * @param Request $request
      */
     public function getAuthenticationLogout(\Silex\Application $app, Request $request)
     {
-        return array();
+        $auth = new Session($this->app, $this->config);
+
+        $auth->doLogout();
+
+        // Logout done, redirect
+        $this->doRedirect($this->app);
     }
 
     /**

@@ -134,7 +134,16 @@ class Session
      */
     public function doLogout()
     {
-        $this->isLoggedIn = false;
+        $this->getToken();
+
+        if ($this->token) {
+            $records = new UserRecords($this->app, $this->config);
+
+            $records->doRemoveSession(array('sessiontoken' => $this->token));
+
+            $this->member = false;
+            $this->isLoggedIn = false;
+        }
     }
 
     /**
@@ -157,6 +166,14 @@ class Session
             $this->isLoggedIn = false;
             return false;
         }
+    }
+
+    /**
+     * Get the users session cookie
+     */
+    private function getToken()
+    {
+        $this->token = $this->app['session']->set('sessiontoken', $this->token);
     }
 
     /**
