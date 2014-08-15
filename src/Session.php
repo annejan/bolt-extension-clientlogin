@@ -10,6 +10,16 @@ namespace SocialLogin;
 class Session
 {
     /**
+     * @var The current authenticated site member
+     */
+    public $member = false;
+
+    /**
+     * @var User cookie token
+     */
+    public $token;
+
+    /**
      * @var Boolean that is true if session is active
      */
     private $isLoggedIn = false;
@@ -47,8 +57,10 @@ class Session
      */
     public function doLogin($provider)
     {
+        // Check for extisting token
         if ($this->doCheckLogin()) {
-            return true;
+            $this->isLoggedIn = true;
+            return array('result' => true, 'error' => '');
         } else {
 
             // Attempt a HybridAuth login
@@ -82,20 +94,19 @@ class Session
                 // Try to authenticate with the selected provider
                 $adapter = $hybridauth->authenticate($providertype, $provideroptions);
 
-                // then grab the user profile
-                $user_profile = $adapter->getUserProfile();
+                // Grab the user profile from HybridAuth
+                $profile = $adapter->getUserProfile();
 
-                if($user_profile) {
+                if($profile) {
                     $records = new UserRecords($this->app, $this->config);
 
+                    // If user record doesn't exist, create it
+                    if (!$records->getUserByName($username, $provider)) {
+                        $records->doCreateuser($provider, $profile)
+                    }
 
-
-
-
-
-
-
-
+                    // User has either just been created or has no token, set it
+                    $this->setToken($records->user['id']);
                 }
             } catch(Exception $e) {
                 $html =  "<pre>Error: please try again!<pre><br>";
@@ -124,6 +135,51 @@ class Session
      */
     public function doCheckLogin()
     {
-        //$this->isLoggedIn = true;
+        // If $member is set, we've been here, done this
+        if ($this->member) {
+            return true;
+        }
+        // Get client 'sessiontoken' if exists
+        $token = $app['session']->get('sessiontoken');
+
+        $records = new UserRecords($this->app, $this->config);
+        if ($records->getUserBySession($token)) {
+            $this->isLoggedIn = true;
+            return true;
+        } else {
+            $this->isLoggedIn = false;
+            return false;
+        }
+
+    }
+
+    /**
+     * Set the users session cookie
+     *
+     * @param integer $id
+     */
+    private function setToken($id)
+    {
+        // Create a unique token
+        $this->token = $this->doCreateToken() . $this->doCreateToken($id);
+
+        // Set session cookie
+        $this->session->set('sessiontoken', $this->token);
+    }
+
+    /**
+     * Create new session token. Should be reasonably unique
+     *
+     * @param string $key Optional salt for the returned token
+     * @return string
+     */
+    private function doCreateToken($key = null)
+    {
+        if(!$key) {
+            $seed = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'] . $_SERVER["REQUEST_TIME"];
+        } else {
+            $seed = $_SERVER['REMOTE_ADDR'] . $key . $_SERVER["REQUEST_TIME"];
+        }
+        return md5($seed);
     }
 }
