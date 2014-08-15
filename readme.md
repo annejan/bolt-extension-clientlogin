@@ -83,8 +83,14 @@ Login Link(s)
 ----------
 
 There are two Twig function options for displaying the login links:
-    {{ clientlogout() }} 
+
+```
+    {{ clientlogout() }}
+```
+
+``` 
     {{ clientlogin(true) }}
+```
     
 In the first instance, after authentication a user is redirected to the homepage.
 
@@ -94,9 +100,14 @@ Logout Link
 -----------
 
 As with login, there are two options for the logout links:
-    {{ clientlogout() }}
-    {{ clientlogout(true) }}
 
+```
+    {{ clientlogout() }}
+```
+
+```
+    {{ clientlogout(true) }}
+```
 In the first instance, after logging out a user is redirected to the homepage.
 
 By supplying the paramter `true` the user is redirected back to the current page.
@@ -114,26 +125,6 @@ Check if $visitor is `empty()` to see if we have a logged on user, from your cod
 If logged on, you'll get an array with the username, id, avatar and information 
 supplied by the provider.
 
-
-Template example
-----------------
-
-If you want to use this in a template, you can use the following code:
-
-    {% if knownvisitor() %}
-        <p>Hello, {{ visitor.username }}.</p>
-        {{ showvisitorlogout() }}
-    {% else %}
-        {{ showvisitorlogin() }}
-    {% endif %}
-
-
-Show the full profile
----------------------
-
-    {% if knownvisitor() %}
-        {{ showvisitorprofile() }}
-    {% endif %}
 
 Frontend Access Control
 =======================
