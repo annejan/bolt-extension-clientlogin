@@ -63,7 +63,7 @@ class Extension extends \Bolt\BaseExtension
         // OAuth callback URI
         $this->app->match("{$this->config['basepath']}/endpoint", array($this->controller, 'getAuthenticationEndpoint'))
                   ->bind('getAuthenticationEndpoint')
-                  ->method('POST');
+                  ->method('GET|POST');
     }
 
     /**
