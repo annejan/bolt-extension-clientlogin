@@ -66,6 +66,9 @@ class Session
             // Attempt a HybridAuth login
             try {
 
+                // Pass the base endpoint URL to HybridAuth
+                $this->config['base_url'] = $this->app['paths']['rooturl'] . $this->config['basepath'] . '/endpoint';
+
                 // Get the type early - because we might need to enable it
                 if (isset($this->config['providers'][$provider]['type'])) {
                     $providertype = $this->config['providers'][$provider]['type'];
@@ -78,18 +81,15 @@ class Session
                     $this->config['providers']['OpenID']['enabled'] = true;
                 }
 
-                // Pass the base endpoint URL to HybridAuth
-                $this->config['base_url'] = $this->app['paths']['rooturl'] . $this->config['basepath'] . '/endpoint';
-
-                // Initialize the authentication with the modified config
-                $hybridauth = new \Hybrid_Auth($this->config);
-
                 $provideroptions = array();
                 if ($providertype == 'OpenID' && !empty($this->config['providers'][$provider]['openid_identifier'])) {
                     // Try to authenticate with the selected OpenID provider
                     $providerurl = $this->config['providers'][$provider]['openid_identifier'];
                     $provideroptions["openid_identifier"] = $providerurl;
                 }
+
+                // Initialize the authentication with the modified config
+                $hybridauth = new \Hybrid_Auth($this->config);
 
                 // Try to authenticate with the selected provider
                 $adapter = $hybridauth->authenticate($providertype, $provideroptions);
@@ -101,8 +101,12 @@ class Session
                     $records = new UserRecords($this->app, $this->config);
 
                     // If user record doesn't exist, create it
-                    if (!$records->getUserByName($profile->displayName, $provider)) {
-                        $records->doCreateuser($provider, $profile);
+                    if (!$records->getUserProfileByName($profile->displayName, $provider)) {
+                        $records->doCreateUserProfile($provider, $profile);
+                    }
+
+                    if (!getUserSessionByID($records->user['id'])) {
+                        $records->doCreateUserSession($this->token);
                     }
 
                     // User has either just been created or has no token, set it
@@ -143,7 +147,7 @@ class Session
         $token = $this->app['session']->get('sessiontoken');
 
         $records = new UserRecords($this->app, $this->config);
-        if ($records->getUserBySession($token)) {
+        if ($records->getUserProfileBySession($token)) {
             $this->isLoggedIn = true;
             return true;
         } else {

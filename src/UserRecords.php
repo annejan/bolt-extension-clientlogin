@@ -37,12 +37,13 @@ class UserRecords
     }
 
     /**
+     * Look up a users database profile
      *
      * @param string $username
      * @param string $provider
-     * @return boolean
+     * @return boolean True if user record found
      */
-    public function getUserByName($username, $provider)
+    public function getUserProfileByName($username, $provider)
     {
         if ($this->user) {
             return true;
@@ -59,14 +60,6 @@ class UserRecords
             if (empty($this->user['id'])) {
                 return false;
             } else {
-                // Get the assocaited session
-                $query = "SELECT * FROM " . $this->getTableNameSessions() .
-                         " WHERE userid = :userid ORDER BY lastseen DESC";
-                $map = array(
-                    ':userid' => $this->user['id']
-                );
-                $this->session = $this->app['db']->fetchAssoc($query, $map);
-
                 return true;
             }
         }
@@ -81,7 +74,7 @@ class UserRecords
      * @param string $token The PHP session token to query
      * @return boolean
      */
-    public function getUserBySession($token)
+    public function getUserProfileBySession($token)
     {
         $query = "SELECT * from " . $this->getTableNameSessions() .
                  " WHERE sessiontoken = :sessiontoken";
@@ -111,7 +104,37 @@ class UserRecords
         return false;
     }
 
-    public function doCreateuser($provider, $profile)
+    /**
+     * Lookup user session by user ID
+     *
+     * @param integer $id
+     * @return boolean
+     */
+    public function getUserSessionByID($id)
+    {
+        // Get the assocaited session
+        $query = "SELECT * FROM " . $this->getTableNameSessions() .
+                 " WHERE userid = :userid ORDER BY lastseen DESC";
+        $map = array(
+            ':userid' => $id
+        );
+        $this->session = $this->app['db']->fetchAssoc($query, $map);
+
+        if (empty($this->session['id'])) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Create a user profile record
+     *
+     * @param string $provider
+     * @param array $profile
+     * @return boolean
+     */
+    public function doCreateUserProfile($provider, $profile)
     {
         $json = json_encode($profile);
 
@@ -122,6 +145,25 @@ class UserRecords
         );
 
         $result = $this->app['db']->insert($this->getTableNameProfiles(), $content);
+// XXX remove when tested
+return $this->app['db']->lastInsertId();
+
+        if ($result) {
+            return $this->app['db']->lastInsertId();
+        } else {
+            return false;
+        }
+    }
+
+    public function doCreateUserSession($token)
+    {
+        $content = array(
+            'visitor_id' =>  $this->user['id'],
+            'lastseen' => date('Y-m-d H:i:s', $_SERVER["REQUEST_TIME"]),
+            'sessiontoken' => $token
+        );
+
+        $result = $this->app['db']->insert($this->getTableNameSessions(), $content);
 // XXX remove when tested
 return $this->app['db']->lastInsertId();
 
