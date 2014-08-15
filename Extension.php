@@ -1,6 +1,6 @@
 <?php
 
-namespace SocialLogin;
+namespace ClientLogin;
 
 /**
  * Social Login with OAuth via HybridAuth
@@ -10,13 +10,13 @@ namespace SocialLogin;
 class Extension extends \Bolt\BaseExtension
 {
     /**
-     * @var SocialLogin\Controller
+     * @var ClientLogin\Controller
      */
     private $controller;
 
     public function getName()
     {
-        return "SocialLogin";
+        return "ClientLogin";
     }
 
     public function initialize()
@@ -42,7 +42,7 @@ class Extension extends \Bolt\BaseExtension
             $this->setController();
 
             // Twig functions
-            $this->app['twig']->addExtension(new SocialLoginTwigExtensions($this->app, $this->config));
+            $this->app['twig']->addExtension(new ClientLoginTwigExtensions($this->app, $this->config));
         }
     }
 

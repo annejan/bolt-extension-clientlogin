@@ -1,6 +1,6 @@
 <?php
 
-namespace SocialLogin;
+namespace ClientLogin;
 
 use Silex;
 use Symfony\Component\HttpFoundation\Request;

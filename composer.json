@@ -1,10 +1,10 @@
 {
-	"name" : "bolt/sociallogin",
-	"description" : "OAuth social login for Bolt frontend",
+	"name" : "bolt/clientlogin",
+	"description" : "OAuth login for Bolt frontend",
 	"type" : "bolt-extension",
 	"keywords" : [
-		"social",
 		"oauth",
+		"login",
 		"Google",
 		"Facebook",
 		"Twitter"
@@ -23,7 +23,7 @@
 			"init.php"
 		],
 		"psr-4" : {
-			"SocialLogin\\" : [
+			"ClientLogin\\" : [
 				"",
 				"src/"
 			]

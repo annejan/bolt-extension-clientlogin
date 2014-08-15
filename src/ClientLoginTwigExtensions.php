@@ -1,11 +1,11 @@
 <?php
 
-namespace SocialLogin;
+namespace ClientLogin;
 
 /**
  * Twig functions
  */
-class SocialLoginTwigExtensions extends \Twig_Extension
+class ClientLoginTwigExtensions extends \Twig_Extension
 {
     /**
      * @var UserInterface class object
@@ -50,12 +50,12 @@ class SocialLoginTwigExtensions extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'sociallogin'  =>  new \Twig_Function_Method($this, 'getSocialLogin'),
+            'sociallogin'  =>  new \Twig_Function_Method($this, 'getClientLogin'),
             'sociallogout' =>  new \Twig_Function_Method($this, 'getSocialLogout')
         );
     }
 
-    public function getSocialLogin($redirect = false)
+    public function getClientLogin($redirect = false)
     {
         return $this->interface->doDisplayLogin($redirect);
     }

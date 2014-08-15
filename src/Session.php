@@ -1,6 +1,6 @@
 <?php
 
-namespace SocialLogin;
+namespace ClientLogin;
 
 /**
  * Authentication class
