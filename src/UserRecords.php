@@ -48,7 +48,7 @@ class UserRecords
             return true;
         } else {
             // Get the user record
-            $query = "SELECT * FROM " . $this->getTableNameUser() .
+            $query = "SELECT * FROM " . $this->getTableNameProfiles() .
                      " WHERE username = :username AND provider = :provider";
             $map = array(
                 ':username' => $username,
@@ -89,7 +89,7 @@ class UserRecords
 
         if (!empty($this->session['userid'])) {
             // Get the user record
-            $query = "SELECT * FROM " . $this->getTableNameUser() .
+            $query = "SELECT * FROM " . $this->getTableNameProfiles() .
                      " WHERE id = :id";
             $map = array(
                 ':id' => $this->session['userid']
@@ -119,7 +119,7 @@ class UserRecords
             'providerdata' => $json
         );
 
-        $result = $this->db->insert($this->getTableNameUser(), $content);
+        $result = $this->db->insert($this->getTableNameProfiles(), $content);
 // XXX remove when tested
 return $this->db->lastInsertId();
 
@@ -140,7 +140,7 @@ return $this->db->lastInsertId();
         if (empty($match)) {
             return;
         }
-        $this->db->delete($this->getTableNameUser(), $match);
+        $this->db->delete($this->getTableNameProfiles(), $match);
     }
 
     /**
@@ -156,21 +156,59 @@ return $this->db->lastInsertId();
         $this->db->delete($this->getTableNameSession(), $match);
     }
 
+
+    /**
+     * Create/update database tables
+     */
+    public function dbCheck()
+    {
+        // User/client provider table
+        $table_name = $this->getTableNameProfiles();
+        $this->app['integritychecker']->registerExtensionTable(
+            function ($schema) use ($table_name) {
+                $table = $schema->createTable($table_name);
+                $table->addColumn("id", "integer", array('autoincrement' => true));
+                $table->setPrimaryKey(array("id"));
+                $table->addColumn("username", "string", array("length" => 64));
+                $table->addColumn("provider", "string", array("length" => 64));
+                $table->addColumn("providerdata", "text");
+                $table->addColumn("apptoken", "string", array("length" => 64, 'notnull' => false));
+                return $table;
+            }
+        );
+
+        // User/client session table
+        $table_name = $this->getTableNameSession();
+        $this->app['integritychecker']->registerExtensionTable(
+            function ($schema) use ($table_name) {
+                $table = $schema->createTable($table_name);
+                $table->addColumn("id", "integer", array('autoincrement' => true));
+                $table->setPrimaryKey(array("id"));
+                $table->addColumn("userid", "integer");
+                $table->addColumn("sessiontoken", "string", array('length' => 64));
+                $table->addColumn("lastseen", "datetime");
+                $table->addIndex(array("userid"));
+                $table->addIndex(array("sessiontoken"));
+                return $table;
+            }
+        );
+    }
+
     /**
      * Get the name of the user record table
      *
      * @return string
      */
-    private function getTableNameUser()
+    private function getTableNameProfiles()
     {
-        $this->prefix = $this->config->get('general/database/prefix', "bolt_");
+        $this->prefix = $this->app['config']->get('general/database/prefix', "bolt_");
 
         // Make sure prefix ends in '_'. Prefixes without '_' are lame..
         if ($this->prefix[ strlen($this->prefix)-1 ] != "_") {
             $this->prefix .= "_";
         }
 
-        return $this->prefix . 'sociallogin_users';
+        return $this->prefix . 'client_profiles';
     }
 
     /**
@@ -180,13 +218,13 @@ return $this->db->lastInsertId();
      */
     private function getTableNameSession()
     {
-        $this->prefix = $this->config->get('general/database/prefix', "bolt_");
+        $this->prefix = $this->app['config']->get('general/database/prefix', "bolt_");
 
         // Make sure prefix ends in '_'. Prefixes without '_' are lame..
         if ($this->prefix[ strlen($this->prefix)-1 ] != "_") {
             $this->prefix .= "_";
         }
 
-        return $this->prefix . 'sociallogin_sessions';
+        return $this->prefix . 'client_sessions';
     }
 }
