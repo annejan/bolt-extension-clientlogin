@@ -54,7 +54,7 @@ class UserRecords
                 ':username' => $username,
                 ':provider' => $provider
             );
-            $this->user = $this->db->fetchAssoc($query, $map);
+            $this->user = $this->app['db']->fetchAssoc($query, $map);
 
             if (!empty($this->user['id'])) {
                 // Get the assocaited session
@@ -63,7 +63,7 @@ class UserRecords
                 $map = array(
                     ':userid' => $this->user['id']
                 );
-                $this->session = $this->db->fetchAssoc($query, $map);
+                $this->session = $this->app['db']->fetchAssoc($query, $map);
             }
 
             return true;
@@ -85,7 +85,7 @@ class UserRecords
                  " WHERE sessiontoken = :sessiontoken";
         $map = array(':sessiontoken' => $token);
 
-        $this->session = $this->db->fetchAssoc($query, $map);
+        $this->session = $this->app['db']->fetchAssoc($query, $map);
 
         if (!empty($this->session['userid'])) {
             // Get the user record
@@ -94,7 +94,7 @@ class UserRecords
             $map = array(
                 ':id' => $this->session['userid']
             );
-            $this->user = $this->db->fetchAssoc($query, $map);
+            $this->user = $this->app['db']->fetchAssoc($query, $map);
 
             // Check we've got a valid record
             if (empty($this->user['id']))
@@ -119,12 +119,12 @@ class UserRecords
             'providerdata' => $json
         );
 
-        $result = $this->db->insert($this->getTableNameProfiles(), $content);
+        $result = $this->app['db']->insert($this->getTableNameProfiles(), $content);
 // XXX remove when tested
-return $this->db->lastInsertId();
+return $this->app['db']->lastInsertId();
 
         if ($result) {
-            return $this->db->lastInsertId();
+            return $this->app['db']->lastInsertId();
         } else {
             return false;
         }
@@ -140,7 +140,7 @@ return $this->db->lastInsertId();
         if (empty($match)) {
             return;
         }
-        $this->db->delete($this->getTableNameProfiles(), $match);
+        $this->app['db']->delete($this->getTableNameProfiles(), $match);
     }
 
     /**
@@ -153,7 +153,7 @@ return $this->db->lastInsertId();
         if (empty($match)) {
             return;
         }
-        $this->db->delete($this->getTableNameSessions(), $match);
+        $this->app['db']->delete($this->getTableNameSessions(), $match);
     }
 
 
