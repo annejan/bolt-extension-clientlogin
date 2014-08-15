@@ -61,8 +61,6 @@ class Controller
                 return '<pre>Provider not given</pre>';
             }
         }
-
-        return;
     }
 
     /**
