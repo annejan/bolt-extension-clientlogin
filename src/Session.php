@@ -113,6 +113,11 @@ class Session
                         $records->doCreateUserSession($this->token);
                     }
 
+                    // Add frontend role if set up
+                    if (!empty($this->config['role'])) {
+                        $this->setUserRole();
+                    }
+
                     // Success
                     $this->isLoggedIn = true;
                     return array('result' => true, 'error' => '');
@@ -204,5 +209,25 @@ class Session
             $seed = $_SERVER['REMOTE_ADDR'] . $key . $_SERVER["REQUEST_TIME"];
         }
         return md5($seed);
+    }
+
+    /**
+     * Set configured frontend role.  Should match one from permissions.yml
+     */
+    private function setUserRole() {
+        // Safe-guard against the 'root' role being applied
+        if ($this->config['role'] == 'root') {
+            return;
+        }
+
+        if (empty($this->app['users']->currentuser)) {
+            $this->app['users']->currentuser = array('roles' => array(
+                $this->config['role'],
+                'everyone'));
+        } else {
+            if (!isset($this->app['users']->currentuser['roles'][$this->config['role']])) {
+                array_push($this->app['users']->currentuser['roles'], $this->config['role']);
+            }
+        }
     }
 }
