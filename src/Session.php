@@ -54,27 +54,31 @@ class Session
             // Attempt a HybridAuth login
             try {
 
-                // get the type early - because we might need to enable it
+                // Get the type early - because we might need to enable it
                 if (isset($this->config['providers'][$provider]['type'])) {
                     $providertype = $this->config['providers'][$provider]['type'];
                 } else {
                     $providertype = $provider;
                 }
 
-                // enable OpenID
+                // Enable OpenID
                 if($providertype == 'OpenID' && $this->config['providers'][$provider]['enabled'] == true) {
                     $this->config['providers']['OpenID']['enabled'] = true;
                 }
+
+                // Pass the base URL to HybridAuth
+                $this->config['base_url'] = $this->app['paths']['rooturl'];
 
                 // Initialize the authentication with the modified config
                 $hybridauth = new \Hybrid_Auth($this->config);
 
                 $provideroptions = array();
-                if ($providertype=='OpenID' && !empty($this->config['providers'][$provider]['openid_identifier'])) {
+                if ($providertype == 'OpenID' && !empty($this->config['providers'][$provider]['openid_identifier'])) {
                     // Try to authenticate with the selected OpenID provider
                     $providerurl = $this->config['providers'][$provider]['openid_identifier'];
                     $provideroptions["openid_identifier"] = $providerurl;
                 }
+
                 // Try to authenticate with the selected provider
                 $adapter = $hybridauth->authenticate($providertype, $provideroptions);
 
