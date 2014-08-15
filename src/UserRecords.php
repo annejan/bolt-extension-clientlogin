@@ -163,7 +163,6 @@ class UserRecords
         );
 
         $result = $this->app['db']->insert($this->getTableNameSessions(), $content);
-        //$this->app['db']->lastInsertId();
 
         if ($result) {
             return true;
