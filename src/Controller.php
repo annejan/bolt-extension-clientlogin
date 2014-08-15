@@ -57,7 +57,7 @@ class Controller
                 }
 
             } else {
-            // This shouldn't happen, just die here
+                // This shouldn't happen, just die here
                 return '<pre>Provider not given</pre>';
             }
         }
