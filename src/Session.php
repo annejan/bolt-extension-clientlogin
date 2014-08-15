@@ -214,7 +214,8 @@ class Session
     /**
      * Set configured frontend role.  Should match one from permissions.yml
      */
-    private function setUserRole() {
+    private function setUserRole()
+    {
         // Safe-guard against the 'root' role being applied
         if ($this->config['role'] == 'root') {
             return;

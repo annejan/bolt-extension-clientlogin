@@ -92,8 +92,7 @@ class UserRecords
             $this->user = $this->app['db']->fetchAssoc($query, $map);
 
             // Check we've got a valid record
-            if (empty($this->user['id']))
-            {
+            if (empty($this->user['id'])) {
                 // No user profile associtated with this token, remove it
                 $this->doRemoveSession(array('id' => $this->session['id']));
             } else {
