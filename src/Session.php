@@ -126,8 +126,6 @@ class Session
 
                 return array('result' => false, 'error' => $html);
             }
-
-
         }
     }
 
