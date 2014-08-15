@@ -66,8 +66,8 @@ class Session
                     $this->config['providers']['OpenID']['enabled'] = true;
                 }
 
-                // Pass the base URL to HybridAuth
-                $this->config['base_url'] = $this->app['paths']['rooturl'];
+                // Pass the base endpoint URL to HybridAuth
+                $this->config['base_url'] = $this->app['paths']['rooturl'] . $this->config['basepath'] . '/endpoint';
 
                 // Initialize the authentication with the modified config
                 $hybridauth = new \Hybrid_Auth($this->config);
