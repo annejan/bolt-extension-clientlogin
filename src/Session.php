@@ -101,8 +101,8 @@ class Session
                     $records = new UserRecords($this->app, $this->config);
 
                     // If user record doesn't exist, create it
-                    if (!$records->getUserByName($username, $provider)) {
-                        $records->doCreateuser($provider, $profile)
+                    if (!$records->getUserByName($profile['displayName'], $provider)) {
+                        $records->doCreateuser($provider, $profile);
                     }
 
                     // User has either just been created or has no token, set it
