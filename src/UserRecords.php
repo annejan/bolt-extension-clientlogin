@@ -58,7 +58,7 @@ class UserRecords
 
             if (!empty($this->user['id'])) {
                 // Get the assocaited session
-                $query = "SELECT * FROM " . $this->getTableNameSession() .
+                $query = "SELECT * FROM " . $this->getTableNameSessions() .
                          " WHERE userid = :userid ORDER BY lastseen DESC";
                 $map = array(
                     ':userid' => $this->user['id']
@@ -81,7 +81,7 @@ class UserRecords
      */
     public function getUserBySession($token)
     {
-        $query = "SELECT * from " . $this->getTableNameSession() .
+        $query = "SELECT * from " . $this->getTableNameSessions() .
                  " WHERE sessiontoken = :sessiontoken";
         $map = array(':sessiontoken' => $token);
 
@@ -153,7 +153,7 @@ return $this->db->lastInsertId();
         if (empty($match)) {
             return;
         }
-        $this->db->delete($this->getTableNameSession(), $match);
+        $this->db->delete($this->getTableNameSessions(), $match);
     }
 
 
@@ -178,7 +178,7 @@ return $this->db->lastInsertId();
         );
 
         // User/client session table
-        $table_name = $this->getTableNameSession();
+        $table_name = $this->getTableNameSessions();
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_name) {
                 $table = $schema->createTable($table_name);
@@ -216,7 +216,7 @@ return $this->db->lastInsertId();
      *
      * @return string
      */
-    private function getTableNameSession()
+    private function getTableNameSessions()
     {
         $this->prefix = $this->app['config']->get('general/database/prefix', "bolt_");
 
