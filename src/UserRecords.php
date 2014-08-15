@@ -147,7 +147,8 @@ class UserRecords
         $result = $this->app['db']->insert($this->getTableNameProfiles(), $content);
 
         if ($result) {
-            return $this->app['db']->lastInsertId();
+            $this->user['id'] = $this->app['db']->lastInsertId();
+            return true;
         } else {
             return false;
         }
@@ -156,15 +157,16 @@ class UserRecords
     public function doCreateUserSession($token)
     {
         $content = array(
-            'visitor_id' =>  $this->user['id'],
+            'userid' =>  $this->user['id'],
             'lastseen' => date('Y-m-d H:i:s', $_SERVER["REQUEST_TIME"]),
             'sessiontoken' => $token
         );
 
         $result = $this->app['db']->insert($this->getTableNameSessions(), $content);
+        //$this->app['db']->lastInsertId();
 
         if ($result) {
-            return $this->app['db']->lastInsertId();
+            return true;
         } else {
             return false;
         }
