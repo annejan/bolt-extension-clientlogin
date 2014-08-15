@@ -101,7 +101,7 @@ class Session
                     $records = new UserRecords($this->app, $this->config);
 
                     // If user record doesn't exist, create it
-                    if (!$records->getUserByName($profile['displayName'], $provider)) {
+                    if (!$records->getUserByName($profile->displayName, $provider)) {
                         $records->doCreateuser($provider, $profile);
                     }
 
@@ -140,7 +140,7 @@ class Session
             return true;
         }
         // Get client 'sessiontoken' if exists
-        $token = $app['session']->get('sessiontoken');
+        $token = $this->app['session']->get('sessiontoken');
 
         $records = new UserRecords($this->app, $this->config);
         if ($records->getUserBySession($token)) {
@@ -164,7 +164,7 @@ class Session
         $this->token = $this->doCreateToken() . $this->doCreateToken($id);
 
         // Set session cookie
-        $this->session->set('sessiontoken', $this->token);
+        $this->app['session']->set('sessiontoken', $this->token);
     }
 
     /**
