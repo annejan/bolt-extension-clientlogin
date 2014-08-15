@@ -1,0 +1,12 @@
+diff -up a/Hybrid/Provider_Adapter.php b/Hybrid/Provider_Adapter.php
+--- a/Hybrid/Provider_Adapter.php	2014-08-15 03:10:04.472498500 +0100
++++ b/Hybrid/Provider_Adapter.php	2014-08-15 03:12:34.802313600 +0100
+@@ -130,7 +130,7 @@ class Hybrid_Provider_Adapter
+ 		if (empty(Hybrid_Auth::$config["base_url"])) {
+ 	        // the base url wasn't provide, so we must use the current
+ 	        // url (which makes sense actually)
+-			$url  = empty($_SERVER['HTTPS']) ? 'http' : 'https';
++			$url  = empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https';
+ 			$url .= '://' . $_SERVER['HTTP_HOST'];
+ 			$url .= $_SERVER['REQUEST_URI'];
+ 			$HYBRID_AUTH_URL_BASE = $url;
