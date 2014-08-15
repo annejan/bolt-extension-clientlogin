@@ -145,8 +145,6 @@ class UserRecords
         );
 
         $result = $this->app['db']->insert($this->getTableNameProfiles(), $content);
-// XXX remove when tested
-return $this->app['db']->lastInsertId();
 
         if ($result) {
             return $this->app['db']->lastInsertId();
@@ -164,8 +162,6 @@ return $this->app['db']->lastInsertId();
         );
 
         $result = $this->app['db']->insert($this->getTableNameSessions(), $content);
-// XXX remove when tested
-return $this->app['db']->lastInsertId();
 
         if ($result) {
             return $this->app['db']->lastInsertId();

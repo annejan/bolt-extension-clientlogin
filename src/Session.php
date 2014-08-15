@@ -105,7 +105,7 @@ class Session
                         $records->doCreateUserProfile($provider, $profile);
                     }
 
-                    if (!getUserSessionByID($records->user['id'])) {
+                    if (!$records->getUserSessionByID($records->user['id'])) {
                         $records->doCreateUserSession($this->token);
                     }
 
@@ -154,7 +154,6 @@ class Session
             $this->isLoggedIn = false;
             return false;
         }
-
     }
 
     /**
