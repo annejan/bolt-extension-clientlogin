@@ -50,8 +50,8 @@ class ClientLoginTwigExtensions extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'sociallogin'  =>  new \Twig_Function_Method($this, 'getClientLogin'),
-            'sociallogout' =>  new \Twig_Function_Method($this, 'getSocialLogout')
+            'clientlogin'  =>  new \Twig_Function_Method($this, 'getClientLogin'),
+            'clientlogout' =>  new \Twig_Function_Method($this, 'getClientLogout')
         );
     }
 
@@ -60,7 +60,7 @@ class ClientLoginTwigExtensions extends \Twig_Extension
         return $this->interface->doDisplayLogin($redirect);
     }
 
-    public function getSocialLogout($redirect = false, $label = "Logout")
+    public function getClientLogout($redirect = false, $label = "Logout")
     {
         return $this->interface->doDisplayLogout($redirect, $label);
     }
