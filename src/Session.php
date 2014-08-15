@@ -105,12 +105,20 @@ class Session
                         $records->doCreateUserProfile($provider, $profile);
                     }
 
+                    // User has either just been created or has no token, set it
+                    $this->setToken($records->user['id']);
+
+                    // Create the session if need be
                     if (!$records->getUserSessionByID($records->user['id'])) {
                         $records->doCreateUserSession($this->token);
                     }
 
-                    // User has either just been created or has no token, set it
-                    $this->setToken($records->user['id']);
+                    // Success
+                    $this->isLoggedIn = true;
+                    return array('result' => true, 'error' => '');
+                } else {
+                    $this->isLoggedIn = false;
+                    return array('result' => false, 'error' => '<pre>OAuth Error: please try again!<pre>');
                 }
             } catch(Exception $e) {
                 $html =  "<pre>Error: please try again!<pre><br>";
@@ -119,10 +127,7 @@ class Session
                 return array('result' => false, 'error' => $html);
             }
 
-            // Success
-            $this->isLoggedIn = true;
 
-            return array('result' => true, 'error' => '');
         }
     }
 
