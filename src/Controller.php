@@ -93,14 +93,13 @@ class Controller
      */
     private function doRedirect(\Silex\Application $app)
     {
-        $returnpage = $app['request']->headers->get('referer');
-        $returnpage = str_replace($app['paths']['hosturl'], '', $returnpage);
+        $returnpage = $app['request']->get('redirect');
 
         if($returnpage) {
+            $returnpage = str_replace($app['paths']['hosturl'], '', $returnpage);
             simpleredirect($returnpage);
-            exit;
         } else {
-            return redirect('homepage');
+            simpleredirect($app['paths']['hosturl']);
         }
     }
 }

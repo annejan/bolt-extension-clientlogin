@@ -55,13 +55,13 @@ class SocialLoginTwigExtensions extends \Twig_Extension
         );
     }
 
-    public function getSocialLogin()
+    public function getSocialLogin($redirect = false)
     {
-        return $this->interface->doDisplayLogin();
+        return $this->interface->doDisplayLogin($redirect);
     }
 
-    public function getSocialLogout()
+    public function getSocialLogout($redirect = false, $label = "Logout")
     {
-        return $this->interface->doDisplayLogout();
+        return $this->interface->doDisplayLogout($redirect, $label);
     }
 }

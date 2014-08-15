@@ -32,15 +32,19 @@ class UserInterface
      *
      * @return \Twig_Markup
      */
-    public function doDisplayLogin()
+    public function doDisplayLogin($redirect, $target = '')
     {
         $buttons = array();
+
+        if ($redirect) {
+            $target = '&redirect=' . urlencode($this->app['paths']['current']);
+        }
 
         foreach($this->config['providers'] as $provider => $values) {
             if($values['enabled']==true) {
                 $label = !empty($values['label']) ? $values['label'] : $provider;
                 $buttons[] = $this->doFormatButton(
-                    $this->app['paths']['root'] . $this->config['basepath'] . '/login?provider=' . $provider,
+                    $this->app['paths']['root'] . $this->config['basepath'] . '/login?provider=' . $provider . $target,
                     $label);
             }
         }
@@ -55,10 +59,14 @@ class UserInterface
      *
      * @return \Twig_Markup
      */
-    public function doDisplayLogout($label = "Logout")
+    public function doDisplayLogout($redirect, $label)
     {
+        if ($redirect) {
+            $target = '?redirect=' . urlencode($this->app['paths']['current']);
+        }
+
         $logoutlink = $this->formatButton(
-            $this->app['paths']['root'] . $this->config['basepath'].'/logout',
+            $this->app['paths']['root'] . $this->config['basepath'].'/logout' . $target,
             $label);
 
         return new \Twig_Markup($logoutlink, 'UTF-8');
