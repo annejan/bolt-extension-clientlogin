@@ -1,6 +1,6 @@
 {
 	"name" : "bolt/clientlogin",
-	"description" : "OAuth login for Bolt frontend",
+	"description" : "OAuth login for a Bolt site's clients in the frontend",
 	"type" : "bolt-extension",
 	"keywords" : [
 		"oauth",
