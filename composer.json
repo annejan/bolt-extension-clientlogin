@@ -10,7 +10,7 @@
 		"Twitter"
 	],
 	"require" : {
-		"bolt/bolt" : ">2.0,<3.0.0"
+		"bolt/bolt" : ">=2.0.0,<3.0.0"
 	},
 	"license" : "GPL",
 	"authors" : [{
