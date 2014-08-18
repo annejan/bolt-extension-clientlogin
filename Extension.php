@@ -26,6 +26,9 @@ class Extension extends \Bolt\BaseExtension
 
     public function initialize()
     {
+        /*
+         * Config - sane defaults
+         */
         if (empty($this->config['basepath'])) {
             $this->config['basepath'] = "clientlogin";
         }
@@ -36,12 +39,18 @@ class Extension extends \Bolt\BaseExtension
             $this->config['template']['button'] = "_button.twig";
         }
 
+        /*
+         * Backend
+         */
         if ($this->app['config']->getWhichEnd() == 'backend') {
             // Check & create database tables if required
             $records = new ClientRecords($this->app);
             $records->dbCheck();
         }
 
+        /*
+         * Frontend
+         */
         if ($this->app['config']->getWhichEnd() == 'frontend') {
             // If debug is set, also set the path for the debug log.
             if ($this->config['debug_mode']) {
