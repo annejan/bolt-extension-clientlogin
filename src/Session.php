@@ -178,7 +178,7 @@ class Session
      */
     private function getToken()
     {
-        $this->token = $this->app['session']->set('sessiontoken', $this->token);
+        $this->token = $this->app['session']->get('sessiontoken', $this->token);
     }
 
     /**
