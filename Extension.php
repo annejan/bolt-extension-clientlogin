@@ -22,7 +22,7 @@ class Extension extends \Bolt\BaseExtension
     public function initialize()
     {
         if (empty($this->config['basepath'])) {
-            $this->config['basepath'] = "sociallogin";
+            $this->config['basepath'] = "clientlogin";
         }
 
         if ($this->app['config']->getWhichEnd() == 'backend') {
