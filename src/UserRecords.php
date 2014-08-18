@@ -66,6 +66,34 @@ class UserRecords
     }
 
     /**
+     * Look up a users database profile
+     *
+     * @param string $username
+     * @param string $provider
+     * @return boolean True if user record found
+     */
+    public function getUserProfileByID($id)
+    {
+        if ($this->user) {
+            return true;
+        } else {
+            // Get the user record
+            $query = "SELECT * FROM " . $this->getTableNameProfiles() .
+                     " WHERE id = :id";
+            $map = array(
+                ':id' => $id
+            );
+            $this->user = $this->app['db']->fetchAssoc($query, $map);
+
+            if (empty($this->user['id'])) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    /**
      * Get the passed member session token.
      *
      * If we have a token record matching the users cookie, retrieve the
