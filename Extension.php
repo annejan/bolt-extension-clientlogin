@@ -16,7 +16,7 @@ class Extension extends \Bolt\BaseExtension
 
     public function getName()
     {
-        return "ClientLogin";
+        return "clientlogin";
     }
 
     public function initialize()
