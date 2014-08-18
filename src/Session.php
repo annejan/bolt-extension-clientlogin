@@ -98,7 +98,7 @@ class Session
                 $profile = $adapter->getUserProfile();
 
                 if($profile) {
-                    $records = new UserRecords($this->app, $this->config);
+                    $records = new ClientRecords($this->app, $this->config);
 
                     // If user record doesn't exist, create it
                     if (!$records->getUserProfileByName($profile->displayName, $provider)) {
@@ -142,7 +142,7 @@ class Session
         $this->getToken();
 
         if ($this->token) {
-            $records = new UserRecords($this->app, $this->config);
+            $records = new ClientRecords($this->app, $this->config);
 
             $records->doRemoveSession(array('sessiontoken' => $this->token));
 
@@ -163,7 +163,7 @@ class Session
         // Get client 'sessiontoken' if exists
         $token = $this->app['session']->get('sessiontoken');
 
-        $records = new UserRecords($this->app, $this->config);
+        $records = new ClientRecords($this->app, $this->config);
         if ($records->getUserProfileBySession($token)) {
             $this->isLoggedIn = true;
             return true;

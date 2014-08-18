@@ -27,7 +27,7 @@ class Extension extends \Bolt\BaseExtension
 
         if ($this->app['config']->getWhichEnd() == 'backend') {
             // Check & create database tables if required
-            $records = new UserRecords($this->app, $this->app->config);
+            $records = new ClientRecords($this->app, $this->app->config);
             $records->dbCheck();
         }
 

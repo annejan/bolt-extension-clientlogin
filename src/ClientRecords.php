@@ -7,7 +7,7 @@ use Silex;
 /**
  * Authiticated user record maintenance
  */
-class UserRecords
+class ClientRecords
 {
     /**
      *
