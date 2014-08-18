@@ -30,10 +30,10 @@ class ClientRecords
      */
     private $config;
 
-    public function __construct(Silex\Application $app, $config)
+    public function __construct(Silex\Application $app)
     {
         $this->app = $app;
-        $this->config = $config;
+        $this->config = $this->app['extensions.' . \ClientLogin\Extension::getName()]->config;
     }
 
     /**

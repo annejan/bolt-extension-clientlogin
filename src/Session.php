@@ -34,10 +34,10 @@ class Session
      */
     private $config;
 
-    public function __construct(\Bolt\Application $app, $config)
+    public function __construct(\Bolt\Application $app)
     {
         $this->app = $app;
-        $this->config = $config;
+        $this->config = $this->app['extensions.' . \ClientLogin\Extension::getName()]->config;
     }
 
     /**
@@ -98,7 +98,7 @@ class Session
                 $profile = $adapter->getUserProfile();
 
                 if($profile) {
-                    $records = new ClientRecords($this->app, $this->config);
+                    $records = new ClientRecords($this->app);
 
                     // If user record doesn't exist, create it
                     if (!$records->getUserProfileByName($profile->displayName, $provider)) {
@@ -142,7 +142,7 @@ class Session
         $this->getToken();
 
         if ($this->token) {
-            $records = new ClientRecords($this->app, $this->config);
+            $records = new ClientRecords($this->app);
 
             $records->doRemoveSession(array('sessiontoken' => $this->token));
 
@@ -163,7 +163,7 @@ class Session
         // Get client 'sessiontoken' if exists
         $token = $this->app['session']->get('sessiontoken');
 
-        $records = new ClientRecords($this->app, $this->config);
+        $records = new ClientRecords($this->app);
         if ($records->getUserProfileBySession($token)) {
             $this->isLoggedIn = true;
             return true;

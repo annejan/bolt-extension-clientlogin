@@ -19,10 +19,10 @@ class UserInterface
      */
     private $config;
 
-    public function __construct(\Bolt\Application $app, $config)
+    public function __construct(\Bolt\Application $app)
     {
         $this->app = $app;
-        $this->config = $config;
+        $this->config = $this->app['extensions.' . \ClientLogin\Extension::getName()]->config;
 
         $this->app['twig.loader.filesystem']->addPath(dirname(__DIR__) . "/assets");
     }

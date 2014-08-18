@@ -24,10 +24,10 @@ class Controller
      */
     private $config;
 
-    public function __construct(Silex\Application $app, $config)
+    public function __construct(Silex\Application $app)
     {
         $this->app = $app;
-        $this->config = $config;
+        $this->config = $this->app['extensions.' . \ClientLogin\Extension::getName()]->config;
     }
 
     /**
@@ -39,7 +39,7 @@ class Controller
      */
     public function getAuthenticationLogin(\Silex\Application $app, Request $request)
     {
-        $auth = new Session($this->app, $this->config);
+        $auth = new Session($this->app);
 
         if ($auth->isLoggedIn()) {
             // User is already logged in, return them... somewhere
@@ -73,7 +73,7 @@ class Controller
      */
     public function getAuthenticationLogout(\Silex\Application $app, Request $request)
     {
-        $auth = new Session($this->app, $this->config);
+        $auth = new Session($this->app);
 
         $auth->doLogout();
 

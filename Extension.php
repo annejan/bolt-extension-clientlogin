@@ -27,7 +27,7 @@ class Extension extends \Bolt\BaseExtension
 
         if ($this->app['config']->getWhichEnd() == 'backend') {
             // Check & create database tables if required
-            $records = new ClientRecords($this->app, $this->app->config);
+            $records = new ClientRecords($this->app);
             $records->dbCheck();
         }
 
@@ -42,14 +42,14 @@ class Extension extends \Bolt\BaseExtension
             $this->setController();
 
             // Twig functions
-            $this->app['twig']->addExtension(new ClientLoginTwigExtensions($this->app, $this->config));
+            $this->app['twig']->addExtension(new ClientLoginTwigExtensions($this->app));
         }
     }
 
     private function setController()
     {
         // Create controller object
-        $this->controller = new Controller($this->app, $this->config);
+        $this->controller = new Controller($this->app);
 
         // Member login
         $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getAuthenticationLogin'))
