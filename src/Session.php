@@ -176,7 +176,7 @@ class Session
     /**
      * Get the users session cookie
      */
-    private function getToken()
+    public function getToken()
     {
         $this->token = $this->app['session']->get('sessiontoken', $this->token);
     }
