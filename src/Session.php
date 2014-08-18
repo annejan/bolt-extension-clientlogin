@@ -34,10 +34,16 @@ class Session
      */
     private $config;
 
+    /**
+     * @var Bolt's session
+     */
+    private $session;
+
     public function __construct(\Bolt\Application $app)
     {
         $this->app = $app;
         $this->config = $this->app['extensions.' . Extension::NAME]->config;
+        $this->session = $app['session'];
     }
 
     /**
@@ -144,7 +150,11 @@ class Session
         if ($this->token) {
             $records = new ClientRecords($this->app);
 
+            // Remove session from database
             $records->doRemoveSession(array('sessiontoken' => $this->token));
+
+            // Remove cookies
+            $this->session->set('sessiontoken', null);
 
             $this->member = false;
             $this->isLoggedIn = false;
@@ -160,8 +170,9 @@ class Session
         if ($this->member) {
             return true;
         }
+
         // Get client 'sessiontoken' if exists
-        $token = $this->app['session']->get('sessiontoken');
+        $token = $this->session->get('sessiontoken');
 
         $records = new ClientRecords($this->app);
         if ($records->getUserProfileBySession($token)) {
@@ -192,7 +203,7 @@ class Session
         $this->token = $this->doCreateToken() . $this->doCreateToken($id);
 
         // Set session cookie
-        $this->app['session']->set('sessiontoken', $this->token);
+        $this->session->set('sessiontoken', $this->token);
     }
 
     /**
