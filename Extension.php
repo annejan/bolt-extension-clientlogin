@@ -10,13 +10,18 @@ namespace ClientLogin;
 class Extension extends \Bolt\BaseExtension
 {
     /**
+     * @var unknown
+     */
+    const NAME = 'clientlogin';
+
+    /**
      * @var ClientLogin\Controller
      */
     private $controller;
 
     public function getName()
     {
-        return "clientlogin";
+        return Extension::NAME;
     }
 
     public function initialize()

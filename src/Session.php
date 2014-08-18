@@ -37,7 +37,7 @@ class Session
     public function __construct(\Bolt\Application $app)
     {
         $this->app = $app;
-        $this->config = $this->app['extensions.' . \ClientLogin\Extension::getName()]->config;
+        $this->config = $this->app['extensions.' . Extension::NAME]->config;
     }
 
     /**
