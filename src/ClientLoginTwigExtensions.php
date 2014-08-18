@@ -10,7 +10,7 @@ class ClientLoginTwigExtensions extends \Twig_Extension
     /**
      * @var UserInterface class object
      */
-    private $interface;
+    private $userinterface;
 
     /**
      * @var Twig environment
@@ -19,7 +19,7 @@ class ClientLoginTwigExtensions extends \Twig_Extension
 
     public function __construct(\Bolt\Application $app)
     {
-        $this->interface = new UserInterface($app);
+        $this->userinterface = new UserInterface($app);
     }
 
     /**
@@ -57,11 +57,11 @@ class ClientLoginTwigExtensions extends \Twig_Extension
 
     public function getClientLogin($redirect = false)
     {
-        return $this->interface->doDisplayLogin($redirect);
+        return $this->userinterface->doDisplayLogin($redirect);
     }
 
     public function getClientLogout($redirect = false, $label = "Logout")
     {
-        return $this->interface->doDisplayLogout($redirect, $label);
+        return $this->userinterface->doDisplayLogout($redirect, $label);
     }
 }
