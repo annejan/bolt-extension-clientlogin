@@ -29,6 +29,12 @@ class Extension extends \Bolt\BaseExtension
         if (empty($this->config['basepath'])) {
             $this->config['basepath'] = "clientlogin";
         }
+        if (empty($this->config['template']['profile'])) {
+            $this->config['template']['profile'] = "_profile.twig";
+        }
+        if (empty($this->config['template']['button'])) {
+            $this->config['template']['button'] = "_button.twig";
+        }
 
         if ($this->app['config']->getWhichEnd() == 'backend') {
             // Check & create database tables if required
