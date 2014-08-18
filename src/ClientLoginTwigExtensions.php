@@ -29,7 +29,7 @@ class ClientLoginTwigExtensions extends \Twig_Extension
      */
     public function getName()
     {
-        return 'clientlogin';
+        return 'bolt.clientlogin';
     }
 
     /**
