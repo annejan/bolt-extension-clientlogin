@@ -34,22 +34,28 @@ class UserInterface
      */
     public function doDisplayLogin($redirect, $target = '')
     {
-        $buttons = array();
+        if (isset($this->config['oauth']) && $this->config['oauth'] == true) {
+            $buttons = array();
 
-        if ($redirect) {
-            $target = '&redirect=' . urlencode($this->app['paths']['current']);
-        }
-
-        foreach($this->config['providers'] as $provider => $values) {
-            if($values['enabled']==true) {
-                $label = !empty($values['label']) ? $values['label'] : $provider;
-                $buttons[] = $this->doFormatButton(
-                    $this->app['paths']['root'] . $this->config['basepath'] . '/login?provider=' . $provider . $target,
-                    $label);
+            if ($redirect) {
+                $target = '&redirect=' . urlencode($this->app['paths']['current']);
             }
+
+            foreach($this->config['providers'] as $provider => $values) {
+                if($values['enabled']==true) {
+                    $label = !empty($values['label']) ? $values['label'] : $provider;
+                    $buttons[] = $this->doFormatButton(
+                        $this->app['paths']['root'] . $this->config['basepath'] . '/login?provider=' . $provider . $target,
+                        $label);
+                }
+            }
+
+            $markup = join("\n", $buttons);
         }
 
-        $markup = join("\n", $buttons);
+        if (isset($this->config['password']) && $this->config['password'] == true) {
+            //
+        }
 
         return new \Twig_Markup($markup, 'UTF-8');
     }
