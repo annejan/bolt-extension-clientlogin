@@ -49,7 +49,7 @@ class Controller
 
             if ($provider) {
                 // Attempt login
-                $result = $auth->doLogin($provider);
+                $result = $auth->doLoginOAuth($provider);
 
                 if ($result['result']) {
                     // Login done, redirect

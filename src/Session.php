@@ -57,11 +57,11 @@ class Session
     }
 
     /**
-     * Do login authentication
+     * Do OAuth login authentication
      *
      * @param string Provider name to authenticate with
      */
-    public function doLogin($provider)
+    public function doLoginOAuth($provider)
     {
         // Check for extisting token
         if ($this->doCheckLogin()) {
