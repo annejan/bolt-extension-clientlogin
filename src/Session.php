@@ -38,6 +38,8 @@ class Session
     {
         $this->app = $app;
         $this->config = $this->app['extensions.' . Extension::NAME]->config;
+
+        $this->getToken();
     }
 
     /**
