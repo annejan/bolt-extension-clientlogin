@@ -59,7 +59,7 @@ class UserInterface
             $password_html = '';
         }
 
-        $html = $this->app['render']->render($this->config['templates']['login'], array(
+        $html = $this->app['render']->render($this->config['template']['login'], array(
             'oauth' => $oauth_html,
             'password' => $password_html
         ));
