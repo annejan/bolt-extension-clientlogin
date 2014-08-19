@@ -43,7 +43,6 @@ class Session
     {
         $this->app = $app;
         $this->config = $this->app['extensions.' . Extension::NAME]->config;
-        $this->session = $app['session'];
     }
 
     /**
@@ -141,7 +140,7 @@ class Session
             $records->doRemoveSession($this->token);
 
             // Remove cookies
-            $this->session->set(Session::TOKENNAME, null);
+            $this->app['session']->set(Session::TOKENNAME, null);
 
             $this->member = false;
         }
@@ -164,7 +163,7 @@ class Session
             return false;
         }
 
-        // See if there is matching record
+        // See if there is matching record, i.e. valid, unrevoked, token
         $records = new ClientRecords($this->app);
         if ($records->getUserProfileBySession($this->token)) {
             return true;
@@ -192,7 +191,7 @@ class Session
         $this->token = $this->doCreateToken() . $this->doCreateToken($id);
 
         // Set session cookie
-        $this->session->set(Session::TOKENNAME, $this->token);
+        $this->app['session']->set(Session::TOKENNAME, $this->token);
     }
 
     /**
