@@ -1,9 +1,23 @@
-# The basepath for the extension's routes. Do not include the leading slash ('/')
-# This path determines the location used to log in or out, like '/clientlogin/login'
-basepath: "clientlogin"
+# Login methods 
+methods:
+    openid: true
+    password: true
 
-# enabled OpenID providers
-# options are dependent on the values for hybridauth
+
+# Templates (relative to assets/ directory)
+template:
+    login: _login.twig
+    password: _password.twig
+    button: _button.twig
+
+# Frontend role to assign to logged in visitor. 
+#
+# Is only relevant when 'frontend_permission_checks' is set to true in config.yml
+# and the role exists in permissions.yml
+#role: social
+
+# Enabled OpenID providers
+# Options are dependent on the values for HybridAuth
 providers:
 
     Google:
@@ -42,17 +56,11 @@ providers:
     #     openid_identifier: "http://openid.example.org"
         
 
+# The basepath for the extension's routes. Do not include the leading slash ('/')
+# This path determines the location used to log in or out, like '/clientlogin/login'
+basepath: "oauth"
+
 # Enabling debug_made will make this extension write out a logfile to {BOLT_CACHE_DIR}/authenticate.log.
 # Note: This file wil get huge, quickly!
 debug_mode: false
 
-# Templates (relative to assets/ directory)
-template:
-    profile: _profile.twig
-    button: _button.twig
-
-# Frontend role to assign to logged in visitor. 
-#
-# Is only relevant when 'frontend_permission_checks' is set to true in config.yml
-# and the role exists in permissions.yml
-#role: social
