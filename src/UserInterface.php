@@ -34,6 +34,8 @@ class UserInterface
      */
     public function doDisplayLogin($redirect, $target = '')
     {
+        $html = '';
+
         // Set redirect if passed
         if ($redirect) {
             $target = '&redirect=' . urlencode($this->app['paths']['current']);
@@ -53,14 +55,12 @@ class UserInterface
                 }
             }
 
-            $oauth_html = join("\n", $buttons);
+            $html .= join("\n", $buttons);
         }
 
         if (isset($this->config['password']) && $this->config['password'] == true) {
-            $password_html = '';
+            $html .= '';
         }
-
-        $html = $oauth_html . $password_html;
 
         return new \Twig_Markup($html, 'UTF-8');
     }
