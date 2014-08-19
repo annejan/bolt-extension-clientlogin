@@ -239,7 +239,6 @@ class ClientRecords
                 $table->addColumn("username", "string", array("length" => 64));
                 $table->addColumn("provider", "string", array("length" => 64));
                 $table->addColumn("providerdata", "text");
-                //$table->addColumn("apptoken", "string", array("length" => 64, 'notnull' => false));
                 return $table;
             }
         );
