@@ -176,9 +176,14 @@ class Session
             return true;
         }
 
-        // Get client 'sessiontoken' if exists
-        $token = $this->session->get('sessiontoken');
+        // Get client token
+        $token = $this->session->get(Session::TOKENNAME);
+        if (empty($token)) {
+            $this->isLoggedIn = false;
+            return false;
+        }
 
+        // See if there is matching record
         $records = new ClientRecords($this->app);
         if ($records->getUserProfileBySession($token)) {
             $this->isLoggedIn = true;
