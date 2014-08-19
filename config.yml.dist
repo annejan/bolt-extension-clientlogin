@@ -21,14 +21,14 @@ providers:
 
     Google:
         label: Google account
-        enabled: true
+        enabled: false
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
 
     Facebook:
         label: Facebook connect
-        enabled: true
+        enabled: false
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
@@ -36,14 +36,14 @@ providers:
 
     Twitter:
         label: Twitter sign in
-        enabled: true
+        enabled: false
         keys:
             key: "*** your KEY here ***"
             secret: "*** your secret here ***"
 
     GitHub:
         label: Github account
-        enabled: true
+        enabled: false
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
