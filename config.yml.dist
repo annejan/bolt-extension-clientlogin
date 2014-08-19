@@ -1,7 +1,6 @@
 # Login methods 
-methods:
-    openid: true
-    password: true
+oauth: true
+password: true
 
 
 # Templates (relative to assets/ directory)
@@ -58,7 +57,7 @@ providers:
 
 # The basepath for the extension's routes. Do not include the leading slash ('/')
 # This path determines the location used to log in or out, like '/clientlogin/login'
-basepath: "oauth"
+basepath: oauth
 
 # Enabling debug_made will make this extension write out a logfile to {BOLT_CACHE_DIR}/authenticate.log.
 # Note: This file wil get huge, quickly!
