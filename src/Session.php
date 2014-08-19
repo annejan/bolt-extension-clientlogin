@@ -142,7 +142,14 @@ class Session
     }
 
     /**
+     * Check if a visitor is logged in by session token
      *
+     * If session token doesn't exist we assume the user is not logged in.
+     *
+     * If session token does exist, we check for a valid database record, no
+     * record means the token has been revoked by the site administrator
+     *
+     * @return bool
      */
     public function doCheckLogin()
     {
