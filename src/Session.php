@@ -10,6 +10,11 @@ namespace ClientLogin;
 class Session
 {
     /**
+     * The name of our session cookie
+     */
+    const TOKENNAME = 'bolt_session_client';
+
+    /**
      * @var The current authenticated site member
      */
     public $member = false;
@@ -151,10 +156,10 @@ class Session
             $records = new ClientRecords($this->app);
 
             // Remove session from database
-            $records->doRemoveSession(array('sessiontoken' => $this->token));
+            $records->doRemoveSession($this->token);
 
             // Remove cookies
-            $this->session->set('sessiontoken', null);
+            $this->session->set(Session::TOKENNAME, null);
 
             $this->member = false;
             $this->isLoggedIn = false;
@@ -189,7 +194,7 @@ class Session
      */
     public function getToken()
     {
-        $this->token = $this->app['session']->get('sessiontoken', $this->token);
+        $this->token = $this->app['session']->get(Session::TOKENNAME, $this->token);
     }
 
     /**
@@ -203,7 +208,7 @@ class Session
         $this->token = $this->doCreateToken() . $this->doCreateToken($id);
 
         // Set session cookie
-        $this->session->set('sessiontoken', $this->token);
+        $this->session->set(Session::TOKENNAME, $this->token);
     }
 
     /**
