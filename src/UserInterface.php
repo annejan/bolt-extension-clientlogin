@@ -34,12 +34,14 @@ class UserInterface
      */
     public function doDisplayLogin($redirect, $target = '')
     {
+        // Set redirect if passed
+        if ($redirect) {
+            $target = '&redirect=' . urlencode($this->app['paths']['current']);
+        }
+        // Render
         if (isset($this->config['oauth']) && $this->config['oauth'] == true) {
             $buttons = array();
 
-            if ($redirect) {
-                $target = '&redirect=' . urlencode($this->app['paths']['current']);
-            }
 
             foreach($this->config['providers'] as $provider => $values) {
                 if($values['enabled']==true) {
@@ -50,14 +52,19 @@ class UserInterface
                 }
             }
 
-            $markup = join("\n", $buttons);
+            $oauth_html = join("\n", $buttons);
         }
 
         if (isset($this->config['password']) && $this->config['password'] == true) {
-            //
+            $password_html = '';
         }
 
-        return new \Twig_Markup($markup, 'UTF-8');
+        $html = $this->app['render']->render($this->config['templates']['login'], array(
+            'oauth' => $oauth_html,
+            'password' => $password_html
+        ));
+
+        return new \Twig_Markup($html, 'UTF-8');
     }
 
     /**
