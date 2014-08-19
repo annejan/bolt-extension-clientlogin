@@ -25,11 +25,6 @@ class Session
     public $token;
 
     /**
-     * @var Boolean that is true if session is active
-     */
-    private $isLoggedIn = false;
-
-    /**
      * @var Silex\Application
      */
     private $app;
@@ -52,16 +47,6 @@ class Session
     }
 
     /**
-     * Test if the session is authenticated
-     *
-     * @return boolean
-     */
-    public function isLoggedIn()
-    {
-        return $this->isLoggedIn;
-    }
-
-    /**
      * Do OAuth login authentication
      *
      * @param string Provider name to authenticate with
@@ -70,7 +55,6 @@ class Session
     {
         // Check for extisting token
         if ($this->doCheckLogin()) {
-            $this->isLoggedIn = true;
             return array('result' => true, 'error' => '');
         } else {
 
@@ -130,10 +114,8 @@ class Session
                     }
 
                     // Success
-                    $this->isLoggedIn = true;
                     return array('result' => true, 'error' => '');
                 } else {
-                    $this->isLoggedIn = false;
                     return array('result' => false, 'error' => '<pre>OAuth Error: please try again!</pre>');
                 }
             } catch(Exception $e) {
@@ -162,7 +144,6 @@ class Session
             $this->session->set(Session::TOKENNAME, null);
 
             $this->member = false;
-            $this->isLoggedIn = false;
         }
     }
 
@@ -176,20 +157,18 @@ class Session
             return true;
         }
 
+        $this->getToken();
+
         // Get client token
-        $token = $this->session->get(Session::TOKENNAME);
-        if (empty($token)) {
-            $this->isLoggedIn = false;
+        if (empty($this->token)) {
             return false;
         }
 
         // See if there is matching record
         $records = new ClientRecords($this->app);
-        if ($records->getUserProfileBySession($token)) {
-            $this->isLoggedIn = true;
+        if ($records->getUserProfileBySession($this->token)) {
             return true;
         } else {
-            $this->isLoggedIn = false;
             return false;
         }
     }
@@ -199,7 +178,7 @@ class Session
      */
     public function getToken()
     {
-        $this->token = $this->app['session']->get(Session::TOKENNAME, $this->token);
+        $this->token = $this->app['session']->get(Session::TOKENNAME);
     }
 
     /**
