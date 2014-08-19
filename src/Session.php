@@ -129,11 +129,11 @@ class Session
                     return array('result' => true, 'error' => '');
                 } else {
                     $this->isLoggedIn = false;
-                    return array('result' => false, 'error' => '<pre>OAuth Error: please try again!<pre>');
+                    return array('result' => false, 'error' => '<pre>OAuth Error: please try again!</pre>');
                 }
             } catch(Exception $e) {
-                $html =  "<pre>Error: please try again!<pre><br>";
-                $html .= "<pre>Original error message: " . $e->getMessage() . "<pre>";
+                $html =  "<pre>Error: please try again!</pre><br>";
+                $html .= "<pre>Original error message: " . $e->getMessage() . "</pre>";
 
                 return array('result' => false, 'error' => $html);
             }
