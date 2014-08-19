@@ -20,7 +20,7 @@ class Session
     public $token;
 
     /**
-     * @var Silex\Application
+     * @var Bolt\Application
      */
     private $app;
 
