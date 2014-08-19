@@ -105,8 +105,8 @@ class ClientRecords
     public function getUserProfileBySession($token)
     {
         $query = "SELECT * from " . $this->getTableNameSessions() .
-                 " WHERE sessiontoken = :sessiontoken";
-        $map = array(':sessiontoken' => $token);
+                 " WHERE token = :token";
+        $map = array(':token' => $token);
 
         $this->session = $this->app['db']->fetchAssoc($query, $map);
 
@@ -186,7 +186,7 @@ class ClientRecords
         $content = array(
             'userid' =>  $this->user['id'],
             'lastseen' => date('Y-m-d H:i:s', $_SERVER["REQUEST_TIME"]),
-            'sessiontoken' => $token
+            'token' => $token
         );
 
         $result = $this->app['db']->insert($this->getTableNameSessions(), $content);
@@ -216,14 +216,13 @@ class ClientRecords
      *
      * @param array $match A parameter/value array representing column/value
      */
-    public function doRemoveSession($match)
+    public function doRemoveSession($token)
     {
-        if (empty($match)) {
+        if (empty($token)) {
             return;
         }
-        $this->app['db']->delete($this->getTableNameSessions(), $match);
+        $this->app['db']->delete($this->getTableNameSessions(), array('token', $token));
     }
-
 
     /**
      * Create/update database tables
@@ -253,10 +252,10 @@ class ClientRecords
                 $table->addColumn("id", "integer", array('autoincrement' => true));
                 $table->setPrimaryKey(array("id"));
                 $table->addColumn("userid", "integer");
-                $table->addColumn("sessiontoken", "string", array('length' => 64));
+                $table->addColumn("token", "string", array('length' => 64));
                 $table->addColumn("lastseen", "datetime");
                 $table->addIndex(array("userid"));
-                $table->addIndex(array("sessiontoken"));
+                $table->addIndex(array("token"));
                 return $table;
             }
         );
