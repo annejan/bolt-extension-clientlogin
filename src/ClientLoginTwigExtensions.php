@@ -12,11 +12,6 @@ class ClientLoginTwigExtensions extends \Twig_Extension
      */
     private $userinterface;
 
-    /**
-     * @var Twig environment
-     */
-    private $twig = null;
-
     public function __construct(\Bolt\Application $app)
     {
         $this->userinterface = new UserInterface($app);
