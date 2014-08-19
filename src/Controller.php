@@ -41,7 +41,7 @@ class Controller
     {
         $auth = new Session($this->app);
 
-        if ($auth->isLoggedIn()) {
+        if ($auth->doCheckLogin()) {
             // User is already logged in, return them... somewhere
             $this->doRedirect($this->app);
         } else {
