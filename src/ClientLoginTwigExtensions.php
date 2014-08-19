@@ -29,17 +29,7 @@ class ClientLoginTwigExtensions extends \Twig_Extension
      */
     public function getName()
     {
-        return 'bolt.clientlogin';
-    }
-
-    /**
-     * Initialise the runtime environment.
-     *
-     * @param \Twig_Environment $environment
-     */
-    public function initRuntime(\Twig_Environment $environment)
-    {
-        $this->twig = $environment;
+        return Extension::NAME . '_Twig';
     }
 
     /**
@@ -50,17 +40,17 @@ class ClientLoginTwigExtensions extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'clientlogin'  =>  new \Twig_Function_Method($this, 'getClientLogin'),
-            'clientlogout' =>  new \Twig_Function_Method($this, 'getClientLogout')
+            'displaylogin'  =>  new \Twig_Function_Method($this, 'getDisplayLogin'),
+            'displaylogout' =>  new \Twig_Function_Method($this, 'getDisplayLogout')
         );
     }
 
-    public function getClientLogin($redirect = false)
+    public function getDisplayLogin($redirect = false)
     {
         return $this->userinterface->doDisplayLogin($redirect);
     }
 
-    public function getClientLogout($redirect = false, $label = "Logout")
+    public function getDisplayLogout($redirect = false, $label = "Logout")
     {
         return $this->userinterface->doDisplayLogout($redirect, $label);
     }

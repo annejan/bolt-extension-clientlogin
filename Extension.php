@@ -12,7 +12,7 @@ class Extension extends \Bolt\BaseExtension
     /**
      * @var unknown
      */
-    const NAME = 'clientlogin';
+    const NAME = 'ClientLogin';
 
     /**
      * @var ClientLogin\Controller
@@ -30,7 +30,7 @@ class Extension extends \Bolt\BaseExtension
          * Config - sane defaults
          */
         if (empty($this->config['basepath'])) {
-            $this->config['basepath'] = "clientlogin";
+            $this->config['basepath'] = "oauth";
         }
         if (empty($this->config['template']['profile'])) {
             $this->config['template']['profile'] = "_profile.twig";
