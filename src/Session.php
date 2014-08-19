@@ -15,11 +15,6 @@ class Session
     const TOKENNAME = 'bolt_session_client';
 
     /**
-     * @var The current authenticated site member
-     */
-    public $member = false;
-
-    /**
      * @var User cookie token
      */
     public $token;
@@ -151,14 +146,8 @@ class Session
      */
     public function doCheckLogin()
     {
-        // If $member is set, we've been here, done this
-        if ($this->member) {
-            return true;
-        }
-
-        $this->getToken();
-
         // Get client token
+        $this->getToken();
         if (empty($this->token)) {
             return false;
         }
