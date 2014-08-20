@@ -81,16 +81,20 @@ class UserInterface
      *
      * @return \Twig_Markup
      */
-    public function doDisplayLogout($redirect, $label)
+    public function doDisplayLogout($redirect)
     {
         if ($redirect) {
             $target = '?redirect=' . urlencode($this->app['paths']['current']);
         }
 
+        if (empty($this->config['label']['logout'])) {
+            $this->config['label']['logout'] = 'Logout';
+        }
+
         $logoutlink = $this->doFormatButton(
             $this->app['paths']['root'] . $this->config['basepath'].'/logout' . $target,
             '',
-            $label);
+            $this->config['label']['logout']);
 
         return new \Twig_Markup($logoutlink, 'UTF-8');
     }

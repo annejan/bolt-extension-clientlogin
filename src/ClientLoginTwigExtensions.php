@@ -51,7 +51,7 @@ class ClientLoginTwigExtensions extends \Twig_Extension
         return $this->userinterface->doDisplayLogin($redirect);
     }
 
-    public function getDisplayLogout($redirect = false, $label = "Logout")
+    public function getDisplayLogout($redirect = false)
     {
         return $this->userinterface->doDisplayLogout($redirect, $label);
     }
