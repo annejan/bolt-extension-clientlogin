@@ -151,7 +151,7 @@ class Session
      * If session token does exist, we check for a valid database record, no
      * record means the token has been revoked by the site administrator
      *
-     * @return bool
+     * @return bool True if user logged in, False is logged out
      */
     public function doCheckLogin()
     {
