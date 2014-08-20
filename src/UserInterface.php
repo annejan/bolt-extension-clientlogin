@@ -52,11 +52,10 @@ class UserInterface
             $target = '&redirect=' . urlencode($this->app['paths']['current']);
         }
         // Render
-        if (isset($this->config['openid']) && $this->config['openid'] == true) {
+        if (isset($this->config['auth']['hybridauth'])) {
             $buttons = array();
 
-
-            foreach($this->config['providers'] as $provider => $values) {
+            foreach($this->config['auth']['hybridauth'] as $provider => $values) {
                 if($values['enabled'] == true) {
                     $label = !empty($values['label']) ? $values['label'] : $provider;
                     $buttons[] = $this->doFormatButton(
@@ -69,7 +68,7 @@ class UserInterface
             $html .= join("\n", $buttons);
         }
 
-        if (isset($this->config['password']) && $this->config['password'] == true) {
+        if (isset($this->config['auth']['password']) && $this->config['auth']['password']['enabled'] === true) {
             $html .= '';
         }
 

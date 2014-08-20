@@ -29,17 +29,9 @@ class Extension extends \Bolt\BaseExtension
     public function initialize()
     {
         /*
-         * Config - sane defaults
+         * Config
          */
-        if (empty($this->config['basepath'])) {
-            $this->config['basepath'] = "oauth";
-        }
-        if (empty($this->config['template']['profile'])) {
-            $this->config['template']['profile'] = "_profile.twig";
-        }
-        if (empty($this->config['template']['button'])) {
-            $this->config['template']['button'] = "_button.twig";
-        }
+        $this->setConfig();
 
         /*
          * Backend
@@ -103,5 +95,26 @@ class Extension extends \Bolt\BaseExtension
                       ->bind('getAuthenticationEndpoint')
                       ->method('GET|POST');
         }
+    }
+
+    private function setConfig()
+    {
+        // Sane defaults
+        if (empty($this->config['basepath'])) {
+            $this->config['basepath'] = "authenticate";
+        }
+        if (empty($this->config['template']['profile'])) {
+            $this->config['template']['profile'] = "_profile.twig";
+        }
+        if (empty($this->config['template']['button'])) {
+            $this->config['template']['button'] = "_button.twig";
+        }
+
+        // Set HybridAuth
+        $this->config['auth']['hybridauth'] = $this->config['providers'];
+        unset($this->config['auth']['hybridauth']['Password']);
+
+        // Password auth
+        $this->config['auth']['password'] = $this->config['providers']['Password'];
     }
 }

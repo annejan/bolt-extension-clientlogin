@@ -1,8 +1,3 @@
-# Login methods 
-openid: true
-password: true
-
-
 # Templates (relative to assets/ directory)
 template:
     login: _login.twig
@@ -21,6 +16,8 @@ label:
 # Enabled OpenID providers
 # Options are dependent on the values for HybridAuth
 providers:
+    Password:
+        enabled: false
 
     Google:
         label: Google account

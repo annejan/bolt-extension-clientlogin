@@ -75,7 +75,7 @@ class Session
                 }
 
                 // Initialize the authentication with the modified config
-                $hybridauth = new \Hybrid_Auth($this->config);
+                $hybridauth = new \Hybrid_Auth($this->config['auth']['hybridauth']);
 
                 // Try to authenticate with the selected provider
                 $adapter = $hybridauth->authenticate($providertype, $provideroptions);

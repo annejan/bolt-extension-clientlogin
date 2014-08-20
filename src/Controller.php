@@ -48,8 +48,15 @@ class Controller
             $provider = $request->query->get('provider');
 
             if ($provider) {
-                // Attempt login
-                $result = $session->doLoginOAuth($provider);
+                if ($provider == 'Password' && $this->config['auth']['password']['enabled']) {
+                    // Attempt password login
+                    $result = $session->doLoginPassword();
+                } elseif ($this->config['auth']['hybridauth'][$provider]) {
+                    // Attempt oauth login
+                    $result = $session->doLoginOAuth($provider);
+                } else {
+                    $result = array('result' => false, 'error' => '<pre>Error: Invalide or disabled provider</pre>');
+                }
 
                 if ($result['result']) {
                     // Login done, redirect
