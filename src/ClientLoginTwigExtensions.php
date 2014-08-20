@@ -43,7 +43,7 @@ class ClientLoginTwigExtensions extends \Twig_Extension
 
     public function getDisplayAuth($redirect = false)
     {
-        return $this->userinterface->getDisplayAuth($redirect);
+        return $this->userinterface->doDisplayAuth($redirect);
     }
 
     public function getDisplayLogin($redirect = false)
