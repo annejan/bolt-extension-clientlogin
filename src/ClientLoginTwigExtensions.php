@@ -35,9 +35,15 @@ class ClientLoginTwigExtensions extends \Twig_Extension
     public function getFunctions()
     {
         return array(
+            'displayauth'   =>  new \Twig_Function_Method($this, 'getDisplayAuth'),
             'displaylogin'  =>  new \Twig_Function_Method($this, 'getDisplayLogin'),
             'displaylogout' =>  new \Twig_Function_Method($this, 'getDisplayLogout')
         );
+    }
+
+    public function getDisplayAuth($redirect = false)
+    {
+        return $this->userinterface->getDisplayAuth($redirect);
     }
 
     public function getDisplayLogin($redirect = false)

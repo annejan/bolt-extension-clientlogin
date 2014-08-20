@@ -27,6 +27,17 @@ class UserInterface
         $this->app['twig.loader.filesystem']->addPath(dirname(__DIR__) . "/assets");
     }
 
+    public function doDisplayAuth($redirect)
+    {
+        $session = new Session($this->app);
+
+        if ($session->doCheckLogin()) {
+            $this->doDisplayLogin($redirect);
+        } else {
+            $this->doDisplayLogout($redirect);
+        }
+    }
+
     /**
      * Returns a list of links to all enabled login options
      *
