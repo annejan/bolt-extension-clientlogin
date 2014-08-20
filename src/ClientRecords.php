@@ -244,7 +244,7 @@ class ClientRecords
         if (empty($token)) {
             return;
         }
-        $this->app['db']->delete($this->getTableNameSessions(), array('token', $token));
+        $this->app['db']->delete($this->getTableNameSessions(), array('token' => $token));
     }
 
     /**
