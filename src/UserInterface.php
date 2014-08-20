@@ -32,9 +32,9 @@ class UserInterface
         $session = new Session($this->app);
 
         if ($session->doCheckLogin()) {
-            $this->doDisplayLogin($redirect);
+            return $this->doDisplayLogin($redirect);
         } else {
-            $this->doDisplayLogout($redirect);
+            return $this->doDisplayLogout($redirect);
         }
     }
 
