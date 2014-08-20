@@ -138,8 +138,6 @@ class Session
 
             // Remove cookies
             $this->app['session']->set(Session::TOKENNAME, null);
-
-            $this->member = false;
         }
     }
 
