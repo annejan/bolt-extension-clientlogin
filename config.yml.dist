@@ -9,6 +9,9 @@ template:
     password: _password.twig
     button: _button.twig
 
+label:
+    logout: Logout
+
 # Frontend role to assign to logged in visitor. 
 #
 # Is only relevant when 'frontend_permission_checks' is set to true in config.yml
