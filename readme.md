@@ -116,6 +116,13 @@ By supplying the paramter `true` the user is redirected back to the current page
 Dynamic Link
 ------------
 
+If you want the login/logout to be automatically varied based on whether a user
+is logged in or our, you can use:
+
+```
+    {{ displayauth() }}
+```
+
 
 Using these values in your own extensions
 -----------------------------------------
