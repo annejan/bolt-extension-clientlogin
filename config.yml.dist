@@ -56,7 +56,7 @@ providers:
         
 
 # The basepath for the extension's routes. Do not include the leading slash ('/')
-# This path determines the location used to log in or out, like '/clientlogin/login'
+# This path determines the location used to log in or out, like '/authenticate/login'
 basepath: authenticate
 
 # Enabling debug_made will make this extension write out a logfile to {BOLT_CACHE_DIR}/authenticate.log.
