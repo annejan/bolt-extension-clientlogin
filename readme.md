@@ -85,11 +85,11 @@ Login Link(s)
 There are two Twig function options for displaying the login links:
 
 ```
-    {{ clientlogout() }}
+    {{ displaylogin() }}
 ```
 
 ``` 
-    {{ clientlogin(true) }}
+    {{ displaylogin(true) }}
 ```
     
 In the first instance, after authentication a user is redirected to the homepage.
@@ -102,15 +102,20 @@ Logout Link
 As with login, there are two options for the logout links:
 
 ```
-    {{ clientlogout() }}
+    {{ displaylogout() }}
 ```
 
 ```
-    {{ clientlogout(true) }}
+    {{ displaylogout(true) }}
 ```
+
 In the first instance, after logging out a user is redirected to the homepage.
 
 By supplying the paramter `true` the user is redirected back to the current page.
+
+Dynamic Link
+------------
+
 
 Using these values in your own extensions
 -----------------------------------------
