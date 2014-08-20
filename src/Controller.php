@@ -55,7 +55,7 @@ class Controller
                     // Attempt oauth login
                     $result = $session->doLoginOAuth($provider);
                 } else {
-                    $result = array('result' => false, 'error' => '<pre>Error: Invalide or disabled provider</pre>');
+                    $result = array('result' => false, 'error' => '<pre>Error: Invalid or disabled provider</pre>');
                 }
 
                 if ($result['result']) {
