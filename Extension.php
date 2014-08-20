@@ -58,6 +58,9 @@ class Extension extends \Bolt\BaseExtension
                 @touch($this->config['debug_file']);
             }
 
+            // Create and store session
+            $this->app['extensions.' . Extension::NAME]->session = new Session($this->app);
+
             // Set up routes
             $this->setController();
 

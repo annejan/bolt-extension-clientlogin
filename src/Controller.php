@@ -39,9 +39,9 @@ class Controller
      */
     public function getAuthenticationLogin(\Silex\Application $app, Request $request)
     {
-        $auth = new Session($this->app);
+        $session = $this->app['extensions.' . Extension::NAME]->session;
 
-        if ($auth->doCheckLogin()) {
+        if ($session->doCheckLogin()) {
             // User is already logged in, return them... somewhere
             $this->doRedirect($this->app);
         } else {
@@ -49,7 +49,7 @@ class Controller
 
             if ($provider) {
                 // Attempt login
-                $result = $auth->doLoginOAuth($provider);
+                $result = $session->doLoginOAuth($provider);
 
                 if ($result['result']) {
                     // Login done, redirect
@@ -73,9 +73,9 @@ class Controller
      */
     public function getAuthenticationLogout(\Silex\Application $app, Request $request)
     {
-        $auth = new Session($this->app);
+        $session = $this->app['extensions.' . Extension::NAME]->session;
 
-        $auth->doLogout();
+        $session->doLogout();
 
         // Logout done, redirect
         $this->doRedirect($this->app);
