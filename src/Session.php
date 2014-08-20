@@ -100,7 +100,7 @@ class Session
                     $this->setToken($records->user['id']);
 
                     // Create the session if need be
-                    if (!$records->getUserSessionByID($records->user['id'])) {
+                    if (!$records->getUserSessionByToken($records->user['id'])) {
                         $records->doCreateUserSession($this->token);
                     }
 

@@ -155,6 +155,29 @@ class ClientRecords
     }
 
     /**
+     * Lookup user session by user ID
+     *
+     * @param integer $id
+     * @return boolean
+     */
+    public function getUserSessionByToken($token)
+    {
+        // Get the assocaited session
+        $query = "SELECT * FROM " . $this->getTableNameSessions() .
+                 " WHERE token = :token ORDER BY lastseen DESC";
+        $map = array(
+            ':token' => $token
+        );
+        $this->session = $this->app['db']->fetchAssoc($query, $map);
+
+        if (empty($this->session['id'])) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Create a user profile record
      *
      * @param string $provider
