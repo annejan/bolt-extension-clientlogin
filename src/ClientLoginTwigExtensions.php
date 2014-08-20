@@ -36,7 +36,7 @@ class ClientLoginTwigExtensions extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'hasauth'   =>  new \Twig_Function_Method($this, 'getHasAuth'),
+            'hasauth'       =>  new \Twig_Function_Method($this, 'getHasAuth'),
             'displayauth'   =>  new \Twig_Function_Method($this, 'getDisplayAuth'),
             'displaylogin'  =>  new \Twig_Function_Method($this, 'getDisplayLogin'),
             'displaylogout' =>  new \Twig_Function_Method($this, 'getDisplayLogout')
