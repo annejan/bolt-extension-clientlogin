@@ -2,8 +2,10 @@
 
 namespace Bolt\Extension\ClientLogin;
 
+use Bolt\CronEvents;
+
 /**
- * Social Login with OAuth via HybridAuth
+ * Login with OAuth via HybridAuth
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
@@ -67,6 +69,17 @@ class Extension extends \Bolt\BaseExtension
             // Twig functions
             $this->app['twig']->addExtension(new ClientLoginTwigExtensions($this->app));
         }
+
+        /*
+         * Scheduled cron listener
+         */
+        $this->app['dispatcher']->addListener(CronEvents::CRON_DAILY, array($this, 'cronDaily'));
+    }
+
+    public function cronDaily()
+    {
+        $record = new ClientRecords($this->app);
+        $record->doRemoveSessionsOld();
     }
 
     private function setController()

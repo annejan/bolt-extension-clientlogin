@@ -247,6 +247,22 @@ class ClientRecords
         $this->app['db']->delete($this->getTableNameSessions(), array('token' => $token));
     }
 
+    public function doRemoveSessionsOld()
+    {
+        $query = "DELETE FROM " . $this->getTableNameSessions() . " WHERE lastseen <= :maxage";
+        $map = array(
+            'maxage' => date('Y-m-d H:i:s', (time() - (60*60*24*14)))
+        );
+
+        $result = $this->app['db']->executeQuery($query, $map);
+
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Create/update database tables
      */
