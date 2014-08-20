@@ -23,7 +23,7 @@
 			"init.php"
 		],
 		"psr-4" : {
-			"ClientLogin\\" : [
+			"Bolt\\Extension\\ClientLogin\\" : [
 				"",
 				"src/"
 			]

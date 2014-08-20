@@ -1,6 +1,6 @@
 <?php
 
-namespace ClientLogin;
+namespace Bolt\Extension\ClientLogin;
 
 /**
  * Twig functions
