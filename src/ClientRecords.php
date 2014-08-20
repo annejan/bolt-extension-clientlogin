@@ -11,12 +11,12 @@ class ClientRecords
 {
     /**
      *
-     * @var User's profile record
+     * @var array User's profile record
      */
     public $user = false;
 
     /**
-     * @var User's session record
+     * @var array User's session record
      */
     public $session = false;
 

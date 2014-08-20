@@ -10,7 +10,7 @@ namespace ClientLogin;
 class Extension extends \Bolt\BaseExtension
 {
     /**
-     * @var unknown
+     * @var string Extension name
      */
     const NAME = 'ClientLogin';
 

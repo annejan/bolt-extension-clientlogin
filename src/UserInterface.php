@@ -15,7 +15,7 @@ class UserInterface
     private $app;
 
     /**
-     * @var Extension config array
+     * @var array Extension config array
      */
     private $config;
 

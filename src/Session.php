@@ -10,12 +10,12 @@ namespace ClientLogin;
 class Session
 {
     /**
-     * The name of our session cookie
+     * @var string The name of our session cookie
      */
     const TOKENNAME = 'bolt_session_client';
 
     /**
-     * @var User cookie token
+     * @var string User cookie token
      */
     public $token;
 
@@ -25,14 +25,9 @@ class Session
     private $app;
 
     /**
-     * @var Extension config array
+     * @var array Extension config array
      */
     private $config;
-
-    /**
-     * @var Bolt's session
-     */
-    private $session;
 
     public function __construct(\Bolt\Application $app)
     {
