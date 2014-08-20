@@ -14,6 +14,7 @@ class ClientLoginTwigExtensions extends \Twig_Extension
 
     public function __construct(\Bolt\Application $app)
     {
+        $this->app = $app;
         $this->userinterface = new UserInterface($app);
     }
 
@@ -35,10 +36,21 @@ class ClientLoginTwigExtensions extends \Twig_Extension
     public function getFunctions()
     {
         return array(
+            'hasauth'   =>  new \Twig_Function_Method($this, 'getHasAuth'),
             'displayauth'   =>  new \Twig_Function_Method($this, 'getDisplayAuth'),
             'displaylogin'  =>  new \Twig_Function_Method($this, 'getDisplayLogin'),
             'displaylogout' =>  new \Twig_Function_Method($this, 'getDisplayLogout')
         );
+    }
+
+    public function getHasAuth()
+    {
+        $session = $this->app['extensions.' . Extension::NAME]->session;
+        if ($session->doCheckLogin()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function getDisplayAuth($redirect = false)
