@@ -1,8 +1,8 @@
 Client Login
 ============
 
-An extension to remember authenticated visitors on your bolt website. This extension uses 
-<a href="http://hybridauth.sourceforge.net" target="_blank">hybridauth</a> for the actual authentication process
+An extension to remember authenticated visitors on your Bolt website. This extension uses 
+<a href="http://hybridauth.sourceforge.net" target="_blank">HybridAuth</a> for the actual authentication process
 
 Installation
 ============
@@ -14,13 +14,26 @@ Installation
 Adding providers
 ================
 
-Google account
---------------
-  - Go to https://code.google.com/apis/console/ and log in, if required
-  - Create a new Client ID in the 'APIs & auth' menu option, under 'Credentials'
-  - Use the 'Client ID' and 'Client Secret' in your config
-  - The 'Redirect URIs' should look like this:
-    http://example.org/authenticate/endpoint?hauth.done=Google
+Google
+------
+1. Go to https://console.developers.google.com/project and log in, if required
+1. Click 'Create Project' (go to next step if using an existing one)
+  1. Set a descriptive Project Name
+  1. Agree to terms and services
+  1. Click Create
+1. Expand 'APIs & auth' menu and select 'Credentials'
+1. Under 'OAuth' click 'Create new Client ID'
+1. In the 'Create Client ID' dialogue
+  - Application Type:
+    Web Application
+  - Authorized JavaScript Origins:  
+    http://your-bolt-site.com  
+    (change the domain name to match yours)
+  - Authorized Redirect URI:  
+    http://your-bolt-site.com/authenticate/endpoint?hauth.done=Google  
+    (change the domain name to match yours)
+1. Click 'Create'
+1. Use the 'Client ID' and 'Client Secret' in your config
 
 Twitter
 -------
