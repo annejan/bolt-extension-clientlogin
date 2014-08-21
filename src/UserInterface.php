@@ -55,7 +55,7 @@ class UserInterface
         if (isset($this->config['auth']['hybridauth'])) {
             $buttons = array();
 
-            foreach($this->config['auth']['hybridauth'] as $provider => $values) {
+            foreach($this->config['auth']['hybridauth']['providers'] as $provider => $values) {
                 if($values['enabled'] == true) {
                     $label = !empty($values['label']) ? $values['label'] : $provider;
                     $buttons[] = $this->doFormatButton(

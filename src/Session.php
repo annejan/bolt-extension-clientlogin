@@ -51,31 +51,29 @@ class Session
 
             // Attempt a HybridAuth login
             try {
-
-                // Pass the base endpoint URL to HybridAuth
-                $this->config['base_url'] = $this->app['paths']['rooturl'] . $this->config['basepath'] . '/endpoint';
+                $hybridconfig = $this->config['auth']['hybridauth'];
 
                 // Get the type early - because we might need to enable it
-                if (isset($this->config['providers'][$provider]['type'])) {
-                    $providertype = $this->config['providers'][$provider]['type'];
+                if (isset($hybridconfig['providers'][$provider]['type'])) {
+                    $providertype = $hybridconfig['providers'][$provider]['type'];
                 } else {
                     $providertype = $provider;
                 }
 
                 // Enable OpenID
-                if($providertype == 'OpenID' && $this->config['providers'][$provider]['enabled'] == true) {
-                    $this->config['providers']['OpenID']['enabled'] = true;
+                if($providertype == 'OpenID' && $hybridconfig['providers'][$provider]['enabled'] == true) {
+                    $hybridconfig['providers']['OpenID']['enabled'] = true;
                 }
 
                 $provideroptions = array();
-                if ($providertype == 'OpenID' && !empty($this->config['providers'][$provider]['openid_identifier'])) {
+                if ($providertype == 'OpenID' && !empty($hybridconfig['providers'][$provider]['openid_identifier'])) {
                     // Try to authenticate with the selected OpenID provider
-                    $providerurl = $this->config['providers'][$provider]['openid_identifier'];
+                    $providerurl = $hybridconfig['providers'][$provider]['openid_identifier'];
                     $provideroptions["openid_identifier"] = $providerurl;
                 }
 
                 // Initialize the authentication with the modified config
-                $hybridauth = new \Hybrid_Auth($this->config['auth']['hybridauth']);
+                $hybridauth = new \Hybrid_Auth($hybridconfig);
 
                 // Try to authenticate with the selected provider
                 $adapter = $hybridauth->authenticate($providertype, $provideroptions);

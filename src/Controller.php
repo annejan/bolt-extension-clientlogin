@@ -51,7 +51,7 @@ class Controller
                 if ($provider == 'Password' && $this->config['auth']['password']['enabled']) {
                     // Attempt password login
                     $result = $session->doLoginPassword();
-                } elseif ($this->config['auth']['hybridauth'][$provider]) {
+                } elseif ($this->config['auth']['hybridauth']['providers'][$provider]['enabled']) {
                     // Attempt oauth login
                     $result = $session->doLoginOAuth($provider);
                 } else {

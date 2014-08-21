@@ -90,11 +90,9 @@ class Extension extends \Bolt\BaseExtension
                   ->method('GET');
 
         // OAuth callback URI
-        if (isset($this->config['openid']) && $this->config['openid'] == true) {
-            $this->app->match("{$this->config['basepath']}/endpoint", array($this->controller, 'getAuthenticationEndpoint'))
-                      ->bind('getAuthenticationEndpoint')
-                      ->method('GET|POST');
-        }
+        $this->app->match("{$this->config['basepath']}/endpoint", array($this->controller, 'getAuthenticationEndpoint'))
+                  ->bind('getAuthenticationEndpoint')
+                  ->method('GET|POST');
     }
 
     private function setConfig()
@@ -110,11 +108,29 @@ class Extension extends \Bolt\BaseExtension
             $this->config['template']['button'] = "_button.twig";
         }
 
-        // Set HybridAuth
-        $this->config['auth']['hybridauth'] = $this->config['providers'];
-        unset($this->config['auth']['hybridauth']['Password']);
+        /*
+         * Set HybridAuth
+         */
 
-        // Password auth
+        // Pass the base endpoint URL to HybridAuth
+        $this->config['auth']['hybridauth']['base_url'] = $this->app['paths']['rooturl'] . $this->config['basepath'] . '/endpoint';
+
+        $this->config['auth']['hybridauth']['providers'] = $this->config['providers'];
+        unset($this->config['auth']['hybridauth']['providers']['Password']);
+
+        // Apparently "A set of identifiers that identify a setting in the listing". Ok, whatever, HybridAuth.
+        $this->config['auth']['hybridauth']['identifier'] = "key";
+
+        // If debug is set, also set the path for the debug log.
+        $this->config['auth']['hybridauth']['debug_mode'] = $this->config['debug_mode'];
+        if ($this->config['debug_mode']) {
+            $this->config['auth']['hybridauth']['debug_file'] = $this->app['resources']->getPath('cache') . "/authenticate.log";
+            @touch($this->config['auth']['hybridauth']['debug_file']);
+        }
+
+        /*
+         * Password auth
+         */
         $this->config['auth']['password'] = $this->config['providers']['Password'];
     }
 }
