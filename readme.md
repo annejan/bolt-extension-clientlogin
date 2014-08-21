@@ -7,8 +7,8 @@ An extension to remember authenticated visitors on your Bolt website. This exten
 Installation
 ============
 
-  - To enable a provider set the value `enabled: true` in the configuration and
-    replace the example provider keys with real values. (see below)
+To enable a provider set the value `enabled: true` in the configuration and 
+replace the example provider keys with real values. (see below)
 
 
 Adding providers
@@ -104,21 +104,11 @@ GitHub
 1. Click 'Register application'
 1. Add the 'Client ID' and 'Client Secret' to your config.yml
 
+Advanced Configuration
+----------------------
+
 See <a href="http://hybridauth.sourceforge.net/userguide.html" target="_blank">
-the hybrid auth userguide</a> for advanced configuration options and how to get
-the needed keys.
-
-An example of the provider keys
-
-```
-  providers:
-    Google:
-      label: "Login with Google"
-      enabled: true
-      keys:
-        id: "*** your id here ***"
-        secret: "*** your secret here ***"
-```
+the hybrid auth userguide</a> for advanced configuration options.
 
 Template Usage
 ==============
@@ -170,21 +160,6 @@ is logged in or our, you can use:
     {{ displayauth() }}
 ```
 
-
-Using these values in your own extensions
------------------------------------------
-
-This extension is pretty bare-bones by design. Most likely, you will use this 
-extension in combination with another extension that builds on its functionality. 
-To get information about the current visitor, use this:
-
-    $visitor = \Authenticate\Controller::checkvisitor($this->app);
-
-Check if $visitor is `empty()` to see if we have a logged on user, from your code. 
-If logged on, you'll get an array with the username, id, avatar and information 
-supplied by the provider.
-
-
 Frontend Access Control
 =======================
 
@@ -217,9 +192,32 @@ Secondly set up the permissions for the desired contenttype(s) to have the 'fron
             view: [ anonymous ]
             frontend: [ social ]
 
-Authenticate config.yml
------------------------
+ClientLogin's config.yml
+------------------------
 
 Set the 'role' parameter, e.g.
 
     role: social
+
+
+ClientLogin in Bolt Extensions
+==============================
+
+This extension is pretty bare-bones by design. Most likely, you will use this 
+extension in combination with another extension that builds on its functionality. 
+
+To get information about the current visitor:
+
+```php
+$session = new \Bolt\Extension\ClientLogin\Session($this->app);
+
+if ($session->doCheckLogin()) {
+    // User is logged in
+    $records = new \Bolt\Extension\ClientLogin\ClientRecords($this->app);
+    if ($records->getUserProfileBySession($session->token)) {
+        $username = $records->user['username'];
+        $provider = $records->user['provider'];
+        $providerdata = json_decode($records->user['providerdata']);
+    }
+}
+```
