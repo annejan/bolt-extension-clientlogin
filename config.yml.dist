@@ -25,6 +25,7 @@ providers:
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
+        scope: "profile"
 
     Facebook:
         label: Facebook connect
