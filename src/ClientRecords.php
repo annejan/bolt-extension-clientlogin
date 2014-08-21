@@ -249,9 +249,15 @@ class ClientRecords
 
     public function doRemoveSessionsOld()
     {
+        if (empty($this->config['login_expiry'])) {
+            $maxage = 14;
+        } else {
+            $maxage = $this->config['login_expiry'];
+        }
+
         $query = "DELETE FROM " . $this->getTableNameSessions() . " WHERE lastseen <= :maxage";
         $map = array(
-            'maxage' => date('Y-m-d H:i:s', (time() - (60*60*24*14)))
+            'maxage' => date('Y-m-d H:i:s', (time() - (60*60*24*$maxage)))
         );
 
         $result = $this->app['db']->executeQuery($query, $map);

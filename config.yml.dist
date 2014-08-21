@@ -59,6 +59,9 @@ providers:
 # This path determines the location used to log in or out, like '/authenticate/login'
 basepath: authenticate
 
+# Number of days to allow login sessions to be valid for
+login_expiry: 14
+
 # Enabling debug_made will make this extension write out a logfile to {BOLT_CACHE_DIR}/authenticate.log.
 # Note: This file wil get huge, quickly!
 debug_mode: false
