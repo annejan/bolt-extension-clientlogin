@@ -11,7 +11,7 @@ To enable a provider set the value `enabled: true` in the configuration and
 replace the example provider keys with real values. (see below)
 
 
-Adding providers
+Adding Providers
 ================
 
 Google
@@ -22,15 +22,20 @@ Google
   1. Agree to terms and services
   1. Click Create
 1. Expand 'APIs & auth' menu and select 'Credentials'
-1. Under 'OAuth' click 'Create new Client ID'
-1. In the 'Create Client ID' dialogue
+  1. Under 'OAuth' click 'Create new Client ID'
+  1. In the 'Create Client ID' dialogue
   - **Application Type**: Web Application
   - **Authorized JavaScript Origins**: http://your-bolt-site.com  
     *(change the domain name to match yours)*
   - **Authorized Redirect URI**: http://your-bolt-site.com/authenticate/endpoint?hauth.done=Google  
     *(change the domain name to match yours)*
-1. Click 'Create'
+  1. Click 'Create'
+1. Expand 'APIs & auth' menu and select 'Consent screen'
+  1. Set your desired email address from the selector
+  1. Set a unique 'Product Name'
 1. Add the 'Client ID' and 'Client Secret' to your config.yml
+
+**NOTE** It may take as long as 10 minutes for the changes to propagate and the client ID and secret to work
 
 Twitter
 -------
