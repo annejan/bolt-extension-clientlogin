@@ -24,14 +24,11 @@ Google
 1. Expand 'APIs & auth' menu and select 'Credentials'
 1. Under 'OAuth' click 'Create new Client ID'
 1. In the 'Create Client ID' dialogue
-  - Application Type:
-    Web Application
-  - Authorized JavaScript Origins:  
-    http://your-bolt-site.com  
-    (change the domain name to match yours)
-  - Authorized Redirect URI:  
-    http://your-bolt-site.com/authenticate/endpoint?hauth.done=Google  
-    (change the domain name to match yours)
+  - **Application Type**: Web Application
+  - **Authorized JavaScript Origins**: http://your-bolt-site.com  
+    *(change the domain name to match yours)*
+  - **Authorized Redirect URI**: http://your-bolt-site.com/authenticate/endpoint?hauth.done=Google  
+    *(change the domain name to match yours)*
 1. Click 'Create'
 1. Add the 'Client ID' and 'Client Secret' to your config.yml
 
@@ -41,12 +38,10 @@ Twitter
 1. Click 'Create New App' and set:
   - Name
   - Description
-  - Website  
-  http://your-bolt-site.com/  
-  (change the domain name to match yours)
-  - Callback URL:  
-  http://your-bolt-site.com/authenticate/endpoint?hauth.done=Twitter  
-  (change the domain name to match yours)
+  - Website: http://your-bolt-site.com/  
+  *(change the domain name to match yours)*
+  - Callback URL: http://your-bolt-site.com/authenticate/endpoint?hauth.done=Twitter  
+  *(change the domain name to match yours)*
 1. Click 'Create your Twitter application'
 1. Select the 'Settings' tab
   - Check 'Allow this application to be used to Sign in with Twitter'
