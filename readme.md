@@ -33,7 +33,7 @@ Google
     http://your-bolt-site.com/authenticate/endpoint?hauth.done=Google  
     (change the domain name to match yours)
 1. Click 'Create'
-1. Use the 'Client ID' and 'Client Secret' in your config
+1. Add the 'Client ID' and 'Client Secret' to your config.yml
 
 Twitter
 -------
@@ -49,7 +49,7 @@ Twitter
   (change the domain name to match yours)
 1. Click 'Create your Twitter application'
 1. Select the 'API Keys' tab
-1. Add the 'Client ID' and 'Client Secret' in your config.yml
+1. Add the 'API key' and 'API secret' to your config.yml
 
 Facebook
 --------
