@@ -111,7 +111,7 @@ class UserInterface
         $context = array(
             'link' => $link,
             'label' => $label,
-            'class' => strtolower(safeString($provider))
+            'class' => strtolower(safeString($provider)).'-login'
         );
 
         $markup = $this->app['render']->render($this->config['template']['button'], $context);
