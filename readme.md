@@ -89,12 +89,20 @@ Facebook
 1. Scroll down to the 'Security' section of the page
 1. Add URLs to the 'Valid OAuth redirect URIs' field
 
-Github
+GitHub
 ------
-  - Log in at Github, and then go to: https://github.com/settings/applications/new
-  - Register a new OAuth application.
-  - Get the Client id and secret from the top right corner of the screen.
-  - The Authorization callback URL should look like: http://example.org/visitors/endpoint
+1. Log into GitHub
+1. Go to: https://github.com/settings/applications/
+1. Click 'Register new application'
+1. Fill in the fields:
+  1. **Application name**
+  1. **Homepage URL**: http://your-bolt-site.com
+  *(change the domain name to match yours)*
+  1. **Application description**
+  1. **Authorization callback URL**: http://your-bolt-site.com/authenticate/endpoint?hauth.done=Github  
+  *(change the domain name to match yours)*
+1. Click 'Register application'
+1. Add the 'Client ID' and 'Client Secret' to your config.yml
 
 See <a href="http://hybridauth.sourceforge.net/userguide.html" target="_blank">
 the hybrid auth userguide</a> for advanced configuration options and how to get
@@ -105,20 +113,21 @@ An example of the provider keys
 ```
   providers:
     Google:
-      label: "Login with google"
+      label: "Login with Google"
       enabled: true
       keys:
         id: "*** your id here ***"
         secret: "*** your secret here ***"
 ```
 
-Usage
-=====
+Template Usage
+==============
 
-You can also use the following functions and snippets in your templates:
+You can use the following functions and snippets in your templates
+
 
 Login Link(s)
-----------
+-------------
 
 There are two Twig function options for displaying the login links:
 
