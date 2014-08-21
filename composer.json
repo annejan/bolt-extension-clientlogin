@@ -7,7 +7,8 @@
 		"login",
 		"Google",
 		"Facebook",
-		"Twitter"
+        "Twitter",
+        "GitHub"
 	],
 	"require" : {
 		"bolt/bolt" : ">=2.0.0,<3.0.0"
