@@ -173,6 +173,6 @@ Secondly set up the permissions for the desired contenttype(s) to have the 'fron
 Authenticate config.yml
 -----------------------
 
-Set the 'role' paramter, e.g.
+Set the 'role' parameter, e.g.
 
     role: social
