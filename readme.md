@@ -78,7 +78,7 @@ Facebook
 1. In the left menu, select 'Status & Review'
   1. Set the toggle next to **"Do you want to make this app and all its live features available to the general public?"** to Yes
   1. Click 'Confim' in the displayed dialogue
-1. In the left menu, select 'Dasboard'
+1. In the left menu, select 'Dashboard'
 1. Add the 'App ID' and 'App Secret' to your config.yml file
 
 
