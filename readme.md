@@ -48,8 +48,11 @@ Twitter
   http://your-bolt-site.com/authenticate/endpoint?hauth.done=Twitter  
   (change the domain name to match yours)
 1. Click 'Create your Twitter application'
+1. Select the 'Settings' tab
+  - Check 'Allow this application to be used to Sign in with Twitter'
+  - Click 'Update settings' button at the bottom of the page
 1. Select the 'API Keys' tab
-1. Add the 'API key' and 'API secret' to your config.yml
+1. Add the 'Client ID' and 'Client Secret' in your config.yml
 
 Facebook
 --------
