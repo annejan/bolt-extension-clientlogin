@@ -37,11 +37,19 @@ Google
 
 Twitter
 -------
-  - Log in at: https://apps.twitter.com/
-  - Create an app.
-  - Get the API key and secret from the 'API Keys'-tab.
-  - Use the 'Client ID' and 'Client Secret' in your config
-  - The "Callback URL" should look like: http://example.org/visitors/endpoint
+1. Log in at: https://apps.twitter.com/
+1. Click 'Create New App' and set:
+  - Name
+  - Description
+  - Website  
+  http://your-bolt-site.com/  
+  (change the domain name to match yours)
+  - Callback URL:  
+  http://your-bolt-site.com/authenticate/endpoint?hauth.done=Twitter  
+  (change the domain name to match yours)
+1. Click 'Create your Twitter application'
+1. Select the 'API Keys' tab
+1. Add the 'Client ID' and 'Client Secret' in your config.yml
 
 Facebook
 --------
