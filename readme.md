@@ -51,24 +51,43 @@ Twitter
 
 Facebook
 --------
-  - Log in on facebook with the facebook account you want to use for the site
-  - Then go to https://developers.facebook.com
-  - In the "Apps" menu choose "Create a New App"
-  - You need to enter a "Display name" and a category. You do not need a namespace and leave the test version switch alone.
-  - Click "Create app" and then fill in the Captcha
-  - After that your app is created in development mode and you will be redirected to de app dashboard.
-  - Go to the settings tab and choose "add platform" and choose "Website"
-  - Then enter your url for site url and mobile site url
-  - After that add extra subdomains to "App Domains"
-  - Enter a valid emailaddress in contact email
-  - Save your settings
-  - Next go to status & review and set the toggle next to "Do you want to make this app and all its live features available to the general public?" to Yes
-  - Then go back to the dashboard and copy the App ID and App secret for your config.yml file.
+1. Login to Facebook with the account you want to use for the site
+1. Go to https://developers.facebook.com
+1. Under the 'Apps' menu select 'Create a New App'
+1. In the 'Create a new app' dialogue set:
+  - **'Display Name'** set to something descriptive
+  - **'Namespace'** just leave blank
+  - **'Is this a test version of another app?'** leave as 'No'
+  - **'Category'** just select a category that fits your site content
+1. Click 'Create App' and enter displayed CAPTCHA
+  - At this point your app is created in development mode and you will be redirected to the App Dashboard.
+1. In the left menu, select 'Settings'
+  1. In the 'App Domains' field enter your sites domain name:
+    - your-bolt-site.com  
+    *(change the domain name to match yours)*
+  1. In the 'Contact Email' field enter your sites contact email address:
+    - someone@your-bolt-site.com  
+    *(change the address to match your site's)*
+  1. Click 'Add Platform' button
+  1. Choose "Website" in displayed dialogue
+  1. Enter your site's relevant URLs:
+    - **'Site URL'** - http://your-bolt-site.com
+    - **'Mobile Site URL'** - http://mobile.your-bolt-site.com  
+    *(change the domain name to match yours)*
+  1. Click 'Save Changes'
+1. In the left menu, select 'Status & Review'
+  1. Set the toggle next to **"Do you want to make this app and all its live features available to the general public?"** to Yes
+  1. Click 'Confim' in the displayed dialogue
+1. In the left menu, select 'Dasboard'
+1. Add the 'App ID' and 'App Secret' to your config.yml file
 
-Multiple urls
 
-  - In https://developers.facebook.com go to your app then settings and then the advanced tab.
-  - In security add the url's to the "Valid OAuth redirect URIs"
+**Multiple URLs**
+1. Go to https://developers.facebook.com
+1. In the left menu, select 'Settings'
+1. Select the 'Advanced' tab
+1. Scroll down to the 'Security' section of the page
+1. Add URLs to the 'Valid OAuth redirect URIs' field
 
 Github
 ------
