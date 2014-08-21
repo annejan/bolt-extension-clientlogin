@@ -16,7 +16,7 @@ Adding providers
 
 Google
 ------
-1. Go to https://console.developers.google.com/project and log in, if required
+1. Login to https://console.developers.google.com/project
 1. Click 'Create Project' (go to next step if using an existing one)
   1. Set a descriptive Project Name
   1. Agree to terms and services
@@ -37,7 +37,7 @@ Google
 
 Twitter
 -------
-1. Log in at: https://apps.twitter.com/
+1. Login to: https://apps.twitter.com/
 1. Click 'Create New App' and set:
   - Name
   - Description
