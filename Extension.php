@@ -68,12 +68,18 @@ class Extension extends \Bolt\BaseExtension
         $this->app['dispatcher']->addListener(CronEvents::CRON_DAILY, array($this, 'cronDaily'));
     }
 
+    /**
+     * Cron jobs
+     */
     public function cronDaily()
     {
         $record = new ClientRecords($this->app);
         $record->doRemoveSessionsOld();
     }
 
+    /**
+     * Create controller and define routes
+     */
     private function setController()
     {
         // Create controller object
@@ -95,6 +101,9 @@ class Extension extends \Bolt\BaseExtension
                   ->method('GET|POST');
     }
 
+    /**
+     * Set up config and defaults
+     */
     private function setConfig()
     {
         // Sane defaults
