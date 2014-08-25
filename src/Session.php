@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\ClientLogin;
+namespace Bolt\Extension\Bolt\ClientLogin;
 
 /**
  * Authentication class

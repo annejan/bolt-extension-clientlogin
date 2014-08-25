@@ -1,5 +1,5 @@
 <?php
 
-use Bolt\Extension\ClientLogin\Extension;
+use Bolt\Extension\Bolt\ClientLogin\Extension;
 
 $app['extensions']->register(new Extension($app));

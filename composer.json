@@ -7,8 +7,8 @@
 		"login",
 		"Google",
 		"Facebook",
-        "Twitter",
-        "GitHub"
+		"Twitter",
+		"GitHub"
 	],
 	"require" : {
 		"bolt/bolt" : ">=2.0.0,<3.0.0"
@@ -24,7 +24,7 @@
 			"init.php"
 		],
 		"psr-4" : {
-			"Bolt\\Extension\\ClientLogin\\" : [
+			"Bolt\\Extension\\Bolt\\ClientLogin\\" : [
 				"",
 				"src/"
 			]
