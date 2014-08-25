@@ -25,9 +25,9 @@ Google
   1. Under 'OAuth' click 'Create new Client ID'
   1. In the 'Create Client ID' dialogue
   - **Application Type**: Web Application
-  - **Authorized JavaScript Origins**: http://your-bolt-site.com  
+  - **Authorized JavaScript Origins**: http://your-bolt-site.example.com  
     *(change the domain name to match yours)*
-  - **Authorized Redirect URI**: http://your-bolt-site.com/authenticate/endpoint?hauth.done=Google  
+  - **Authorized Redirect URI**: http://your-bolt-site.example.com/authenticate/endpoint?hauth.done=Google  
     *(change the domain name to match yours)*
   1. Click 'Create'
 1. Expand 'APIs & auth' menu and select 'Consent screen'
@@ -43,9 +43,9 @@ Twitter
 1. Click 'Create New App' and set:
   - Name
   - Description
-  - Website: http://your-bolt-site.com/  
+  - Website: http://your-bolt-site.example.com/  
   *(change the domain name to match yours)*
-  - Callback URL: http://your-bolt-site.com/authenticate/endpoint?hauth.done=Twitter  
+  - Callback URL: http://your-bolt-site.example.com/authenticate/endpoint?hauth.done=Twitter  
   *(change the domain name to match yours)*
 1. Click 'Create your Twitter application'
 1. Select the 'Settings' tab
@@ -68,16 +68,16 @@ Facebook
   - At this point your app is created in development mode and you will be redirected to the App Dashboard.
 1. In the left menu, select 'Settings'
   1. In the 'App Domains' field enter your sites domain name:
-    - your-bolt-site.com  
+    - your-bolt-site.example.com  
     *(change the domain name to match yours)*
   1. In the 'Contact Email' field enter your sites contact email address:
-    - someone@your-bolt-site.com  
+    - someone@your-bolt-site.example.com  
     *(change the address to match your site's)*
   1. Click 'Add Platform' button
   1. Choose "Website" in displayed dialogue
   1. Enter your site's relevant URLs:
-    - **'Site URL'** - http://your-bolt-site.com
-    - **'Mobile Site URL'** - http://mobile.your-bolt-site.com  
+    - **'Site URL'** - http://your-bolt-site.example.com
+    - **'Mobile Site URL'** - http://mobile.your-bolt-site.example.com  
     *(change the domain name to match yours)*
   1. Click 'Save Changes'
 1. In the left menu, select 'Status & Review'
@@ -101,10 +101,10 @@ GitHub
 1. Click 'Register new application'
 1. Fill in the fields:
   1. **Application name**
-  1. **Homepage URL**: http://your-bolt-site.com
+  1. **Homepage URL**: http://your-bolt-site.example.com
   *(change the domain name to match yours)*
   1. **Application description**
-  1. **Authorization callback URL**: http://your-bolt-site.com/authenticate/endpoint?hauth.done=Github  
+  1. **Authorization callback URL**: http://your-bolt-site.example.com/authenticate/endpoint?hauth.done=Github  
   *(change the domain name to match yours)*
 1. Click 'Register application'
 1. Add the 'Client ID' and 'Client Secret' to your config.yml
