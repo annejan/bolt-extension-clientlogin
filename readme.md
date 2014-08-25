@@ -136,7 +136,7 @@ There are two Twig function options for displaying the login links:
     
 In the first instance, after authentication a user is redirected to the homepage.
 
-By supplying the paramter `true` the user is redirected to the current page.
+By supplying the parameter `true` the user is redirected to the current page.
 
 Logout Link
 -----------
@@ -153,7 +153,7 @@ As with login, there are two options for the logout links:
 
 In the first instance, after logging out a user is redirected to the homepage.
 
-By supplying the paramter `true` the user is redirected back to the current page.
+By supplying the parameter `true` the user is redirected back to the current page.
 
 Dynamic Link
 ------------
@@ -187,7 +187,7 @@ First, create a role to be used
             description: Social Media login access
             label: Social Media Login
 
-Secondly set up the permissions for the desired contenttype(s) to have the 'frontend' paramter set to the role created above.
+Secondly set up the permissions for the desired contenttype(s) to have the 'frontend' parameter set to the role created above.
 
     contenttypes:
         mycontenttype:
