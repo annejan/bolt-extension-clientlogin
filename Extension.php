@@ -8,6 +8,11 @@ use Bolt\CronEvents;
  * Login with OAuth via HybridAuth
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
+ *
+ * Based on the Bolt 1.5 extension 'Authenticate' by:
+ * @author Lodewijk Evers
+ * @author Tobias Dammers
+ * @author Bob den Otter
  */
 class Extension extends \Bolt\BaseExtension
 {
