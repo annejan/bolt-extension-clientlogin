@@ -76,8 +76,9 @@ class Extension extends \Bolt\BaseExtension
     /**
      * Cron jobs
      */
-    public function cronDaily()
+    public function cronDaily(\Bolt\CronEvent $event)
     {
+        $event->output->writeln("<comment>ClientLogin: Clearing old sessions</comment>");
         $record = new ClientRecords($this->app);
         $record->doRemoveSessionsOld();
     }
