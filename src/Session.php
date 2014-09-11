@@ -129,6 +129,9 @@ class Session
     {
         $this->getToken();
 
+        // Remove HA sessions
+        $this->doHybridAuth(false, 'logout');
+
         if ($this->token) {
             $records = new ClientRecords($this->app);
 
@@ -226,7 +229,12 @@ class Session
         }
     }
 
-    private function doHybridAuth($provider)
+    /**
+     * Login or logout of service provider via HybridAuth
+     * @param string $provider
+     * @param string $process
+     */
+    private function doHybridAuth($provider, $process = 'login')
     {
         $hybridconfig = $this->config['auth']['hybridauth'];
 
@@ -252,20 +260,34 @@ class Session
         // Initialize the authentication with the modified config
         $this->hybridauth = new \Hybrid_Auth($hybridconfig);
 
-        // See if the user already has valid provider authentication data
-        if (! $this->hybridauth->isConnectedWith(strtolower($provider))) {
-            // Try to authenticate with the selected provider
-            $this->hybridadapter = $this->hybridauth->authenticate($providertype, $provideroptions);
-            $this->isnewauth = true;
+        if ($process == 'login') {
+            // See if the user already has valid provider authentication data
+            if (! $this->hybridauth->isConnectedWith(strtolower($provider))) {
+                // Try to authenticate with the selected provider
+                $this->hybridadapter = $this->hybridauth->authenticate($providertype, $provideroptions);
+                $this->isnewauth = true;
+            } else {
+                // Get the provider's adapter
+                $this->hybridadapter = $this->hybridauth->getAdapter(strtolower($provider));
+            }
+
+            // Get HybridAuth's session data
+            $this->hybridsession = unserialize($this->hybridauth->getSessionData());
+
+            // Grab the user profile from HybridAuth
+            $this->hybridprofile = $this->hybridadapter->getUserProfile();
         } else {
-            // Get the provider's adapter
-            $this->hybridadapter = $this->hybridauth->getAdapter(strtolower($provider));
+            $records = new ClientRecords($this->app);
+            $records->getUserProfileBySession($this->token);
+            $provider = $records->user['provider'];
+
+            // Cancel our session
+            if ($this->hybridauth->isConnectedWith($provider)) {
+                // Get the provider's adapter
+                $this->hybridadapter = $this->hybridauth->getAdapter($provider);
+
+                $this->hybridadapter->logout();
+            }
         }
-
-        // Get HybridAuth's session data
-        $this->hybridsession = unserialize($this->hybridauth->getSessionData());
-
-        // Grab the user profile from HybridAuth
-        $this->hybridprofile = $this->hybridadapter->getUserProfile();
     }
 }
