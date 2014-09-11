@@ -226,3 +226,26 @@ if ($session->doCheckLogin()) {
     }
 }
 ```
+
+Event Handlers
+--------------
+
+If you want to hook into login/logout events, ClientLogin dispatches events to 
+listeners on `clientlogin.Login` and `clientlogin.Logout`.
+
+You can add the hooks and specify callback functions like so: 
+
+```php
+$this->app['dispatcher']->addListener('clientlogin.Login',  array($this, 'myLoginCallback'));
+$this->app['dispatcher']->addListener('clientlogin.Logout', array($this, 'myLogoutCallback'));
+```
+
+Inside your callback you can get the array of user profile data for the login/logout
+with:
+
+```php
+public function myLoginCallback($event)
+{ 
+    $userdata = $event->getUser();
+}
+```
