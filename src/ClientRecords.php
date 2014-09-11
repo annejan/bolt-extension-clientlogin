@@ -298,6 +298,40 @@ class ClientRecords
     }
 
     /**
+     * Get the name of the user record table
+     *
+     * @return string
+     */
+    public function getTableNameProfiles()
+    {
+        $this->prefix = $this->app['config']->get('general/database/prefix', "bolt_");
+
+        // Make sure prefix ends in '_'. Prefixes without '_' are lame..
+        if ($this->prefix[ strlen($this->prefix)-1 ] != "_") {
+            $this->prefix .= "_";
+        }
+
+        return $this->prefix . 'client_profiles';
+    }
+
+    /**
+     * Get the name of the user session table
+     *
+     * @return string
+     */
+    private function getTableNameSessions()
+    {
+        $this->prefix = $this->app['config']->get('general/database/prefix', "bolt_");
+
+        // Make sure prefix ends in '_'. Prefixes without '_' are lame..
+        if ($this->prefix[ strlen($this->prefix)-1 ] != "_") {
+            $this->prefix .= "_";
+        }
+
+        return $this->prefix . 'client_sessions';
+    }
+
+    /**
      * Create/update database tables
      */
     public function dbCheck()
@@ -335,39 +369,5 @@ class ClientRecords
                 return $table;
             }
         );
-    }
-
-    /**
-     * Get the name of the user record table
-     *
-     * @return string
-     */
-    private function getTableNameProfiles()
-    {
-        $this->prefix = $this->app['config']->get('general/database/prefix', "bolt_");
-
-        // Make sure prefix ends in '_'. Prefixes without '_' are lame..
-        if ($this->prefix[ strlen($this->prefix)-1 ] != "_") {
-            $this->prefix .= "_";
-        }
-
-        return $this->prefix . 'client_profiles';
-    }
-
-    /**
-     * Get the name of the user session table
-     *
-     * @return string
-     */
-    private function getTableNameSessions()
-    {
-        $this->prefix = $this->app['config']->get('general/database/prefix', "bolt_");
-
-        // Make sure prefix ends in '_'. Prefixes without '_' are lame..
-        if ($this->prefix[ strlen($this->prefix)-1 ] != "_") {
-            $this->prefix .= "_";
-        }
-
-        return $this->prefix . 'client_sessions';
     }
 }
