@@ -99,13 +99,19 @@ class Session
                     $this->setToken($records->user['id']);
 
                     // Create the session if need be
-                    if (!$records->getUserSessionByToken($records->user['id'])) {
+                    if (!$records->getUserProfileBySession($this->token)) {
                         $records->doCreateUserSession($this->token);
                     }
 
                     // Add frontend role if set up
                     if (!empty($this->config['role'])) {
                         $this->setUserRole();
+                    }
+
+                    // Event dispatcher
+                    if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
+                        $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
+                        $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
                     }
 
                     // Success
@@ -134,12 +140,19 @@ class Session
 
         if ($this->token) {
             $records = new ClientRecords($this->app);
+            $records->getUserProfileBySession($this->token);
 
             // Remove session from database
             $records->doRemoveSession($this->token);
 
             // Remove cookies
             $this->app['session']->set(Session::TOKENNAME, null);
+
+            // Event dispatcher
+            if ($this->app['dispatcher']->hasListeners('clientlogin.Logout')) {
+                $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
+                $this->app['dispatcher']->dispatch('clientlogin.Logout', $event);
+            }
         }
     }
 
