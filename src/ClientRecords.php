@@ -182,16 +182,19 @@ class ClientRecords
      *
      * @param string $provider
      * @param array $profile
+     * @param array $sessiondata
      * @return boolean
      */
-    public function doCreateUserProfile($provider, $profile)
+    public function doCreateUserProfile($provider, $profile, $sessiondata)
     {
         $json = json_encode($profile);
 
         $content = array(
-            'username' => $profile->displayName,
-            'provider' => $provider,
-            'providerdata' => $json
+            'username'     => $profile->displayName,
+            'provider'     => $provider,
+            'providerdata' => $json,
+            'sessiondata'  => json_encode($sessiondata),
+            'lastupdate'   => date('Y-m-d H:i:s', $_SERVER["REQUEST_TIME"]),
         );
 
         $result = $this->app['db']->insert($this->getTableNameProfiles(), $content);
@@ -204,12 +207,35 @@ class ClientRecords
         }
     }
 
+    /**
+     * Update a user profile record
+     *
+     * @param string $provider
+     * @param array $profile
+     * @param array $sessiondata
+     */
+    public function doUpdateUserProfile($provider, $profile, $sessiondata)
+    {
+        $json = json_encode($profile);
+
+        $content = array(
+            'providerdata' => $json,
+            'sessiondata'  => json_encode($sessiondata),
+            'lastupdate'   => date('Y-m-d H:i:s', $_SERVER["REQUEST_TIME"]),
+        );
+
+        $this->app['db']->update($this->getTableNameProfiles(), $content, array(
+            'username'     => $profile->displayName,
+            'provider'     => $provider,
+        ));
+    }
+
     public function doCreateUserSession($token)
     {
         $content = array(
-            'userid' =>  $this->user['id'],
+            'userid'   => $this->user['id'],
             'lastseen' => date('Y-m-d H:i:s', $_SERVER["REQUEST_TIME"]),
-            'token' => $token
+            'token'    => $token
         );
 
         $result = $this->app['db']->insert($this->getTableNameSessions(), $content);

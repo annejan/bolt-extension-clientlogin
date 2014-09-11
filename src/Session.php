@@ -29,6 +29,35 @@ class Session
      */
     private $config;
 
+    /**
+     * @var \Hybrid_Auth
+     */
+    private $hybridauth = false;
+
+    /**
+     * Is this a new authentication
+     * @var bool
+     */
+    private $isnewauth = false;
+
+    /**
+     * @var \Hybrid_Provider_Adapter
+     */
+    private $hybridadapter = false;
+
+    /**
+     * User profile returned from HybridAuth
+     * @var array
+     */
+    private $hybridprofile;
+
+    /**
+     * HybridAuth PHP session information for active logins
+     *
+     * @var array
+     */
+    private $hybridsession = false;
+
     public function __construct(\Bolt\Application $app)
     {
         $this->app = $app;
@@ -51,42 +80,19 @@ class Session
 
             // Attempt a HybridAuth login
             try {
-                $hybridconfig = $this->config['auth']['hybridauth'];
 
-                // Get the type early - because we might need to enable it
-                if (isset($hybridconfig['providers'][$provider]['type'])) {
-                    $providertype = $hybridconfig['providers'][$provider]['type'];
-                } else {
-                    $providertype = $provider;
-                }
+                // Do the HybridAuth dance.
+                $this->doHybridAuth($provider);
 
-                // Enable OpenID
-                if($providertype == 'OpenID' && $hybridconfig['providers'][$provider]['enabled'] == true) {
-                    $hybridconfig['providers']['OpenID']['enabled'] = true;
-                }
-
-                $provideroptions = array();
-                if ($providertype == 'OpenID' && !empty($hybridconfig['providers'][$provider]['openid_identifier'])) {
-                    // Try to authenticate with the selected OpenID provider
-                    $providerurl = $hybridconfig['providers'][$provider]['openid_identifier'];
-                    $provideroptions["openid_identifier"] = $providerurl;
-                }
-
-                // Initialize the authentication with the modified config
-                $hybridauth = new \Hybrid_Auth($hybridconfig);
-
-                // Try to authenticate with the selected provider
-                $adapter = $hybridauth->authenticate($providertype, $provideroptions);
-
-                // Grab the user profile from HybridAuth
-                $profile = $adapter->getUserProfile();
-
-                if($profile) {
+                if($this->hybridprofile) {
                     $records = new ClientRecords($this->app);
 
                     // If user record doesn't exist, create it
-                    if (!$records->getUserProfileByName($profile->displayName, $provider)) {
-                        $records->doCreateUserProfile($provider, $profile);
+                    $profilerecord = $records->getUserProfileByName($this->hybridprofile->displayName, $provider);
+                    if ($profilerecord) {
+                        $records->doUpdateUserProfile($provider, $this->hybridprofile, $this->hybridsession);
+                    } else {
+                        $records->doCreateUserProfile($provider, $this->hybridprofile, $this->hybridsession);
                     }
 
                     // User has either just been created or has no token, set it
@@ -105,7 +111,7 @@ class Session
                     // Success
                     return array('result' => true, 'error' => '');
                 } else {
-                    return array('result' => false, 'error' => '<pre>OAuth Error: please try again!</pre>');
+                    return array('result' => false, 'error' => '<pre>ClientLogin Authentication Problem: Please try again!</pre>');
                 }
             } catch(Exception $e) {
                 $html =  "<pre>Error: please try again!</pre><br>";
@@ -218,5 +224,48 @@ class Session
                 array_push($this->app['users']->currentuser['roles'], $this->config['role']);
             }
         }
+    }
+
+    private function doHybridAuth($provider)
+    {
+        $hybridconfig = $this->config['auth']['hybridauth'];
+
+        // Get the type early - because we might need to enable it
+        if (isset($hybridconfig['providers'][$provider]['type'])) {
+            $providertype = $hybridconfig['providers'][$provider]['type'];
+        } else {
+            $providertype = $provider;
+        }
+
+        // Enable OpenID
+        if($providertype == 'OpenID' && $hybridconfig['providers'][$provider]['enabled'] == true) {
+            $hybridconfig['providers']['OpenID']['enabled'] = true;
+        }
+
+        $provideroptions = array();
+        if ($providertype == 'OpenID' && !empty($hybridconfig['providers'][$provider]['openid_identifier'])) {
+            // Try to authenticate with the selected OpenID provider
+            $providerurl = $hybridconfig['providers'][$provider]['openid_identifier'];
+            $provideroptions["openid_identifier"] = $providerurl;
+        }
+
+        // Initialize the authentication with the modified config
+        $this->hybridauth = new \Hybrid_Auth($hybridconfig);
+
+        // See if the user already has valid provider authentication data
+        if (! $this->hybridauth->isConnectedWith(strtolower($provider))) {
+            // Try to authenticate with the selected provider
+            $this->hybridadapter = $this->hybridauth->authenticate($providertype, $provideroptions);
+            $this->isnewauth = true;
+        } else {
+            // Get the provider's adapter
+            $this->hybridadapter = $this->hybridauth->getAdapter(strtolower($provider));
+        }
+
+        // Get HybridAuth's session data
+        $this->hybridsession = unserialize($this->hybridauth->getSessionData());
+
+        // Grab the user profile from HybridAuth
+        $this->hybridprofile = $this->hybridadapter->getUserProfile();
     }
 }
