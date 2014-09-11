@@ -279,11 +279,13 @@ class ClientRecords
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_name) {
                 $table = $schema->createTable($table_name);
-                $table->addColumn("id", "integer", array('autoincrement' => true));
-                $table->setPrimaryKey(array("id"));
-                $table->addColumn("username", "string", array("length" => 64));
-                $table->addColumn("provider", "string", array("length" => 64));
+                $table->addColumn("id",           "integer", array('autoincrement' => true));
+                $table->addColumn("username",     "string",  array("length" => 64));
+                $table->addColumn("provider",     "string",  array("length" => 64));
                 $table->addColumn("providerdata", "text");
+                $table->addColumn("sessiondata",  "text");
+                $table->addColumn("lastupdate",   "datetime");
+                $table->setPrimaryKey(array("id"));
                 return $table;
             }
         );
@@ -293,11 +295,11 @@ class ClientRecords
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_name) {
                 $table = $schema->createTable($table_name);
-                $table->addColumn("id", "integer", array('autoincrement' => true));
-                $table->setPrimaryKey(array("id"));
-                $table->addColumn("userid", "integer");
-                $table->addColumn("token", "string", array('length' => 64));
+                $table->addColumn("id",      "integer", array('autoincrement' => true));
+                $table->addColumn("userid",   "integer");
+                $table->addColumn("token",    "string", array('length' => 64));
                 $table->addColumn("lastseen", "datetime");
+                $table->setPrimaryKey(array("id"));
                 $table->addIndex(array("userid"));
                 $table->addIndex(array("token"));
                 return $table;
