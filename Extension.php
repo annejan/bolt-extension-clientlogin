@@ -112,17 +112,6 @@ class Extension extends \Bolt\BaseExtension
      */
     private function setConfig()
     {
-        // Sane defaults
-        if (empty($this->config['basepath'])) {
-            $this->config['basepath'] = "authenticate";
-        }
-        if (empty($this->config['template']['profile'])) {
-            $this->config['template']['profile'] = "_profile.twig";
-        }
-        if (empty($this->config['template']['button'])) {
-            $this->config['template']['button'] = "_button.twig";
-        }
-
         /*
          * Set HybridAuth
          */
@@ -147,5 +136,41 @@ class Extension extends \Bolt\BaseExtension
          * Password auth
          */
         $this->config['auth']['password'] = $this->config['providers']['Password'];
+    }
+
+    /**
+     * Default config options
+     *
+     * @return array
+     */
+    protected function getDefaultConfig()
+    {
+        return array(
+            'providers' => array(
+                'Password' => array(
+                    'enabled' => false
+                ),
+                'Google' => array(
+                    'enabled' => false
+                ),
+                'Facebook' => array(
+                    'enabled' => false
+                ),
+                'Twitter' => array(
+                    'enabled' => false
+                ),
+                'GitHub' => array(
+                    'enabled' => false
+                )
+            ),
+            'basepath' => 'authenticate',
+            'template' => array(
+                'profile'  => '_profile.twig',
+                'button'   => '_button.twig',
+                'password' => '_password.twig'
+            ),
+            'login_expiry' => 14,
+            'debug_mode'   => false
+        );
     }
 }
