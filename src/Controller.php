@@ -4,8 +4,6 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 
 use Silex;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Authentication controller
@@ -33,8 +31,8 @@ class Controller
     /**
      * Logout controller
      *
-     * @param \Silex\Application $app
-     * @param Request $request
+     * @param  \Silex\Application $app
+     * @param  Request            $request
      * @return multitype:
      */
     public function getAuthenticationLogin(\Silex\Application $app, Request $request)
@@ -76,7 +74,7 @@ class Controller
      * Logout controller
      *
      * @param \Silex\Application $app
-     * @param Request $request
+     * @param Request            $request
      */
     public function getAuthenticationLogout(\Silex\Application $app, Request $request)
     {
@@ -91,7 +89,7 @@ class Controller
     /**
      * HybridAuth endpoint — passes all login requests to HybridAuth
      *
-     * @param \Silex\Application $app
+     * @param  \Silex\Application $app
      * @return multitype:
      */
     public function getAuthenticationEndpoint(\Silex\Application $app, Request $request)
@@ -108,7 +106,7 @@ class Controller
     {
         $returnpage = $app['request']->get('redirect');
 
-        if($returnpage) {
+        if ($returnpage) {
             $returnpage = str_replace($app['paths']['hosturl'], '', $returnpage);
             simpleredirect($returnpage);
         } else {

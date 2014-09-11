@@ -39,8 +39,8 @@ class ClientRecords
     /**
      * Look up a users database profile
      *
-     * @param string $username
-     * @param string $provider
+     * @param  string  $username
+     * @param  string  $provider
      * @return boolean True if user record found
      */
     public function getUserProfileByName($username, $provider)
@@ -68,8 +68,8 @@ class ClientRecords
     /**
      * Look up a users database profile
      *
-     * @param string $username
-     * @param string $provider
+     * @param  string  $username
+     * @param  string  $provider
      * @return boolean True if user record found
      */
     public function getUserProfileByID($id)
@@ -99,7 +99,7 @@ class ClientRecords
      * If we have a token record matching the users cookie, retrieve the
      * matching user record and store in obeject
      *
-     * @param string $token The PHP session token to query
+     * @param  string  $token The PHP session token to query
      * @return boolean
      */
     public function getUserProfileBySession($token)
@@ -128,13 +128,14 @@ class ClientRecords
                 return true;
             }
         }
+
         return false;
     }
 
     /**
      * Lookup user session by user ID
      *
-     * @param integer $id
+     * @param  integer $id
      * @return boolean
      */
     public function getUserSessionByID($id)
@@ -157,7 +158,7 @@ class ClientRecords
     /**
      * Lookup user session by user ID
      *
-     * @param integer $id
+     * @param  integer $id
      * @return boolean
      */
     public function getUserSessionByToken($token)
@@ -180,9 +181,9 @@ class ClientRecords
     /**
      * Create a user profile record
      *
-     * @param string $provider
-     * @param array $profile
-     * @param array $sessiondata
+     * @param  string  $provider
+     * @param  array   $profile
+     * @param  array   $sessiondata
      * @return boolean
      */
     public function doCreateUserProfile($provider, $profile, $sessiondata)
@@ -201,6 +202,7 @@ class ClientRecords
 
         if ($result) {
             $this->user['id'] = $this->app['db']->lastInsertId();
+
             return true;
         } else {
             return false;
@@ -211,8 +213,8 @@ class ClientRecords
      * Update a user profile record
      *
      * @param string $provider
-     * @param array $profile
-     * @param array $sessiondata
+     * @param array  $profile
+     * @param array  $sessiondata
      */
     public function doUpdateUserProfile($provider, $profile, $sessiondata)
     {
@@ -312,6 +314,7 @@ class ClientRecords
                 $table->addColumn("sessiondata",  "text");
                 $table->addColumn("lastupdate",   "datetime");
                 $table->setPrimaryKey(array("id"));
+
                 return $table;
             }
         );
@@ -328,6 +331,7 @@ class ClientRecords
                 $table->setPrimaryKey(array("id"));
                 $table->addIndex(array("userid"));
                 $table->addIndex(array("token"));
+
                 return $table;
             }
         );

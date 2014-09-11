@@ -84,7 +84,7 @@ class Session
                 // Do the HybridAuth dance.
                 $this->doHybridAuth($provider);
 
-                if($this->hybridprofile) {
+                if ($this->hybridprofile) {
                     $records = new ClientRecords($this->app);
 
                     // If user record doesn't exist, create it
@@ -113,7 +113,7 @@ class Session
                 } else {
                     return array('result' => false, 'error' => '<pre>ClientLogin Authentication Problem: Please try again!</pre>');
                 }
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 $html =  "<pre>Error: please try again!</pre><br>";
                 $html .= "<pre>Original error message: " . $e->getMessage() . "</pre>";
 
@@ -195,16 +195,17 @@ class Session
     /**
      * Create new session token. Should be reasonably unique
      *
-     * @param string $key Optional salt for the returned token
+     * @param  string $key Optional salt for the returned token
      * @return string
      */
     private function doCreateToken($key = null)
     {
-        if(!$key) {
+        if (!$key) {
             $seed = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'] . $_SERVER["REQUEST_TIME"];
         } else {
             $seed = $_SERVER['REMOTE_ADDR'] . $key . $_SERVER["REQUEST_TIME"];
         }
+
         return md5($seed);
     }
 
@@ -231,6 +232,7 @@ class Session
 
     /**
      * Login or logout of service provider via HybridAuth
+     *
      * @param string $provider
      * @param string $process
      */
@@ -246,7 +248,7 @@ class Session
         }
 
         // Enable OpenID
-        if($providertype == 'OpenID' && $hybridconfig['providers'][$provider]['enabled'] == true) {
+        if ($providertype == 'OpenID' && $hybridconfig['providers'][$provider]['enabled'] == true) {
             $hybridconfig['providers']['OpenID']['enabled'] = true;
         }
 

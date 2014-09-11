@@ -55,8 +55,8 @@ class UserInterface
         if (isset($this->config['auth']['hybridauth'])) {
             $buttons = array();
 
-            foreach($this->config['auth']['hybridauth']['providers'] as $provider => $values) {
-                if($values['enabled'] == true) {
+            foreach ($this->config['auth']['hybridauth']['providers'] as $provider => $values) {
+                if ($values['enabled'] == true) {
                     $label = !empty($values['label']) ? $values['label'] : $provider;
                     $class = isset($values['type']) && $values['type'] == 'OpenID' ? 'openid' : $provider;
 
@@ -103,9 +103,9 @@ class UserInterface
     /**
      * Simple function to format the HTML for a button.
      *
-     * @param string $link
-     * @param string $provider
-     * @param string $label
+     * @param  string       $link
+     * @param  string       $provider
+     * @param  string       $label
      * @return \Twig_Markup
      */
     private function doFormatButton($link, $provider, $label)
