@@ -58,9 +58,11 @@ class UserInterface
             foreach($this->config['auth']['hybridauth']['providers'] as $provider => $values) {
                 if($values['enabled'] == true) {
                     $label = !empty($values['label']) ? $values['label'] : $provider;
+                    $class = isset($values['type']) && $values['type'] == 'OpenID' ? 'openid' : $provider;
+
                     $buttons[] = $this->doFormatButton(
                         $this->app['paths']['root'] . $this->config['basepath'] . '/login?provider=' . $provider . $target,
-                        $provider,
+                        $class,
                         $label);
                 }
             }
