@@ -20,7 +20,7 @@ providers:
         enabled: false
 
     Google:
-        label: Google account
+        label: Sign in with Google
         enabled: false
         keys:
             id: "*** your ID here ***"
@@ -28,7 +28,7 @@ providers:
         scope: "profile"
 
     Facebook:
-        label: Facebook connect
+        label: Sign in with Facebook
         enabled: false
         keys:
             id: "*** your ID here ***"
@@ -36,14 +36,14 @@ providers:
         scope: "email"
 
     Twitter:
-        label: Twitter sign in
+        label: Sign in with Twitter
         enabled: false
         keys:
             key: "*** your KEY here ***"
             secret: "*** your secret here ***"
 
     GitHub:
-        label: Github account
+        label: Sign in with Github
         enabled: false
         keys:
             id: "*** your ID here ***"
@@ -51,7 +51,7 @@ providers:
        
     # MyOpenIdProvider:
     #     type: OpenID
-    #     label: MyOpenIdProvider account
+    #     label: Sign in with MyOpenIdProvider
     #     enabled: true
     #     openid_identifier: "http://openid.example.org"
         
