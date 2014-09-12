@@ -191,6 +191,7 @@ class ClientRecords
         $json = json_encode($profile);
 
         $content = array(
+            'identifier'   => $profile->identifier,
             'username'     => $profile->displayName,
             'provider'     => $provider,
             'providerdata' => $json,
@@ -227,7 +228,7 @@ class ClientRecords
         );
 
         $this->app['db']->update($this->getTableNameProfiles(), $content, array(
-            'username'     => $profile->displayName,
+            'identifier'   => $profile->identifier,
             'provider'     => $provider,
         ));
     }
@@ -342,8 +343,9 @@ class ClientRecords
             function ($schema) use ($table_name) {
                 $table = $schema->createTable($table_name);
                 $table->addColumn("id",           "integer", array('autoincrement' => true));
-                $table->addColumn("username",     "string",  array("length" => 64));
                 $table->addColumn("provider",     "string",  array("length" => 64));
+                $table->addColumn("identifier",   "string",  array("length" => 128));
+                $table->addColumn("username",     "string",  array("length" => 64));
                 $table->addColumn("providerdata", "text");
                 $table->addColumn("sessiondata",  "text");
                 $table->addColumn("lastupdate",   "datetime");
@@ -358,7 +360,7 @@ class ClientRecords
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_name) {
                 $table = $schema->createTable($table_name);
-                $table->addColumn("id",      "integer", array('autoincrement' => true));
+                $table->addColumn("id",       "integer", array('autoincrement' => true));
                 $table->addColumn("userid",   "integer");
                 $table->addColumn("token",    "string", array('length' => 64));
                 $table->addColumn("lastseen", "datetime");
