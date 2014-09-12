@@ -48,6 +48,7 @@ providers:
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
+        scope: "user:email"
        
     # MyOpenIdProvider:
     #     type: OpenID
