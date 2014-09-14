@@ -169,7 +169,7 @@ class Extension extends \Bolt\BaseExtension
                 'button'   => '_button.twig',
                 'password' => '_password.twig'
             ),
-            'zocial' => true,
+            'zocial' => false,
             'login_expiry' => 14,
             'debug_mode'   => false
         );

@@ -8,7 +8,9 @@ label:
     logout: Logout
 
 # Use the Zocial styling CSS for buttons
-zocial: true
+#
+# You must also install the 'bolt/zocial-icons' extension
+zocial: false
 
 # Frontend role to assign to logged in visitor. 
 #
