@@ -28,7 +28,7 @@ providers:
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
-        scope: "profile"
+        scope: "openid profile email"
 
     Facebook:
         label: Sign in with Facebook
