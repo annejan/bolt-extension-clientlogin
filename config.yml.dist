@@ -7,6 +7,9 @@ template:
 label:
     logout: Logout
 
+# Use the Zocial styling CSS for buttons
+zocial: true
+
 # Frontend role to assign to logged in visitor. 
 #
 # Is only relevant when 'frontend_permission_checks' is set to true in config.yml

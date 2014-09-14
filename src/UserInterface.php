@@ -110,11 +110,17 @@ class UserInterface
      */
     private function doFormatButton($link, $provider, $label)
     {
+        if ($this->config['zocial']) {
+            $class = "zocial {$provider}";
+        } else {
+            $class = "{$provider}";
+        }
+
         $provider = strtolower(safeString($provider));
         $context = array(
             'link' => $link,
             'label' => $label,
-            'class' => "zocial {$provider}"
+            'class' => $class
         );
 
         $markup = $this->app['render']->render($this->config['template']['button'], $context);
