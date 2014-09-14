@@ -110,13 +110,14 @@ class UserInterface
      */
     private function doFormatButton($link, $provider, $label)
     {
+        $provider = strtolower(safeString($provider));
+
         if ($this->config['zocial']) {
             $class = "zocial {$provider}";
         } else {
             $class = "{$provider}";
         }
 
-        $provider = strtolower(safeString($provider));
         $context = array(
             'link' => $link,
             'label' => $label,
