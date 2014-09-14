@@ -96,7 +96,7 @@ class Session
                     }
 
                     // User has either just been created or has no token, set it
-                    $this->setToken($records->user['id']);
+                    $this->setToken();
 
                     // Create the session if need be
                     if (!$records->getUserProfileBySession($this->token)) {
@@ -196,30 +196,13 @@ class Session
      *
      * @param integer $id
      */
-    private function setToken($id)
+    private function setToken()
     {
         // Create a unique token
-        $this->token = $this->doCreateToken() . $this->doCreateToken($id);
+        $this->token = $this->app['randomgenerator']->generateString(32);
 
         // Set session cookie
         $this->app['session']->set(Session::TOKENNAME, $this->token);
-    }
-
-    /**
-     * Create new session token. Should be reasonably unique
-     *
-     * @param  string $key Optional salt for the returned token
-     * @return string
-     */
-    private function doCreateToken($key = null)
-    {
-        if (!$key) {
-            $seed = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'] . $_SERVER["REQUEST_TIME"];
-        } else {
-            $seed = $_SERVER['REMOTE_ADDR'] . $key . $_SERVER["REQUEST_TIME"];
-        }
-
-        return md5($seed);
     }
 
     /**
