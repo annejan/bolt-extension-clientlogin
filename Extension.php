@@ -22,6 +22,13 @@ class Extension extends \Bolt\BaseExtension
     const NAME = 'ClientLogin';
 
     /**
+     * Extension's container
+     *
+     * @var string
+     */
+    const CONTAINER = 'extensions.ClientLogin';
+
+    /**
      * @var ClientLogin\Controller
      */
     private $controller;

@@ -25,7 +25,7 @@ class Controller
     public function __construct(Silex\Application $app)
     {
         $this->app = $app;
-        $this->config = $this->app['extensions.' . Extension::NAME]->config;
+        $this->config = $this->app[Extension::CONTAINER]->config;
     }
 
     /**
@@ -37,7 +37,7 @@ class Controller
      */
     public function getAuthenticationLogin(\Silex\Application $app, Request $request)
     {
-        $session = $this->app['extensions.' . Extension::NAME]->session;
+        $session = $this->app[Extension::CONTAINER]->session;
 
         if ($session->doCheckLogin()) {
             // User is already logged in, return them... somewhere
@@ -78,7 +78,7 @@ class Controller
      */
     public function getAuthenticationLogout(\Silex\Application $app, Request $request)
     {
-        $session = $this->app['extensions.' . Extension::NAME]->session;
+        $session = $this->app[Extension::CONTAINER]->session;
 
         $session->doLogout();
 

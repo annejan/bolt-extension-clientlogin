@@ -22,14 +22,14 @@ class UserInterface
     public function __construct(\Bolt\Application $app)
     {
         $this->app = $app;
-        $this->config = $this->app['extensions.' . Extension::NAME]->config;
+        $this->config = $this->app[Extension::CONTAINER]->config;
 
         $this->app['twig.loader.filesystem']->addPath(dirname(__DIR__) . "/assets");
     }
 
     public function doDisplayAuth($redirect)
     {
-        $session = $this->app['extensions.' . Extension::NAME]->session;
+        $session = $this->app[Extension::CONTAINER]->session;
 
         if ($session->doCheckLogin()) {
             return $this->doDisplayLogout($redirect);
