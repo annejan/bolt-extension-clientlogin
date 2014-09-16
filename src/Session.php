@@ -75,6 +75,17 @@ class Session
     {
         // Check for extisting token
         if ($this->doCheckLogin()) {
+            $records = new ClientRecords($this->app);
+
+            $this->getToken();
+            $records->getUserProfileBySession($this->token);
+
+            // Event dispatcher
+            if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
+                $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
+                $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
+            }
+
             return array('result' => true, 'error' => '');
         } else {
 

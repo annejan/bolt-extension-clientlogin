@@ -39,34 +39,29 @@ class Controller
     {
         $session = $this->app[Extension::CONTAINER]->session;
 
-        if ($session->doCheckLogin()) {
-            // User is already logged in, return them... somewhere
-            $this->doRedirect($this->app);
-        } else {
-            $provider = $request->query->get('provider');
+        $provider = $request->query->get('provider');
 
-            if ($provider) {
-                if ($provider == 'Password' && $this->config['auth']['password']['enabled']) {
-                    // Attempt password login
-                    $result = $session->doLoginPassword();
-                } elseif ($this->config['auth']['hybridauth']['providers'][$provider]['enabled']) {
-                    // Attempt oauth login
-                    $result = $session->doLoginOAuth($provider);
-                } else {
-                    $result = array('result' => false, 'error' => '<pre>Error: Invalid or disabled provider</pre>');
-                }
-
-                if ($result['result']) {
-                    // Login done, redirect
-                    $this->doRedirect($this->app);
-                } else {
-                    return $result['error'];
-                }
-
+        if ($provider) {
+            if ($provider == 'Password' && $this->config['auth']['password']['enabled']) {
+                // Attempt password login
+                $result = $session->doLoginPassword();
+            } elseif ($this->config['auth']['hybridauth']['providers'][$provider]['enabled']) {
+                // Attempt oauth login
+                $result = $session->doLoginOAuth($provider);
             } else {
-                // This shouldn't happen, just die here
-                return '<pre>Provider not given</pre>';
+                $result = array('result' => false, 'error' => '<pre>Error: Invalid or disabled provider</pre>');
             }
+
+            if ($result['result']) {
+                // Login done, redirect
+                $this->doRedirect($this->app);
+            } else {
+                return $result['error'];
+            }
+
+        } else {
+            // This shouldn't happen, just die here
+            return '<pre>Provider not given</pre>';
         }
     }
 
