@@ -65,7 +65,7 @@ class Extension extends \Bolt\BaseExtension
             }
 
             // Create and store session
-            $this->app['extensions.' . Extension::NAME]->session = new Session($this->app);
+            $this->app[Extension::CONTAINER]->session = new Session($this->app);
 
             // Set up routes
             $this->setController();
