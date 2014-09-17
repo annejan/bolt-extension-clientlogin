@@ -305,14 +305,14 @@ class ClientRecords
      */
     public function getTableNameProfiles()
     {
-        $this->prefix = $this->app['config']->get('general/database/prefix', "bolt_");
+        $prefix = $this->app['config']->get('general/database/prefix', "bolt_");
 
         // Make sure prefix ends in '_'. Prefixes without '_' are lame..
-        if ($this->prefix[ strlen($this->prefix)-1 ] != "_") {
-            $this->prefix .= "_";
+        if ($prefix[ strlen($prefix)-1 ] != "_") {
+            $prefix .= "_";
         }
 
-        return $this->prefix . 'client_profiles';
+        return $prefix . 'client_profiles';
     }
 
     /**
@@ -322,14 +322,14 @@ class ClientRecords
      */
     private function getTableNameSessions()
     {
-        $this->prefix = $this->app['config']->get('general/database/prefix', "bolt_");
+        $prefix = $this->app['config']->get('general/database/prefix', "bolt_");
 
         // Make sure prefix ends in '_'. Prefixes without '_' are lame..
-        if ($this->prefix[ strlen($this->prefix)-1 ] != "_") {
-            $this->prefix .= "_";
+        if ($prefix[ strlen($prefix)-1 ] != "_") {
+            $prefix .= "_";
         }
 
-        return $this->prefix . 'client_sessions';
+        return $prefix . 'client_sessions';
     }
 
     /**
