@@ -13,7 +13,7 @@
 	"require" : {
 		"bolt/bolt" : ">=2.0.0,<3.0.0"
 	},
-	"license" : "GPL",
+	"license" : "GPL-3.0+",
 	"authors" : [{
 			"name" : "Gawain Lynch",
 			"email" : "gawain.lynch@gmail.com"
@@ -35,9 +35,9 @@
 			"lib/Hybrid/User_Profile.php"
 		]
 	},
-    "extra" : {
-        "branch-alias" : {
-            "dev-master" : "2.0.*-dev"
-        }
-    }
+	"extra" : {
+		"branch-alias" : {
+			"dev-master" : "2.0.*-dev"
+		}
+	}
 }
