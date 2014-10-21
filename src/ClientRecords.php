@@ -202,6 +202,7 @@ class ClientRecords
         $result = $this->app['db']->insert($this->getTableNameProfiles(), $content);
 
         if ($result) {
+            $this->user = $content;
             $this->user['id'] = $this->app['db']->lastInsertId();
 
             return true;
