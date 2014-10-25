@@ -2,7 +2,8 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
-use Bolt\CronEvents;
+use Bolt\Events\CronEvent;
+use Bolt\Events\CronEvents;
 
 /**
  * Login with OAuth via HybridAuth
@@ -82,8 +83,10 @@ class Extension extends \Bolt\BaseExtension
 
     /**
      * Cron jobs
+     *
+     * @param \Bolt\Events\CronEvent $event
      */
-    public function cronDaily(\Bolt\CronEvent $event)
+    public function cronDaily(CronEvent $event)
     {
         $event->output->writeln("<comment>ClientLogin: Clearing old sessions</comment>");
         $record = new ClientRecords($this->app);
