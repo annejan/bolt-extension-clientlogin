@@ -2,6 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Bolt\Library as Lib;
 use Silex;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -103,9 +104,9 @@ class Controller
 
         if ($returnpage) {
             $returnpage = str_replace($app['paths']['hosturl'], '', $returnpage);
-            simpleredirect($returnpage);
+            Lib::simpleredirect($returnpage);
         } else {
-            simpleredirect($app['paths']['hosturl']);
+            Lib::simpleredirect($app['paths']['hosturl']);
         }
     }
 }
