@@ -29,6 +29,12 @@ class UserInterface
         $this->app['twig.loader.filesystem']->addPath(dirname(__DIR__) . "/assets");
     }
 
+    /**
+     * Disply login/logout depending on auth status
+     *
+     * @param  string      $redirect
+     * @return Twig_Markup
+     */
     public function doDisplayAuth($redirect)
     {
         $session = $this->app[Extension::CONTAINER]->session;
