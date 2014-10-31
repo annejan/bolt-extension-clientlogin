@@ -2,6 +2,8 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Bolt\Helpers\String;
+
 /**
  * User interface
  *
@@ -110,7 +112,7 @@ class UserInterface
      */
     private function doFormatButton($link, $provider, $label)
     {
-        $provider = strtolower(safeString($provider));
+        $provider = strtolower(String::makeSafe($provider));
 
         if ($this->config['zocial']) {
             $class = "zocial {$provider}";
