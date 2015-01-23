@@ -3,6 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
 use Bolt\Extension\Bolt\ClientLogin\Extension;
+use Bolt\Extension\Bolt\ClientLogin\Session;
 use Bolt\Library as Lib;
 use Silex;
 use Silex\ControllerProviderInterface;
@@ -16,11 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 class ClientLoginController implements ControllerProviderInterface
 {
     /**
-     * @var Silex\Application
-     */
-    private $app;
-
-    /**
      * @var Extension config array
      */
     private $config;
@@ -32,7 +28,6 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function connect(Silex\Application $app)
     {
-        $this->app = $app;
         $this->config = $app[Extension::CONTAINER]->config;
 
         /**
@@ -41,17 +36,17 @@ class ClientLoginController implements ControllerProviderInterface
         $ctr = $app['controllers_factory'];
 
         // Member login
-        $ctr->match("{$this->config['basepath']}/login", array($this, 'authenticationLogin'))
+        $ctr->match('/login', array($this, 'authenticationLogin'))
             ->bind('authenticationLogin')
             ->method('GET');
 
         // Member logout
-        $ctr->match("{$this->config['basepath']}/logout", array($this, 'authenticationLogout'))
+        $ctr->match('/logout', array($this, 'authenticationLogout'))
             ->bind('authenticationLogout')
             ->method('GET');
 
         // OAuth callback URI
-        $ctr->match("{$this->config['basepath']}/endpoint", array($this, 'authenticationEndpoint'))
+        $ctr->match('/endpoint', array($this, 'authenticationEndpoint'))
             ->bind('authenticationEndpoint')
             ->method('GET|POST');
 
@@ -67,7 +62,7 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogin(\Silex\Application $app, Request $request)
     {
-        $session = $this->app[Extension::CONTAINER]->session;
+        $session = $app[Extension::CONTAINER]->session;
 
         $provider = $request->query->get('provider');
 
@@ -84,7 +79,7 @@ class ClientLoginController implements ControllerProviderInterface
 
             if ($result['result']) {
                 // Login done, redirect
-                $this->doRedirect($this->app);
+                return $this->doRedirect($app);
             } else {
                 return $result['error'];
             }
@@ -103,12 +98,12 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogout(\Silex\Application $app, Request $request)
     {
-        $session = $this->app[Extension::CONTAINER]->session;
+        $session = $app[Extension::CONTAINER]->session;
 
         $session->doLogout();
 
         // Logout done, redirect
-        $this->doRedirect($this->app);
+        return $this->doRedirect($app);
     }
 
     /**
@@ -133,9 +128,10 @@ class ClientLoginController implements ControllerProviderInterface
 
         if ($returnpage) {
             $returnpage = str_replace($app['paths']['hosturl'], '', $returnpage);
-            Lib::simpleredirect($returnpage);
         } else {
-            Lib::simpleredirect($app['paths']['hosturl']);
+            $returnpage = $app['paths']['hosturl'];
         }
+
+        return $app->redirect($returnpage, 301);
     }
 }
