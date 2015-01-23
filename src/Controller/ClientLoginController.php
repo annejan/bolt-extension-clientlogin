@@ -2,6 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
+use Bolt\Extension\Bolt\ClientLogin\Extension;
 use Bolt\Library as Lib;
 use Silex;
 use Silex\ControllerProviderInterface;
@@ -24,10 +25,37 @@ class ClientLoginController implements ControllerProviderInterface
      */
     private $config;
 
-    public function __construct(Silex\Application $app)
+    /**
+     *
+     * @param  Silex\Application           $app
+     * @return \Silex\ControllerCollection
+     */
+    public function connect(Silex\Application $app)
     {
         $this->app = $app;
-        $this->config = $this->app[Extension::CONTAINER]->config;
+        $this->config = $app[Extension::CONTAINER]->config;
+
+        /**
+         * @var $ctr \Silex\ControllerCollection
+         */
+        $ctr = $app['controllers_factory'];
+
+        // Member login
+        $ctr->match("{$this->config['basepath']}/login", array($this, 'getAuthenticationLogin'))
+            ->bind('getAuthenticationLogin')
+            ->method('GET');
+
+        // Member logout
+        $ctr->match("{$this->config['basepath']}/logout", array($this, 'getAuthenticationLogout'))
+            ->bind('getAuthenticationLogout')
+            ->method('GET');
+
+        // OAuth callback URI
+        $ctr->match("{$this->config['basepath']}/endpoint", array($this, 'getAuthenticationEndpoint'))
+            ->bind('getAuthenticationEndpoint')
+            ->method('GET|POST');
+
+        return $ctr;
     }
 
     /**

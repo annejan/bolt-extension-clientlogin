@@ -95,30 +95,6 @@ class Extension extends \Bolt\BaseExtension
     }
 
     /**
-     * Create controller and define routes
-     */
-    private function setController()
-    {
-        // Create controller object
-        $this->controller = new ClientLoginController($this->app);
-
-        // Member login
-        $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getAuthenticationLogin'))
-                  ->bind('getAuthenticationLogin')
-                  ->method('GET');
-
-        // Member logout
-        $this->app->match("{$this->config['basepath']}/logout", array($this->controller, 'getAuthenticationLogout'))
-                  ->bind('getAuthenticationLogout')
-                  ->method('GET');
-
-        // OAuth callback URI
-        $this->app->match("{$this->config['basepath']}/endpoint", array($this->controller, 'getAuthenticationEndpoint'))
-                  ->bind('getAuthenticationEndpoint')
-                  ->method('GET|POST');
-    }
-
-    /**
      * Set up config and defaults
      */
     private function setConfig()
