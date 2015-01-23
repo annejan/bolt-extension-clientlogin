@@ -1,9 +1,10 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin;
+namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
 use Bolt\Library as Lib;
 use Silex;
+use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Controller
+class ClientLoginController implements ControllerProviderInterface
 {
     /**
      * @var Silex\Application

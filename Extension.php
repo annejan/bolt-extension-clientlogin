@@ -4,6 +4,7 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 
 use Bolt\Events\CronEvent;
 use Bolt\Events\CronEvents;
+use Bolt\Extension\Bolt\ClientLogin\Controller\ClientLoginController;
 
 /**
  * Login with OAuth via HybridAuth
@@ -68,8 +69,8 @@ class Extension extends \Bolt\BaseExtension
             // Create and store session
             $this->app[Extension::CONTAINER]->session = new Session($this->app);
 
-            // Set up routes
-            $this->setController();
+            // Set up controller routes
+            $this->app->mount('/' . $this->config['basepath'], new ClientLoginController());
 
             // Twig functions
             $this->app['twig']->addExtension(new ClientLoginTwigExtensions($this->app));
@@ -99,7 +100,7 @@ class Extension extends \Bolt\BaseExtension
     private function setController()
     {
         // Create controller object
-        $this->controller = new Controller($this->app);
+        $this->controller = new ClientLoginController($this->app);
 
         // Member login
         $this->app->match("{$this->config['basepath']}/login", array($this->controller, 'getAuthenticationLogin'))
