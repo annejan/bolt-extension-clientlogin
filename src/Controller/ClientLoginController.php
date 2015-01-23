@@ -41,18 +41,18 @@ class ClientLoginController implements ControllerProviderInterface
         $ctr = $app['controllers_factory'];
 
         // Member login
-        $ctr->match("{$this->config['basepath']}/login", array($this, 'getAuthenticationLogin'))
-            ->bind('getAuthenticationLogin')
+        $ctr->match("{$this->config['basepath']}/login", array($this, 'authenticationLogin'))
+            ->bind('authenticationLogin')
             ->method('GET');
 
         // Member logout
-        $ctr->match("{$this->config['basepath']}/logout", array($this, 'getAuthenticationLogout'))
-            ->bind('getAuthenticationLogout')
+        $ctr->match("{$this->config['basepath']}/logout", array($this, 'authenticationLogout'))
+            ->bind('authenticationLogout')
             ->method('GET');
 
         // OAuth callback URI
-        $ctr->match("{$this->config['basepath']}/endpoint", array($this, 'getAuthenticationEndpoint'))
-            ->bind('getAuthenticationEndpoint')
+        $ctr->match("{$this->config['basepath']}/endpoint", array($this, 'authenticationEndpoint'))
+            ->bind('authenticationEndpoint')
             ->method('GET|POST');
 
         return $ctr;
@@ -65,7 +65,7 @@ class ClientLoginController implements ControllerProviderInterface
      * @param  Request            $request
      * @return multitype:
      */
-    public function getAuthenticationLogin(\Silex\Application $app, Request $request)
+    public function authenticationLogin(\Silex\Application $app, Request $request)
     {
         $session = $this->app[Extension::CONTAINER]->session;
 
@@ -101,7 +101,7 @@ class ClientLoginController implements ControllerProviderInterface
      * @param \Silex\Application $app
      * @param Request            $request
      */
-    public function getAuthenticationLogout(\Silex\Application $app, Request $request)
+    public function authenticationLogout(\Silex\Application $app, Request $request)
     {
         $session = $this->app[Extension::CONTAINER]->session;
 
@@ -117,7 +117,7 @@ class ClientLoginController implements ControllerProviderInterface
      * @param  \Silex\Application $app
      * @return multitype:
      */
-    public function getAuthenticationEndpoint(\Silex\Application $app, Request $request)
+    public function authenticationEndpoint(\Silex\Application $app, Request $request)
     {
         \Hybrid_Endpoint::process();
     }
