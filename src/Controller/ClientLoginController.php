@@ -5,7 +5,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 use Bolt\Extension\Bolt\ClientLogin\Extension;
 use Bolt\Extension\Bolt\ClientLogin\Session;
 use Bolt\Library as Lib;
-use Silex;
+use Silex\Application;
 use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -26,7 +26,7 @@ class ClientLoginController implements ControllerProviderInterface
      * @param  Silex\Application           $app
      * @return \Silex\ControllerCollection
      */
-    public function connect(Silex\Application $app)
+    public function connect(Application $app)
     {
         $this->config = $app[Extension::CONTAINER]->config;
 
@@ -60,7 +60,7 @@ class ClientLoginController implements ControllerProviderInterface
      * @param  Request            $request
      * @return multitype:
      */
-    public function authenticationLogin(\Silex\Application $app, Request $request)
+    public function authenticationLogin(Application $app, Request $request)
     {
         $session = $app[Extension::CONTAINER]->session;
 
@@ -96,7 +96,7 @@ class ClientLoginController implements ControllerProviderInterface
      * @param \Silex\Application $app
      * @param Request            $request
      */
-    public function authenticationLogout(\Silex\Application $app, Request $request)
+    public function authenticationLogout(Application $app, Request $request)
     {
         $session = $app[Extension::CONTAINER]->session;
 
@@ -112,7 +112,7 @@ class ClientLoginController implements ControllerProviderInterface
      * @param  \Silex\Application $app
      * @return multitype:
      */
-    public function authenticationEndpoint(\Silex\Application $app, Request $request)
+    public function authenticationEndpoint(Application $app, Request $request)
     {
         \Hybrid_Endpoint::process();
     }
@@ -122,7 +122,7 @@ class ClientLoginController implements ControllerProviderInterface
      *
      * @param \Silex\Application $app
      */
-    private function doRedirect(\Silex\Application $app)
+    private function doRedirect(Application $app)
     {
         $returnpage = $app['request']->get('redirect');
 
