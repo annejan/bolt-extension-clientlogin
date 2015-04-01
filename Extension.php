@@ -41,21 +41,22 @@ class Extension extends \Bolt\BaseExtension
         $this->setConfig();
 
         /*
+         * Register ourselves as a service
+         */
+        $this->app->register(new Provider\ClientLoginServiceProvider($this->app));
+
+        /*
          * Backend
          */
         if ($this->app['config']->getWhichEnd() === 'backend') {
             // Check & create database tables if required
-            $records = new ClientRecords($this->app);
-            $records->dbCheck();
+            $this->app['clientlogin.records']->dbCheck();
         }
 
         /*
          * Frontend
          */
         if ($this->app['config']->getWhichEnd() === 'frontend') {
-            // Create and store session
-            $this->app[Extension::CONTAINER]->session = new Session($this->app);
-
             // Twig functions
             $this->app['twig']->addExtension(new ClientLoginTwigExtensions($this->app));
         }

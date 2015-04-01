@@ -62,17 +62,15 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogin(Application $app, Request $request)
     {
-        $session = $app[Extension::CONTAINER]->session;
-
         $provider = $request->query->get('provider');
 
         if ($provider) {
             if ($provider == 'Password' && $this->config['auth']['password']['enabled']) {
                 // Attempt password login
-                $result = $session->doLoginPassword();
+                $result = $app['clientlogin.session']->doLoginPassword();
             } elseif ($this->config['auth']['hybridauth']['providers'][$provider]['enabled']) {
                 // Attempt oauth login
-                $result = $session->doLoginOAuth($provider);
+                $result = $app['clientlogin.session']->doLoginOAuth($provider);
             } else {
                 $result = array('result' => false, 'error' => '<pre>Error: Invalid or disabled provider</pre>');
             }
@@ -97,9 +95,7 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogout(Application $app, Request $request)
     {
-        $session = $app[Extension::CONTAINER]->session;
-
-        $session->doLogout();
+        $app['clientlogin.session']->doLogout();
 
         // Logout done, redirect
         return $this->doRedirect($app);
