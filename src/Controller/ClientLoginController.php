@@ -110,6 +110,8 @@ class ClientLoginController implements ControllerProviderInterface
     public function authenticationEndpoint(Application $app, Request $request)
     {
         \Hybrid_Endpoint::process();
+
+        return new Response('', Response::HTTP_OK);
     }
 
     /**
