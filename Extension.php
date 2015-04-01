@@ -4,6 +4,8 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 
 use Bolt\Events\CronEvent;
 use Bolt\Events\CronEvents;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * Login with OAuth via HybridAuth
@@ -41,7 +43,7 @@ class Extension extends \Bolt\BaseExtension
         /*
          * Backend
          */
-        if ($this->app['config']->getWhichEnd() == 'backend') {
+        if ($this->app['config']->getWhichEnd() === 'backend') {
             // Check & create database tables if required
             $records = new ClientRecords($this->app);
             $records->dbCheck();
@@ -50,22 +52,18 @@ class Extension extends \Bolt\BaseExtension
         /*
          * Frontend
          */
-        if ($this->app['config']->getWhichEnd() == 'frontend') {
-            // If debug is set, also set the path for the debug log.
-            if ($this->config['debug_mode']) {
-                $this->config['debug_file'] = $this->app['resources']->getPath('cache') . "/authenticate.log";
-                @touch($this->config['debug_file']);
-            }
-
+        if ($this->app['config']->getWhichEnd() === 'frontend') {
             // Create and store session
             $this->app[Extension::CONTAINER]->session = new Session($this->app);
-
-            // Set up controller routes
-            $this->app->mount('/' . $this->config['basepath'], new Controller\ClientLoginController());
 
             // Twig functions
             $this->app['twig']->addExtension(new ClientLoginTwigExtensions($this->app));
         }
+
+        /*
+         * Set up controller routes
+         */
+        $this->app->mount('/' . $this->config['basepath'], new Controller\ClientLoginController());
 
         /*
          * Scheduled cron listener
@@ -104,10 +102,16 @@ class Extension extends \Bolt\BaseExtension
         $this->config['auth']['hybridauth']['identifier'] = "key";
 
         // If debug is set, also set the path for the debug log.
-        $this->config['auth']['hybridauth']['debug_mode'] = $this->config['debug_mode'];
         if ($this->config['debug_mode']) {
-            $this->config['auth']['hybridauth']['debug_file'] = $this->app['resources']->getPath('cache') . "/authenticate.log";
-            @touch($this->config['auth']['hybridauth']['debug_file']);
+            $this->config['auth']['hybridauth']['debug_file'] = $this->app['resources']->getPath('cache') . '/authenticate.log';
+
+            $fs = new Filesystem();
+            try {
+                $fs->touch($this->config['auth']['hybridauth']['debug_file']);
+            } catch (IOException $e) {
+                $this->app['logger.system']->critical("Unable to create ClientLogin debug file.", array('event' => 'exception', 'exception' => $e));
+                $this->config['debug_mode'] = false;
+            }
         }
 
         /*
