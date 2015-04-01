@@ -4,7 +4,6 @@ namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
 use Bolt\Extension\Bolt\ClientLogin\Extension;
 use Bolt\Extension\Bolt\ClientLogin\Session;
-use Bolt\Library as Lib;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,14 +17,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ClientLoginController implements ControllerProviderInterface
 {
-    /**
-     * @var Extension config array
-     */
+    /** @var array Extension config */
     private $config;
 
     /**
+     * @param \Silex\Application $app
      *
-     * @param  Silex\Application           $app
      * @return \Silex\ControllerCollection
      */
     public function connect(Application $app)
@@ -58,8 +55,9 @@ class ClientLoginController implements ControllerProviderInterface
     /**
      * Logout controller
      *
-     * @param  \Silex\Application $app
-     * @param  Request            $request
+     * @param \Silex\Application $app
+     * @param Request            $request
+     *
      * @return multitype:
      */
     public function authenticationLogin(Application $app, Request $request)
@@ -85,7 +83,6 @@ class ClientLoginController implements ControllerProviderInterface
             } else {
                 return $result['error'];
             }
-
         } else {
             // This shouldn't happen, just die here
             return '<pre>Provider not given</pre>';
@@ -111,7 +108,7 @@ class ClientLoginController implements ControllerProviderInterface
     /**
      * HybridAuth endpoint — passes all login requests to HybridAuth
      *
-     * @param  \Silex\Application $app
+     * @param \Silex\Application $app
      */
     public function authenticationEndpoint(Application $app, Request $request)
     {

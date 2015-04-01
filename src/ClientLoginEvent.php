@@ -2,27 +2,23 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
-use Bolt;
 use Symfony\Component\EventDispatcher\Event;
 
 class ClientLoginEvent extends Event
 {
-    /**
-     * The user record
-     */
+    /** @var array The user record */
     private $user;
 
-    /**
-     * The user profile table name
-     */
+    /** @var string The user profile table name */
     private $tablename;
 
     /**
-     * @param int $id The user ID
+     * @param array  $user
+     * @param string $tablename
      */
     public function __construct($user, $tablename)
     {
-        $this->user = $user;
+        $this->user      = $user;
         $this->tablename = $tablename;
     }
 

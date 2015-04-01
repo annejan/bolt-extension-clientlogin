@@ -17,21 +17,13 @@ use Bolt\Events\CronEvents;
  */
 class Extension extends \Bolt\BaseExtension
 {
-    /**
-     * @var string Extension name
-     */
+    /** @var string Extension name */
     const NAME = 'ClientLogin';
 
-    /**
-     * Extension's container
-     *
-     * @var string
-     */
+    /** @var string Extension's container */
     const CONTAINER = 'extensions.ClientLogin';
 
-    /**
-     * @var ClientLogin\Controller
-     */
+    /** @var ClientLogin\Controller */
     private $controller;
 
     public function getName()
@@ -155,7 +147,7 @@ class Extension extends \Bolt\BaseExtension
                 'button'   => '_button.twig',
                 'password' => '_password.twig'
             ),
-            'zocial' => false,
+            'zocial'       => false,
             'login_expiry' => 14,
             'debug_mode'   => false
         );

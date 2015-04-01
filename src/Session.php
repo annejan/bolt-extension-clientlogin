@@ -2,6 +2,8 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Bolt\Application;
+
 /**
  * Authentication class
  *
@@ -9,56 +11,34 @@ namespace Bolt\Extension\Bolt\ClientLogin;
  */
 class Session
 {
-    /**
-     * @var string The name of our session cookie
-     */
+    /** @var string The name of our session cookie */
     const TOKENNAME = 'bolt_session_client';
 
-    /**
-     * @var string User cookie token
-     */
+    /** @var string User cookie token */
     public $token;
 
-    /**
-     * @var Bolt\Application
-     */
+    /** @var \Bolt\Application */
     private $app;
 
-    /**
-     * @var array Extension config array
-     */
+    /** @var array Extension config */
     private $config;
 
-    /**
-     * @var \Hybrid_Auth
-     */
+    /** @var \Hybrid_Auth */
     private $hybridauth = false;
 
-    /**
-     * Is this a new authentication
-     * @var bool
-     */
+    /** @var boolean Is this a new authentication */
     private $isnewauth = false;
 
-    /**
-     * @var \Hybrid_Provider_Adapter
-     */
+    /** @var \Hybrid_Provider_Adapter */
     private $hybridadapter = false;
 
-    /**
-     * User profile returned from HybridAuth
-     * @var array
-     */
+    /** @var array User profile returned from HybridAuth */
     private $hybridprofile;
 
-    /**
-     * HybridAuth PHP session information for active logins
-     *
-     * @var array
-     */
+    /** @var array HybridAuth PHP session information for active logins */
     private $hybridsession = false;
 
-    public function __construct(\Bolt\Application $app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
         $this->config = $this->app[Extension::CONTAINER]->config;

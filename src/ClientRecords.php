@@ -2,35 +2,26 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
-use Silex;
+use Silex\Application;
 
 /**
  * Authiticated user record maintenance
  */
 class ClientRecords
 {
-    /**
-     *
-     * @var array User's profile record
-     */
+    /** @var array User's profile record */
     public $user = false;
 
-    /**
-     * @var array User's session record
-     */
+    /** @var array User's session record */
     public $session = false;
 
-    /**
-     * @var Silex\Application
-     */
+    /** @var \Silex\Application */
     private $app;
 
-    /**
-     * @var Extension config array
-     */
+    /** @var Extension config array */
     private $config;
 
-    public function __construct(Silex\Application $app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
         $this->config = $this->app[Extension::CONTAINER]->config;
@@ -39,8 +30,9 @@ class ClientRecords
     /**
      * Look up a users database profile
      *
-     * @param  string  $username
-     * @param  string  $provider
+     * @param string $username
+     * @param string $provider
+     *
      * @return boolean True if user record found
      */
     public function getUserProfileByName($username, $provider)
@@ -68,8 +60,9 @@ class ClientRecords
     /**
      * Look up a users database profile
      *
-     * @param  string  $username
-     * @param  string  $provider
+     * @param string $username
+     * @param string $provider
+     *
      * @return boolean True if user record found
      */
     public function getUserProfileByID($id)
@@ -99,7 +92,8 @@ class ClientRecords
      * If we have a token record matching the users cookie, retrieve the
      * matching user record and store in obeject
      *
-     * @param  string  $token The PHP session token to query
+     * @param string $token The PHP session token to query
+     *
      * @return boolean
      */
     public function getUserProfileBySession($token)
@@ -135,7 +129,8 @@ class ClientRecords
     /**
      * Lookup user session by user ID
      *
-     * @param  integer $id
+     * @param integer $id
+     *
      * @return boolean
      */
     public function getUserSessionByID($id)
@@ -158,7 +153,8 @@ class ClientRecords
     /**
      * Lookup user session by user ID
      *
-     * @param  integer $id
+     * @param integer $id
+     *
      * @return boolean
      */
     public function getUserSessionByToken($token)
@@ -181,12 +177,13 @@ class ClientRecords
     /**
      * Create a user profile record
      *
-     * @param  string  $provider
-     * @param  array   $profile
-     * @param  array   $sessiondata
+     * @param string $provider
+     * @param array  $profile
+     * @param array  $sessiondata
+     *
      * @return boolean
      */
-    public function doCreateUserProfile($provider, $profile, $sessiondata)
+    public function doCreateUserProfile($provider, array $profile, array $sessiondata)
     {
         $json = json_encode($profile);
 
@@ -218,7 +215,7 @@ class ClientRecords
      * @param array  $profile
      * @param array  $sessiondata
      */
-    public function doUpdateUserProfile($provider, $profile, $sessiondata)
+    public function doUpdateUserProfile($provider, array $profile, array $sessiondata)
     {
         $json = json_encode($profile);
 
@@ -256,7 +253,7 @@ class ClientRecords
      *
      * @param array $match A parameter/value array representing column/value
      */
-    public function doRemoveUser($match)
+    public function doRemoveUser(array $match)
     {
         if (empty($match)) {
             return;
@@ -269,7 +266,7 @@ class ClientRecords
      *
      * @param array $match A parameter/value array representing column/value
      */
-    public function doRemoveSession($token)
+    public function doRemoveSession(array $token)
     {
         if (empty($token)) {
             return;

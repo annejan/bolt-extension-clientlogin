@@ -2,6 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Bolt\Application;
 use Bolt\Helpers\String;
 
 /**
@@ -11,17 +12,13 @@ use Bolt\Helpers\String;
  */
 class UserInterface
 {
-    /**
-     * @var \Bolt\Application
-     */
+    /** @var \Bolt\Application */
     private $app;
 
-    /**
-     * @var array Extension config array
-     */
+    /** @var array Extension config */
     private $config;
 
-    public function __construct(\Bolt\Application $app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
         $this->config = $this->app[Extension::CONTAINER]->config;
@@ -32,7 +29,8 @@ class UserInterface
     /**
      * Disply login/logout depending on auth status
      *
-     * @param  string      $redirect
+     * @param string $redirect
+     *
      * @return Twig_Markup
      */
     public function doDisplayAuth($redirect)
@@ -48,6 +46,9 @@ class UserInterface
 
     /**
      * Returns a list of links to all enabled login options
+     *
+     * @param boolean $redirect
+     * @param string  $target
      *
      * @return \Twig_Markup
      */
@@ -88,6 +89,8 @@ class UserInterface
     /**
      * Returns logout button
      *
+     * @param boolean $redirect
+     *
      * @return \Twig_Markup
      */
     public function doDisplayLogout($redirect)
@@ -111,9 +114,10 @@ class UserInterface
     /**
      * Simple function to format the HTML for a button.
      *
-     * @param  string       $link
-     * @param  string       $provider
-     * @param  string       $label
+     * @param string $link
+     * @param string $provider
+     * @param string $label
+     *
      * @return \Twig_Markup
      */
     private function doFormatButton($link, $provider, $label)
@@ -127,7 +131,7 @@ class UserInterface
         }
 
         $context = array(
-            'link' => $link,
+            'link'  => $link,
             'label' => $label,
             'class' => $class
         );

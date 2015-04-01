@@ -2,17 +2,17 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Bolt\Application;
+
 /**
  * Twig functions
  */
 class ClientLoginTwigExtensions extends \Twig_Extension
 {
-    /**
-     * @var UserInterface class object
-     */
+    /** @var UserInterface class object */
     private $userinterface;
 
-    public function __construct(\Bolt\Application $app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
         $this->userinterface = new UserInterface($app);
@@ -36,10 +36,10 @@ class ClientLoginTwigExtensions extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'hasauth'       =>  new \Twig_Function_Method($this, 'getHasAuth'),
-            'displayauth'   =>  new \Twig_Function_Method($this, 'getDisplayAuth'),
-            'displaylogin'  =>  new \Twig_Function_Method($this, 'getDisplayLogin'),
-            'displaylogout' =>  new \Twig_Function_Method($this, 'getDisplayLogout')
+            'hasauth'       => new \Twig_Function_Method($this, 'getHasAuth'),
+            'displayauth'   => new \Twig_Function_Method($this, 'getDisplayAuth'),
+            'displaylogin'  => new \Twig_Function_Method($this, 'getDisplayLogin'),
+            'displaylogout' => new \Twig_Function_Method($this, 'getDisplayLogout')
         );
     }
 
@@ -53,16 +53,34 @@ class ClientLoginTwigExtensions extends \Twig_Extension
         }
     }
 
+    /**
+     *
+     * @param string $redirect
+     *
+     * @return \Twig_Markup
+     */
     public function getDisplayAuth($redirect = false)
     {
         return $this->userinterface->doDisplayAuth($redirect);
     }
 
+    /**
+     *
+     * @param string $redirect
+     *
+     * @return \Twig_Markup
+     */
     public function getDisplayLogin($redirect = false)
     {
         return $this->userinterface->doDisplayLogin($redirect);
     }
 
+    /**
+     *
+     * @param string $redirect
+     *
+     * @return \Twig_Markup
+     */
     public function getDisplayLogout($redirect = false)
     {
         return $this->userinterface->doDisplayLogout($redirect, $label);
