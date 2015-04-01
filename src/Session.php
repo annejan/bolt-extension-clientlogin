@@ -110,7 +110,9 @@ class Session
                 } else {
                     return array('result' => false, 'error' => '<pre>ClientLogin Authentication Problem: Please try again!</pre>');
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
+                $this->app['logger.system']->critical('Exception setting up ClientLogin session.', array('event' => 'exception', 'exception' => $e));
+
                 $html =  "<pre>Error: please try again!</pre><br>";
                 $html .= "<pre>Original error message: " . $e->getMessage() . "</pre>";
 
