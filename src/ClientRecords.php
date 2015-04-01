@@ -275,7 +275,7 @@ class ClientRecords
      * @param array  $profile
      * @param array  $sessiondata
      */
-    public function doUpdateUserProfile($provider, array $profile, array $sessiondata)
+    public function doUpdateUserProfile($provider, \Hybrid_User_Profile $profile, array $sessiondata)
     {
         try {
             $this->app['db']
