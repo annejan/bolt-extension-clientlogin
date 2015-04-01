@@ -9,6 +9,7 @@ use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Symfony\Component\HttpFoundation;
 
 /**
  * Authentication controller
@@ -77,13 +78,13 @@ class ClientLoginController implements ControllerProviderInterface
 
             if ($result['result']) {
                 // Login done, redirect
-                return $this->doRedirect($app);
+                return new RedirectResponse($this->getRedirect($app, $request), Response::HTTP_FOUND);
             } else {
-                return $result['error'];
+                return new Response($result['error'], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         } else {
             // This shouldn't happen, just die here
-            return '<pre>Provider not given</pre>';
+            return new Response('<pre>Provider not given</pre>', Response::HTTP_BAD_REQUEST);
         }
     }
 
@@ -98,7 +99,7 @@ class ClientLoginController implements ControllerProviderInterface
         $app['clientlogin.session']->doLogout();
 
         // Logout done, redirect
-        return $this->doRedirect($app);
+        return new RedirectResponse($this->getRedirect($app, $request), Response::HTTP_FOUND);
     }
 
     /**
@@ -112,22 +113,21 @@ class ClientLoginController implements ControllerProviderInterface
     }
 
     /**
-     * Do the best redirect we can
+     * Get the redirect URL
      *
-     * @param \Silex\Application $app
+     * @param Application $app
+     * @param Request $request
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return string
      */
-    private function doRedirect(Application $app)
+    private function getRedirect(Application $app, Request $request)
     {
         $returnpage = $app['request']->get('redirect');
 
         if ($returnpage) {
-            $returnpage = str_replace($app['resources']->getUrl('hosturl'), '', $returnpage);
+            return str_replace($app['resources']->getUrl('hosturl'), '', $returnpage);
         } else {
-            $returnpage = $app['resources']->getUrl('hosturl');
+            return $app['resources']->getUrl('hosturl');
         }
-
-        return new RedirectResponse($returnpage, Response::HTTP_FOUND);
     }
 }
