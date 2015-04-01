@@ -7,7 +7,9 @@ use Bolt\Extension\Bolt\ClientLogin\Session;
 use Bolt\Library as Lib;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Authentication controller
@@ -110,7 +112,6 @@ class ClientLoginController implements ControllerProviderInterface
      * HybridAuth endpoint — passes all login requests to HybridAuth
      *
      * @param  \Silex\Application $app
-     * @return multitype:
      */
     public function authenticationEndpoint(Application $app, Request $request)
     {
@@ -121,17 +122,19 @@ class ClientLoginController implements ControllerProviderInterface
      * Do the best redirect we can
      *
      * @param \Silex\Application $app
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     private function doRedirect(Application $app)
     {
         $returnpage = $app['request']->get('redirect');
 
         if ($returnpage) {
-            $returnpage = str_replace($app['paths']['hosturl'], '', $returnpage);
+            $returnpage = str_replace($app['resources']->getUrl('hosturl'), '', $returnpage);
         } else {
-            $returnpage = $app['paths']['hosturl'];
+            $returnpage = $app['resources']->getUrl('hosturl');
         }
 
-        return $app->redirect($returnpage, 301);
+        return new RedirectResponse($returnpage, Response::HTTP_FOUND);
     }
 }
