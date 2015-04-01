@@ -103,7 +103,7 @@ class Extension extends \Bolt\BaseExtension
          */
 
         // Pass the base endpoint URL to HybridAuth
-        $this->config['auth']['hybridauth']['base_url'] = $this->app['paths']['rooturl'] . $this->config['basepath'] . '/endpoint';
+        $this->config['auth']['hybridauth']['base_url'] = $this->app['resources']->getUrl('rooturl') . $this->config['basepath'] . '/endpoint';
 
         $this->config['auth']['hybridauth']['providers'] = $this->config['providers'];
         unset($this->config['auth']['hybridauth']['providers']['Password']);

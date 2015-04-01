@@ -57,7 +57,7 @@ class UserInterface
 
         // Set redirect if passed
         if ($redirect) {
-            $target = '&redirect=' . urlencode($this->app['paths']['current']);
+            $target = '&redirect=' . urlencode($this->app['resources']->getUrl('current'));
         }
         // Render
         if (isset($this->config['auth']['hybridauth'])) {
@@ -69,7 +69,7 @@ class UserInterface
                     $class = isset($values['type']) && $values['type'] == 'OpenID' ? 'openid' : $provider;
 
                     $buttons[] = $this->doFormatButton(
-                        $this->app['paths']['root'] . $this->config['basepath'] . '/login?provider=' . $provider . $target,
+                        $this->app['resources']->getUrl('root') . $this->config['basepath'] . '/login?provider=' . $provider . $target,
                         $class,
                         $label);
                 }
@@ -93,7 +93,7 @@ class UserInterface
     public function doDisplayLogout($redirect)
     {
         if ($redirect) {
-            $target = '?redirect=' . urlencode($this->app['paths']['current']);
+            $target = '?redirect=' . urlencode($this->app['resources']->getUrl('current'));
         }
 
         if (empty($this->config['label']['logout'])) {
@@ -101,7 +101,7 @@ class UserInterface
         }
 
         $logoutlink = $this->doFormatButton(
-            $this->app['paths']['root'] . $this->config['basepath'].'/logout' . $target,
+            $this->app['resources']->getUrl('root') . $this->config['basepath'].'/logout' . $target,
             '',
             $this->config['label']['logout']);
 
