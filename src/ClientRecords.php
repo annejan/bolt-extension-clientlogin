@@ -2,6 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Silex\Application;
 
 /**
@@ -37,23 +38,28 @@ class ClientRecords
      */
     public function getUserProfileByName($username, $provider)
     {
-        if ($this->user) {
-            return true;
-        } else {
-            // Get the user record
-            $query = "SELECT * FROM " . $this->getTableNameProfiles() .
-                     " WHERE username = :username AND provider = :provider";
-            $map = array(
-                ':username' => $username,
-                ':provider' => $provider
-            );
-            $this->user = $this->app['db']->fetchAssoc($query, $map);
+        try {
+            $this->user = $this->app['db']
+                ->createQueryBuilder()
+                ->select('*')
+                ->from($this->getTableNameProfiles())
+                ->where('username = :username', 'provider = :provider')
+                ->setParameter(':username', $username)
+                ->setParameter(':provider', $provider)
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC)
+            ;
 
             if (empty($this->user['id'])) {
                 return false;
             } else {
                 return true;
             }
+        } catch (\Exception $e) {
+            $msg = sprintf("ClientLogin had an error getting %s profile for %s from the database.", $username, $provider);
+            $this->app['logger.system']->critical($msg, array('event' => 'exception', 'exception' => $e));
+
+            return false;
         }
     }
 
@@ -69,20 +75,28 @@ class ClientRecords
     {
         if ($this->user) {
             return true;
-        } else {
-            // Get the user record
-            $query = "SELECT * FROM " . $this->getTableNameProfiles() .
-                     " WHERE id = :id";
-            $map = array(
-                ':id' => $id
-            );
-            $this->user = $this->app['db']->fetchAssoc($query, $map);
+        }
+
+        try {
+            $this->user = $this->app['db']
+                ->createQueryBuilder()
+                ->select('*')
+                ->from($this->getTableNameProfiles())
+                ->where('id = :id')
+                ->setParameter(':id', $id)
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC)
+            ;
 
             if (empty($this->user['id'])) {
                 return false;
             } else {
                 return true;
             }
+        } catch (\Exception $e) {
+            $this->app['logger.system']->critical("ClientLogin had an error getting profile with ID '$id' from the database.", array('event' => 'exception', 'exception' => $e));
+
+            return false;
         }
     }
 
@@ -98,32 +112,36 @@ class ClientRecords
      */
     public function getUserProfileBySession($token)
     {
-        $query = "SELECT * from " . $this->getTableNameSessions() .
-                 " WHERE token = :token";
-        $map = array(':token' => $token);
+        try {
+            $this->session = $this->app['db']
+                ->createQueryBuilder()
+                ->select('*')
+                ->from($this->getTableNameSessions())
+                ->where('token = :token')
+                ->setParameter(':token', $token)
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC)
+            ;
 
-        $this->session = $this->app['db']->fetchAssoc($query, $map);
+            if (!empty($this->session['userid'])) {
+                unset($this->user);
 
-        if (!empty($this->session['userid'])) {
-            // Get the user record
-            $query = "SELECT * FROM " . $this->getTableNameProfiles() .
-                     " WHERE id = :id";
-            $map = array(
-                ':id' => $this->session['userid']
-            );
-            $this->user = $this->app['db']->fetchAssoc($query, $map);
+                // Check we've got a valid record
+                if ($this->getUserProfileByID($this->session['userid'])) {
+                    // User records are all good
+                    return true;
+                }
 
-            // Check we've got a valid record
-            if (empty($this->user['id'])) {
                 // No user profile associtated with this token, remove it
                 $this->doRemoveSession(array('id' => $this->session['id']));
-            } else {
-                // User records are all good
-                return true;
             }
-        }
 
-        return false;
+            return false;
+        } catch (\Exception $e) {
+            $this->app['logger.system']->critical("ClientLogin had an error getting profile with token '$token' from the database.", array('event' => 'exception', 'exception' => $e));
+
+            return false;
+        }
     }
 
     /**
@@ -136,17 +154,27 @@ class ClientRecords
     public function getUserSessionByID($id)
     {
         // Get the assocaited session
-        $query = "SELECT * FROM " . $this->getTableNameSessions() .
-                 " WHERE userid = :userid ORDER BY lastseen DESC";
-        $map = array(
-            ':userid' => $id
-        );
-        $this->session = $this->app['db']->fetchAssoc($query, $map);
+        try {
+            $this->session = $this->app['db']
+                ->createQueryBuilder()
+                ->select('*')
+                ->from($this->getTableNameSessions())
+                ->where('userid = :userid')
+                ->orderBy('lastseen', 'DESC')
+                ->setParameter(':userid', $id)
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC)
+            ;
 
-        if (empty($this->session['id'])) {
+            if (empty($this->session['id'])) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->app['logger.system']->critical("ClientLogin had an error getting session with ID '$id' from the database.", array('event' => 'exception', 'exception' => $e));
+
             return false;
-        } else {
-            return true;
         }
     }
 
@@ -160,17 +188,27 @@ class ClientRecords
     public function getUserSessionByToken($token)
     {
         // Get the assocaited session
-        $query = "SELECT * FROM " . $this->getTableNameSessions() .
-                 " WHERE token = :token ORDER BY lastseen DESC";
-        $map = array(
-            ':token' => $token
-        );
-        $this->session = $this->app['db']->fetchAssoc($query, $map);
+        try {
+            $this->session = $this->app['db']
+                ->createQueryBuilder()
+                ->select('*')
+                ->from($this->getTableNameSessions())
+                ->where('token = :token')
+                ->orderBy('lastseen', 'DESC')
+                ->setParameter(':token', $token)
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC)
+            ;
 
-        if (empty($this->session['id'])) {
+            if (empty($this->session['id'])) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->app['logger.system']->critical("ClientLogin had an error getting session with token '$token' from the database.", array('event' => 'exception', 'exception' => $e));
+
             return false;
-        } else {
-            return true;
         }
     }
 
@@ -185,27 +223,49 @@ class ClientRecords
      */
     public function doCreateUserProfile($provider, array $profile, array $sessiondata)
     {
-        $json = json_encode($profile);
+        try {
+            $count = $this->app['db']
+                ->createQueryBuilder()
+                ->insert($this->getTableNameProfiles())
+                ->values(array(
+                    'identifier'   => ':identifier',
+                    'username'     => ':username',
+                    'provider'     => ':provider',
+                    'providerdata' => ':providerdata',
+                    'sessiondata'  => ':sessiondata',
+                    'lastupdate'   => ':lastupdate',
+                ))
+                ->setParameters(array(
+                    ':identifier'   => $profile->identifier,
+                    ':username'     => $profile->displayName,
+                    ':provider'     => $provider,
+                    ':providerdata' => json_encode($profile),
+                    ':sessiondata'  => json_encode($sessiondata),
+                    ':lastupdate'   => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time()))
+                ))
+                ->execute()
+                ->fetch()
+            ;
 
-        $content = array(
-            'identifier'   => $profile->identifier,
-            'username'     => $profile->displayName,
-            'provider'     => $provider,
-            'providerdata' => $json,
-            'sessiondata'  => json_encode($sessiondata),
-            'lastupdate'   => date('Y-m-d H:i:s', $_SERVER["REQUEST_TIME"]),
-        );
+            if ($count) {
+                $this->user = null;
+                $this->getUserProfileByName($profile->displayName, $provider);
 
-        $result = $this->app['db']->insert($this->getTableNameProfiles(), $content);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (\Exception $e) {
+            $msg = sprintf("ClientLogin had an error creating %s profile for '%s' with identifier '%s'.",
+                $provider,
+                $profile->displayName,
+                $profile->identifier
+                );
+            $this->app['logger.system']->critical($msg, array('event' => 'exception', 'exception' => $e));
 
-        if ($result) {
-            $this->user = null;
-            $this->getUserProfileByName($profile->displayName, $provider);
-
-            return true;
-        } else {
             return false;
         }
+
     }
 
     /**
@@ -217,33 +277,57 @@ class ClientRecords
      */
     public function doUpdateUserProfile($provider, array $profile, array $sessiondata)
     {
-        $json = json_encode($profile);
+        try {
+            $this->app['db']
+                ->createQueryBuilder()
+                ->update($this->getTableNameProfiles())
+                ->set('providerdata', ':providerdata')
+                ->set('sessiondata',  ':sessiondata')
+                ->set('lastupdate',   ':lastupdate')
+                ->where('identifier  = :identifier', 'provider = :provider')
+                ->setParameters(array(
+                    ':providerdata' => json_encode($profile),
+                    ':sessiondata'  => json_encode($sessiondata),
+                    ':lastupdate'   => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time())),
+                    ':identifier'   => $profile->identifier,
+                    ':provider'     => $provider,
+                ))
+                ->execute()
+            ;
 
-        $content = array(
-            'providerdata' => $json,
-            'sessiondata'  => json_encode($sessiondata),
-            'lastupdate'   => date('Y-m-d H:i:s', $_SERVER["REQUEST_TIME"]),
-        );
+            return true;
+        } catch (\Exception $e) {
+            $msg = sprintf("ClientLogin had an error updating profile '%s' with identifier '%s'.", $provider, $profile->identifier);
+            $this->app['logger.system']->critical($msg, array('event' => 'exception', 'exception' => $e));
 
-        $this->app['db']->update($this->getTableNameProfiles(), $content, array(
-            'identifier'   => $profile->identifier,
-            'provider'     => $provider,
-        ));
+            return false;
+        }
     }
 
     public function doCreateUserSession($token)
     {
-        $content = array(
-            'userid'   => $this->user['id'],
-            'lastseen' => date('Y-m-d H:i:s', $_SERVER["REQUEST_TIME"]),
-            'token'    => $token
-        );
+        try {
+            $this->app['db']
+                ->createQueryBuilder()
+                ->insert($this->getTableNameSessions())
+                ->values(array(
+                    'userid'   => ':userid',
+                    'lastseen' => ':lastseen',
+                    'token'    => ':token'
+                ))
+                ->setParameters(array(
+                    ':userid'   => $this->user['id'],
+                    ':lastseen' => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time())),
+                    ':token'    => $token
+                ))
+                ->execute()
+            ;
 
-        $result = $this->app['db']->insert($this->getTableNameSessions(), $content);
-
-        if ($result) {
             return true;
-        } else {
+        } catch (\Exception $e) {
+            $msg = sprintf("ClientLogin had an error adding user ID '%s' token '%s' to the database.", $this->user['id'], $token);
+            $this->app['logger.system']->critical($msg, array('event' => 'exception', 'exception' => $e));
+
             return false;
         }
     }
@@ -272,9 +356,28 @@ class ClientRecords
             return;
         }
 
-        $this->app['db']->delete($this->getTableNameSessions(), array('token' => $token));
+        try {
+            $this->app['db']
+                ->createQueryBuilder()
+                ->delete($this->getTableNameSessions())
+                ->where('token <= :token')
+                ->setParameter(':token', $token)
+                ->execute()
+            ;
+
+            return true;
+        } catch (\Exception $e) {
+            $this->app['logger.system']->critical("ClientLogin had an error removing token '$token' from the database.", array('event' => 'exception', 'exception' => $e));
+
+            return false;
+        }
     }
 
+    /**
+     * Remove expired session from the database
+     *
+     * @return boolean
+     */
     public function doRemoveExpiredSessions()
     {
         if (empty($this->config['login_expiry'])) {
@@ -283,16 +386,19 @@ class ClientRecords
             $maxage = $this->config['login_expiry'];
         }
 
-        $query = "DELETE FROM " . $this->getTableNameSessions() . " WHERE lastseen <= :maxage";
-        $map = array(
-            'maxage' => date('Y-m-d H:i:s', (time() - (60*60*24*$maxage)))
-        );
+        try {
+            $this->app['db']
+                ->createQueryBuilder()
+                ->delete($this->getTableNameSessions())
+                ->where('lastseen <= :maxage')
+                ->setParameter(':maxage', date('Y-m-d H:i:s', strtotime("-$maxage days")))
+                ->execute()
+            ;
 
-        $result = $this->app['db']->executeQuery($query, $map);
-
-        if ($result) {
             return true;
-        } else {
+        } catch (\Exception $e) {
+            $this->app['logger.system']->critical('ClientLogin had an error removing expired sessions from the database.', array('event' => 'exception', 'exception' => $e));
+
             return false;
         }
     }
@@ -304,14 +410,7 @@ class ClientRecords
      */
     public function getTableNameProfiles()
     {
-        $prefix = $this->app['config']->get('general/database/prefix', "bolt_");
-
-        // Make sure prefix ends in '_'. Prefixes without '_' are lame..
-        if ($prefix[ strlen($prefix)-1 ] != "_") {
-            $prefix .= "_";
-        }
-
-        return $prefix . 'client_profiles';
+        return $this->getPrefix() . 'client_profiles';
     }
 
     /**
@@ -321,14 +420,24 @@ class ClientRecords
      */
     private function getTableNameSessions()
     {
-        $prefix = $this->app['config']->get('general/database/prefix', "bolt_");
+        return $this->getPrefix() . 'client_sessions';
+    }
 
-        // Make sure prefix ends in '_'. Prefixes without '_' are lame..
-        if ($prefix[ strlen($prefix)-1 ] != "_") {
-            $prefix .= "_";
+    /**
+     * Get a valid database prefix
+     *
+     * @return string
+     */
+    private function getPrefix()
+    {
+        $prefix = $this->app['config']->get('general/database/prefix', 'bolt_');
+
+        // Make sure prefix ends in '_'
+        if ($prefix[ strlen($prefix)-1 ] != '_') {
+            $prefix .= '_';
         }
 
-        return $prefix . 'client_sessions';
+        return $prefix;
     }
 
     /**
@@ -341,14 +450,14 @@ class ClientRecords
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_name) {
                 $table = $schema->createTable($table_name);
-                $table->addColumn("id",           "integer", array('autoincrement' => true));
-                $table->addColumn("provider",     "string",  array("length" => 64));
-                $table->addColumn("identifier",   "string",  array("length" => 128));
-                $table->addColumn("username",     "string",  array("length" => 64));
-                $table->addColumn("providerdata", "text");
-                $table->addColumn("sessiondata",  "text");
-                $table->addColumn("lastupdate",   "datetime");
-                $table->setPrimaryKey(array("id"));
+                $table->addColumn('id',           'integer', array('autoincrement' => true));
+                $table->addColumn('provider',     'string',  array('length' => 64));
+                $table->addColumn('identifier',   'string',  array('length' => 128));
+                $table->addColumn('username',     'string',  array('length' => 64));
+                $table->addColumn('providerdata', 'text');
+                $table->addColumn('sessiondata',  'text');
+                $table->addColumn('lastupdate',   'datetime');
+                $table->setPrimaryKey(array('id'));
 
                 return $table;
             }
@@ -359,13 +468,13 @@ class ClientRecords
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_name) {
                 $table = $schema->createTable($table_name);
-                $table->addColumn("id",       "integer", array('autoincrement' => true));
-                $table->addColumn("userid",   "integer");
-                $table->addColumn("token",    "string", array('length' => 64));
-                $table->addColumn("lastseen", "datetime");
-                $table->setPrimaryKey(array("id"));
-                $table->addIndex(array("userid"));
-                $table->addIndex(array("token"));
+                $table->addColumn('id',       'integer', array('autoincrement' => true));
+                $table->addColumn('userid',   'integer');
+                $table->addColumn('token',    'string', array('length' => 64));
+                $table->addColumn('lastseen', 'datetime');
+                $table->setPrimaryKey(array('id'));
+                $table->addIndex(array('userid'));
+                $table->addIndex(array('token'));
 
                 return $table;
             }
