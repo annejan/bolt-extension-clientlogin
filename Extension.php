@@ -81,7 +81,7 @@ class Extension extends \Bolt\BaseExtension
     {
         $event->output->writeln("<comment>ClientLogin: Clearing old sessions</comment>");
         $record = new ClientRecords($this->app);
-        $record->doRemoveSessionsOld();
+        $record->doRemoveExpiredSessions();
     }
 
     /**

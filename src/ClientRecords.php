@@ -264,17 +264,18 @@ class ClientRecords
     /**
      * Remove a session from the database
      *
-     * @param array $match A parameter/value array representing column/value
+     * @param string $token A parameter/value array representing column/value
      */
-    public function doRemoveSession(array $token)
+    public function doRemoveSession($token)
     {
         if (empty($token)) {
             return;
         }
+
         $this->app['db']->delete($this->getTableNameSessions(), array('token' => $token));
     }
 
-    public function doRemoveSessionsOld()
+    public function doRemoveExpiredSessions()
     {
         if (empty($this->config['login_expiry'])) {
             $maxage = 14;
