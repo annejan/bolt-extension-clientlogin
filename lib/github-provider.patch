@@ -1,0 +1,22 @@
+commit 0b64f356576bceac2fddc3d94ea8b84ab66f91e6
+Author: Gawain Lynch <gawain.lynch@gmail.com>
+Date:   Wed Apr 1 05:34:19 2015 +0100
+
+    GitHub provider upstream derp
+
+diff --git a/lib/Hybrid/Providers/GitHub.php b/lib/Hybrid/Providers/GitHub.php
+index 00b35f2..701704b 100755
+--- a/lib/Hybrid/Providers/GitHub.php
++++ b/lib/Hybrid/Providers/GitHub.php
+@@ -60,9 +60,9 @@ class Hybrid_Providers_GitHub extends Hybrid_Provider_Model_OAuth2
+ 				if (is_array($emails)) {
+ 					foreach ($emails as $email) {
+ 						if ($email instanceof stdClass
+-							&& property_exists('primary', $email)
++							&& property_exists($email, 'primary')
+ 							&& true === $email->primary
+-							&& property_exists('email', $email)
++							&& property_exists($email, 'email')
+ 						) {
+ 							$this->user->profile->email = $email->email;
+ 							break;
