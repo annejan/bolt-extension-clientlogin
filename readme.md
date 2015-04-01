@@ -174,15 +174,12 @@ extension in combination with another extension that builds on its functionality
 To get information about the current visitor:
 
 ```php
-$session = new \Bolt\Extension\ClientLogin\Session($this->app);
-
-if ($session->doCheckLogin()) {
+if ($this->app['clientlogin.session']->doCheckLogin()) {
     // User is logged in
-    $records = new \Bolt\Extension\ClientLogin\ClientRecords($this->app);
-    if ($records->getUserProfileBySession($session->token)) {
-        $username = $records->user['username'];
-        $provider = $records->user['provider'];
-        $providerdata = json_decode($records->user['providerdata']);
+    if ($this->app['clientlogin.records']->getUserProfileBySession($this->app['clientlogin.session']->token)) {
+        $username = $this->app['clientlogin.records']->user['username'];
+        $provider = $this->app['clientlogin.records']->user['provider'];
+        $providerdata = json_decode($this->app['clientlogin.records']->user['providerdata']);
     }
 }
 ```
@@ -204,7 +201,7 @@ Inside your callback you can get the array of user profile data for the login/lo
 with:
 
 ```php
-public function myLoginCallback($event)
+public function myLoginCallback(\Bolt\Extension\Bolt\ClientLogin\ClientLoginEvent $event)
 { 
     $userdata = $event->getUser();
 }
