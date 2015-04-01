@@ -34,6 +34,9 @@ Google
   1. Set **Authorized Redirect URI**: http://your-bolt-site.example.com/authenticate/endpoint?hauth.done=Google  
     *(change the domain name to match yours)*
   1. Click 'Create Client ID'
+1. Under the 'APIs & auth' menu select 'APIs'
+  1. Click the 'Google+ API' link (middle of the page at time of writing)
+  1. Click the 'Enable API' button
 1. Add the 'Client ID' and 'Client Secret' to your config.yml
 
 **NOTE** It may take as long as 10 minutes for the changes to propagate and the client ID and secret to work
