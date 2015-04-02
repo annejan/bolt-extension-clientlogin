@@ -11,7 +11,7 @@
 		"GitHub"
 	],
 	"require" : {
-		"php": ">=5.4.0",
+		"php" : ">=5.4.0",
 		"bolt/bolt" : ">=2.1.0,<3.0.0"
 	},
 	"license" : "GPL-3.0+",
@@ -31,7 +31,8 @@
 				"",
 				"src/"
 			],
-			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/"
+			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
+			"League\\OAuth1\\" : "lib/League/OAuth1/"
 		}
 	},
 	"extra" : {
