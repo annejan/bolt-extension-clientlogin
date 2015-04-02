@@ -2,13 +2,14 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Bolt\BaseExtension;
 use Bolt\Events\CronEvent;
 use Bolt\Events\CronEvents;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
- * Login with OAuth via HybridAuth
+ * Login with OAuth1 or OAuth2
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  *
@@ -17,7 +18,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
  * @author Tobias Dammers
  * @author Bob den Otter
  */
-class Extension extends \Bolt\BaseExtension
+class Extension extends BaseExtension
 {
     /** @var string Extension name */
     const NAME = 'ClientLogin';
@@ -93,27 +94,27 @@ class Extension extends \Bolt\BaseExtension
          * Set HybridAuth
          */
 
-        // Pass the base endpoint URL to HybridAuth
-        $this->config['auth']['hybridauth']['base_url'] = $this->app['resources']->getUrl('rooturl') . $this->config['basepath'] . '/endpoint';
+//         // Pass the base endpoint URL to HybridAuth
+//         $this->config['auth']['hybridauth']['base_url'] = $this->app['resources']->getUrl('rooturl') . $this->config['basepath'] . '/endpoint';
 
-        $this->config['auth']['hybridauth']['providers'] = $this->config['providers'];
-        unset($this->config['auth']['hybridauth']['providers']['Password']);
+//         $this->config['auth']['hybridauth']['providers'] = $this->config['providers'];
+//         unset($this->config['auth']['hybridauth']['providers']['Password']);
 
-        // Apparently "A set of identifiers that identify a setting in the listing". Ok, whatever, HybridAuth.
-        $this->config['auth']['hybridauth']['identifier'] = "key";
+//         // Apparently "A set of identifiers that identify a setting in the listing". Ok, whatever, HybridAuth.
+//         $this->config['auth']['hybridauth']['identifier'] = "key";
 
-        // If debug is set, also set the path for the debug log.
-        if ($this->config['debug_mode']) {
-            $this->config['auth']['hybridauth']['debug_file'] = $this->app['resources']->getPath('cache') . '/authenticate.log';
+//         // If debug is set, also set the path for the debug log.
+//         if ($this->config['debug_mode']) {
+//             $this->config['auth']['hybridauth']['debug_file'] = $this->app['resources']->getPath('cache') . '/authenticate.log';
 
-            $fs = new Filesystem();
-            try {
-                $fs->touch($this->config['auth']['hybridauth']['debug_file']);
-            } catch (IOException $e) {
-                $this->app['logger.system']->critical("Unable to create ClientLogin debug file.", array('event' => 'exception', 'exception' => $e));
-                $this->config['debug_mode'] = false;
-            }
-        }
+//             $fs = new Filesystem();
+//             try {
+//                 $fs->touch($this->config['auth']['hybridauth']['debug_file']);
+//             } catch (IOException $e) {
+//                 $this->app['logger.system']->critical("Unable to create ClientLogin debug file.", array('event' => 'exception', 'exception' => $e));
+//                 $this->config['debug_mode'] = false;
+//             }
+//         }
 
         /*
          * Password auth
