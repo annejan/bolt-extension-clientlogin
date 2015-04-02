@@ -205,7 +205,7 @@ Inside your callback you can get the array of user profile data for the login/lo
 with:
 
 ```php
-public function myLoginCallback(\Bolt\Extension\Bolt\ClientLogin\ClientLoginEvent $event)
+public function myLoginCallback(\Bolt\Extension\Bolt\ClientLogin\ClientLogin\Event\ClientLoginEvent $event)
 { 
     $userdata = $event->getUser();
 }

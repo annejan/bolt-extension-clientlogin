@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin;
+namespace Bolt\Extension\Bolt\ClientLogin\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 

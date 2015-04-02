@@ -3,6 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin;
 
 use Bolt\Application;
+use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 
 /**
  * Authentication class
