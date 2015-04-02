@@ -20,8 +20,8 @@
 		}
 	],
 	"minimum-stability" : "dev",
-    "prefer-stable" : true,
-    "autoload" : {
+	"prefer-stable" : true,
+	"autoload" : {
 		"files" : [
 			"init.php"
 		],
@@ -31,12 +31,7 @@
 				"src/"
 			],
 			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/"
-		},
-		"classmap" : [
-			"lib/Hybrid/Auth.php",
-			"lib/Hybrid/Endpoint.php",
-			"lib/Hybrid/User_Profile.php"
-		]
+		}
 	},
 	"extra" : {
 		"branch-alias" : {
