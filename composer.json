@@ -19,7 +19,9 @@
 			"email" : "gawain.lynch@gmail.com"
 		}
 	],
-	"autoload" : {
+	"minimum-stability" : "dev",
+    "prefer-stable" : true,
+    "autoload" : {
 		"files" : [
 			"init.php"
 		],
@@ -27,7 +29,8 @@
 			"Bolt\\Extension\\Bolt\\ClientLogin\\" : [
 				"",
 				"src/"
-			]
+			],
+			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/"
 		},
 		"classmap" : [
 			"lib/Hybrid/Auth.php",
@@ -37,7 +40,7 @@
 	},
 	"extra" : {
 		"branch-alias" : {
-			"dev-master" : "2.0.*-dev"
+			"dev-master" : "2.2.*-dev"
 		}
 	}
 }
