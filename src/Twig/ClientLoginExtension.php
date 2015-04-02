@@ -3,6 +3,8 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Twig;
 
 use Bolt\Application;
+use Bolt\Extension\Bolt\ClientLogin\Extension;
+use Bolt\Extension\Bolt\ClientLogin\UserInterface;
 
 /**
  * Twig functions
@@ -53,6 +55,7 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
+     * Display login/logout depending on status
      *
      * @param string $redirect
      *
@@ -64,6 +67,7 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
+     * Display login
      *
      * @param string $redirect
      *
@@ -75,6 +79,7 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
+     * Display logout
      *
      * @param string $redirect
      *
@@ -82,6 +87,6 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayLogout($redirect = false)
     {
-        return $this->userinterface->doDisplayLogout($redirect, $label);
+        return $this->userinterface->doDisplayLogout($redirect);
     }
 }
