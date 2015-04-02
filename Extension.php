@@ -58,7 +58,7 @@ class Extension extends \Bolt\BaseExtension
          */
         if ($this->app['config']->getWhichEnd() === 'frontend') {
             // Twig functions
-            $this->app['twig']->addExtension(new ClientLoginTwigExtensions($this->app));
+            $this->app['twig']->addExtension(new Twig\ClientLoginExtension($this->app));
         }
 
         /*

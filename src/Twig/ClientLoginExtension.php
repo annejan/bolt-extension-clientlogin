@@ -1,13 +1,13 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin;
+namespace Bolt\Extension\Bolt\ClientLogin\Twig;
 
 use Bolt\Application;
 
 /**
  * Twig functions
  */
-class ClientLoginTwigExtensions extends \Twig_Extension
+class ClientLoginExtension extends \Twig_Extension
 {
     /** @var UserInterface class object */
     private $userinterface;
