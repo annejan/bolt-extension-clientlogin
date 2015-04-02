@@ -113,7 +113,7 @@ class Session
             } catch (\Exception $e) {
                 $this->app['logger.system']->critical('Exception setting up ClientLogin session.', array('event' => 'exception', 'exception' => $e));
 
-                $response = json_encode($this->hybridadapter->getResponse());
+                $response = json_encode($this->hybridadapter->adapter->api->getResponse());
                 $this->app['logger.system']->critical('ClientLogin received: ' . $response, array('event' => 'exception'));
 
                 $html =  "<pre>Error: please try again!</pre><br>";
