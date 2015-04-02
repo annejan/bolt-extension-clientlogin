@@ -12,14 +12,7 @@ label:
 # You must also install the 'bolt/zocial-icons' extension
 zocial: false
 
-# Frontend role to assign to logged in visitor. 
-#
-# Is only relevant when 'frontend_permission_checks' is set to true in config.yml
-# and the role exists in permissions.yml
-#role: social
-
 # Enabled OpenID providers
-# Options are dependent on the values for HybridAuth
 providers:
     Password:
         enabled: false
@@ -30,7 +23,7 @@ providers:
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
-        scope: "openid profile email"
+        scopes: [ openid, profile, email]
 
     Facebook:
         label: Sign in with Facebook
@@ -38,7 +31,7 @@ providers:
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
-        scope: "email"
+        scopes: [ email ]
 
     Twitter:
         label: Sign in with Twitter
@@ -53,14 +46,7 @@ providers:
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
-        scope: "user:email"
-       
-    # MyOpenIdProvider:
-    #     type: OpenID
-    #     label: Sign in with MyOpenIdProvider
-    #     enabled: true
-    #     openid_identifier: "http://openid.example.org"
-        
+        scopes: [ 'user:email' ]
 
 # The basepath for the extension's routes. Do not include the leading slash ('/')
 # This path determines the location used to log in or out, like '/authenticate/login'

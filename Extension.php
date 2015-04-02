@@ -116,6 +116,13 @@ class Extension extends BaseExtension
 //             }
 //         }
 
+        // Handle old provider config
+        foreach ($this->config['providers'] as &$provider) {
+            if (isset($provider['scope']) && !isset($provider['scopes'])) {
+                $provider['scopes'] = explode(' ', $provider['scope']);
+            }
+        }
+
         /*
          * Password auth
          */
