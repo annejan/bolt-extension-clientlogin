@@ -76,7 +76,7 @@ class ClientLoginController implements ControllerProviderInterface
         $app['clientlogin.session']->doLogout();
 
         // Logout done, redirect
-        return new RedirectResponse($this->getRedirect($app, $request), Response::HTTP_FOUND);
+        return new RedirectResponse($app['clientlogin.session']->getRedirectUrl(), Response::HTTP_FOUND);
     }
 
     /**
@@ -89,24 +89,5 @@ class ClientLoginController implements ControllerProviderInterface
         \Hybrid_Endpoint::process();
 
         return new Response('', Response::HTTP_OK);
-    }
-
-    /**
-     * Get the redirect URL
-     *
-     * @param Application $app
-     * @param Request     $request
-     *
-     * @return string
-     */
-    private function getRedirect(Application $app, Request $request)
-    {
-        $returnpage = $app['request']->get('redirect');
-
-        if ($returnpage) {
-            return str_replace($app['resources']->getUrl('hosturl'), '', $returnpage);
-        } else {
-            return $app['resources']->getUrl('hosturl');
-        }
     }
 }
