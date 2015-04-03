@@ -32,9 +32,9 @@
 				"src/"
 			],
 			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
-			"Ivory\\HttpAdapter\\" : "lib/Ivory/HttpAdapter/"
+			"Ivory\\HttpAdapter\\" : "lib/Ivory/HttpAdapter/",
 			"League\\OAuth1\\" : "lib/League/OAuth1/",
-			"League\\OAuth2\\Client\\" : "lib/League/OAuth2/"
+			"League\\OAuth2\\Client\\" : "lib/League/OAuth2/",
 			"Psr\\Http\\Message\\" : "lib/Psr/Http/"
 		}
 	},
