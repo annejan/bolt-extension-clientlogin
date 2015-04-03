@@ -70,7 +70,7 @@ class Extension extends BaseExtension
         /*
          * Scheduled cron listener
          */
-        $this->app['dispatcher']->addListener(CronEvents::CRON_DAILY, array($this, 'cronDaily'));
+        $this->app['dispatcher']->addListener(CronEvents::CRON_DAILY, [$this, 'cronDaily']);
     }
 
     /**
@@ -87,46 +87,39 @@ class Extension extends BaseExtension
 
     /**
      * Set up config and defaults
+     *
+     * This has evolved from HybridAuth configuration and we need to cope as such
      */
     private function setConfig()
     {
-        /*
-         * Set HybridAuth
-         */
-
-//         // Pass the base endpoint URL to HybridAuth
-//         $this->config['auth']['hybridauth']['base_url'] = $this->app['resources']->getUrl('rooturl') . $this->config['basepath'] . '/endpoint';
-
-//         $this->config['auth']['hybridauth']['providers'] = $this->config['providers'];
-//         unset($this->config['auth']['hybridauth']['providers']['Password']);
-
-//         // Apparently "A set of identifiers that identify a setting in the listing". Ok, whatever, HybridAuth.
-//         $this->config['auth']['hybridauth']['identifier'] = "key";
-
-//         // If debug is set, also set the path for the debug log.
-//         if ($this->config['debug_mode']) {
-//             $this->config['auth']['hybridauth']['debug_file'] = $this->app['resources']->getPath('cache') . '/authenticate.log';
-
-//             $fs = new Filesystem();
-//             try {
-//                 $fs->touch($this->config['auth']['hybridauth']['debug_file']);
-//             } catch (IOException $e) {
-//                 $this->app['logger.system']->critical("Unable to create ClientLogin debug file.", array('event' => 'exception', 'exception' => $e));
-//                 $this->config['debug_mode'] = false;
-//             }
-//         }
+        $basepath = $this->app['resources']->getUrl('rooturl') . $this->config['basepath'] . '/endpoint?hauth.done=';
 
         // Handle old provider config
-        foreach ($this->config['providers'] as &$provider) {
-            if (isset($provider['scope']) && !isset($provider['scopes'])) {
-                $provider['scopes'] = explode(' ', $provider['scope']);
+        $providersConfig = [];
+        foreach ($this->config['providers'] as $provider => $values) {
+            // This needs to match the provider class name for OAuth
+            $name = ucwords(strtolower($provider));
+
+            // On/off switch
+            $providersConfig[$name]['enabled'] = $values['enabled'];
+
+            // Keys
+            $providersConfig[$name]['clientId']     = $values['clientId']     ? : $values['keys']['id'];
+            $providersConfig[$name]['clientSecret'] = $values['clientSecret'] ? : $values['keys']['secret'];
+
+            // Redirect URI
+            $providersConfig[$name]['redirectUri'] = $basepath . $name;
+
+            // Scopes
+            if (isset($values['scopes'])) {
+                $providersConfig[$name]['scopes'] = $values['scopes'];
+            } elseif (isset($values['scope']) && !isset($values['scopes'])) {
+                $providersConfig[$name]['scopes'] = explode(' ', $values['scope']);
             }
         }
 
-        /*
-         * Password auth
-         */
-        $this->config['auth']['password'] = $this->config['providers']['Password'];
+        // Write it all back
+        $this->config['providers'] = $providersConfig;
     }
 
     /**
@@ -136,33 +129,33 @@ class Extension extends BaseExtension
      */
     protected function getDefaultConfig()
     {
-        return array(
-            'providers' => array(
-                'Password' => array(
+        return [
+            'providers' => [
+                'Password' => [
                     'enabled' => false
-                ),
-                'Google' => array(
+                ],
+                'Google' => [
                     'enabled' => false
-                ),
-                'Facebook' => array(
+                ],
+                'Facebook' => [
                     'enabled' => false
-                ),
-                'Twitter' => array(
+                ],
+                'Twitter' => [
                     'enabled' => false
-                ),
-                'GitHub' => array(
+                ],
+                'GitHub' => [
                     'enabled' => false
-                )
-            ),
+                ]
+            ],
             'basepath' => 'authenticate',
-            'template' => array(
+            'template' => [
                 'profile'  => '_profile.twig',
                 'button'   => '_button.twig',
                 'password' => '_password.twig'
-            ),
+            ],
             'zocial'       => false,
             'login_expiry' => 14,
             'debug_mode'   => false
-        );
+        ];
     }
 }
