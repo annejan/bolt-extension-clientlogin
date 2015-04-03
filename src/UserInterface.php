@@ -23,7 +23,7 @@ class UserInterface
         $this->app = $app;
         $this->config = $this->app[Extension::CONTAINER]->config;
 
-        $this->app['twig.loader.filesystem']->addPath(dirname(__DIR__) . "/assets");
+        $this->app['twig.loader.filesystem']->addPath(dirname(__DIR__) . '/assets');
     }
 
     /**

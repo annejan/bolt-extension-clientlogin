@@ -4,6 +4,12 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 
 use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
+use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
+use Ivory\HttpAdapter\GuzzleHttpHttpAdapter;
+use League\OAuth2\Client\Provider\ProviderInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Authentication class
@@ -12,7 +18,7 @@ use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
  */
 class Session
 {
-    /** @var string The name of our session cookie */
+    /** @var string The name of our session */
     const TOKENNAME = 'bolt_session_client';
 
     /** @var string User cookie token */
@@ -24,21 +30,15 @@ class Session
     /** @var array Extension config */
     private $config;
 
-    /** @var \Hybrid_Auth */
-    private $hybridauth = false;
-
     /** @var boolean Is this a new authentication */
     private $isnewauth = false;
 
-    /** @var \Hybrid_Provider_Adapter */
-    private $hybridadapter = false;
+    /** @var \League\OAuth2\Client\Provider\ProviderInterface */
+    private $provider;
 
-    /** @var array User profile returned from HybridAuth */
-    private $hybridprofile;
-
-    /** @var array HybridAuth PHP session information for active logins */
-    private $hybridsession = false;
-
+    /**
+     * @param Application $app
+     */
     public function __construct(Application $app)
     {
         $this->app = $app;
@@ -50,9 +50,44 @@ class Session
     /**
      * Do OAuth login authentication
      *
-     * @param string Provider name to authenticate with
+     * @param Request $request
+     *
+     * @return Response
      */
-    public function doLoginOAuth($provider)
+    public function doLogin(Request $request)
+    {
+        $providerName = ucwords(strtolower($request->query->get('provider', '')));
+        $config = $this->config['providers'];
+
+        if (empty($providerName)) {
+            return new Response('<pre>Provider not given</pre>', Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            if ($providerName === 'Password' && $config['Password']['enabled']) {
+                return $this->doLoginPassword();
+            } elseif ($config[$providerName]['enabled']) {
+                return $this->doLoginOAuth($providerName);
+            } else {
+                return new Response('<pre>Error: Invalid or disabled provider</pre>', Response::HTTP_FORBIDDEN);
+            }
+        } catch (\Exception $e) {
+            $this->app['logger.system']->critical('ClientLogin had an error processing a login.', ['event' => 'exception', 'exception' => $e]);
+
+            return new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return new Response('', Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Do OAuth login authentication
+     *
+     * @param string Provider name to authenticate with
+     *
+     * @return Response
+     */
+    public function doLoginOAuth($providerName)
     {
         // Check for extisting token
         if ($this->doCheckLogin()) {
@@ -67,61 +102,69 @@ class Session
                 $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
             }
 
-            return array('result' => true, 'error' => '');
-        } else {
+            return new RedirectResponse($this->getRedirectUrl());
+        }
 
-            // Attempt a HybridAuth login
-            try {
+        // Set up chosen provider
+        $this->setProvider($providerName);
 
-                // Do the HybridAuth dance.
-                $this->doHybridAuth($provider);
+        // If we don't have an authorization code then get one
+        if (empty($this->app['request']->get('code'))) {
+            $this->clearToken();
 
-                if ($this->hybridprofile) {
-                    $records = new ClientRecords($this->app);
+            return new RedirectResponse($this->provider->getAuthorizationUrl());
+        }
 
-                    // If user record doesn't exist, create it
-                    $profilerecord = $records->getUserProfileByName($this->hybridprofile->displayName, $provider);
-                    if ($profilerecord) {
-                        $records->doUpdateUserProfile($provider, $this->hybridprofile, $this->hybridsession);
-                    } else {
-                        $records->doCreateUserProfile($provider, $this->hybridprofile, $this->hybridsession);
-                    }
+        // Given state must match previously stored one to mitigate CSRF attack
+        $stateRequest = $this->app['request']->get('state');
+        $stateSession = $this->app['session']->get(Session::TOKENNAME);
+        if (empty($stateRequest) || $stateRequest !== $stateSession) {
+            $this->clearToken();
 
-                    // User has either just been created or has no token, set it
-                    $this->setToken();
+            return new Response(null, Response::HTTP_FORBIDDEN);
+        }
 
-                    // Create the session if need be
-                    if (!$records->getUserProfileBySession($this->token)) {
-                        $records->doCreateUserSession($this->token);
-                    }
+        // Try to get an access token (using the authorization code grant)
+        $token = $this->provider->getAccessToken('authorization_code', ['code' => $this->app['request']->get('code')]);
 
-                    // Add frontend role if set up
-                    if (!empty($this->config['role'])) {
-                        $this->setUserRole();
-                    }
+        try {
+            // We got an access token, let's now get the user's details
+            $userDetails = $this->provider->getUserDetails($token);
 
-                    // Event dispatcher
-                    if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
-                        $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
-                        $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
-                    }
+            $records = new ClientRecords($this->app);
 
-                    // Success
-                    return array('result' => true, 'error' => '');
-                } else {
-                    return array('result' => false, 'error' => '<pre>ClientLogin Authentication Problem: Please try again!</pre>');
-                }
-            } catch (\Exception $e) {
-                $this->app['logger.system']->critical('Exception setting up ClientLogin session.', array('event' => 'exception', 'exception' => $e));
-
-                $response = json_encode($this->hybridadapter->adapter->api->getResponse());
-                $this->app['logger.system']->critical('ClientLogin received: ' . $response, array('event' => 'exception'));
-
-                $html =  "<pre>Error: please try again!</pre><br>";
-                $html .= "<pre>Original error message: " . $e->getMessage() . "</pre>";
-
-                return array('result' => false, 'error' => $html);
+            // If user record doesn't exist, create it
+            $profilerecord = $records->getUserProfileByName($userDetails->name, $providerName);
+            if ($profilerecord) {
+                $records->doUpdateUserProfile($providerName, $userDetails, $this->provider->state);
+            } else {
+                $records->doCreateUserProfile($providerName, $userDetails, $this->provider->state);
             }
+
+            // User has either just been created or has no token, set it
+            $this->setToken();
+
+            // Create the session if need be
+            if (!$records->getUserProfileBySession($this->token)) {
+                $records->doCreateUserSession($this->token);
+            }
+
+            // Add frontend role if set up
+            if (!empty($this->config['role'])) {
+                $this->setUserRole();
+            }
+
+            // Event dispatcher
+            if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
+                $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
+                $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
+            }
+
+            return new RedirectResponse($this->getRedirectUrl());
+        } catch (\Exception $e) {
+            $this->app['logger.system']->critical('ClientLogin had an error processing the user profile.', ['event' => 'exception', 'exception' => $e]);
+
+            return new Response('There was a server error. Please contact the site administrator.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -133,7 +176,6 @@ class Session
         $this->getToken();
 
         // Remove HA sessions
-        $this->doHybridAuth(false, 'logout');
 
         if ($this->token) {
             $records = new ClientRecords($this->app);
@@ -166,8 +208,7 @@ class Session
     public function doCheckLogin()
     {
         // Get client token
-        $this->getToken();
-        if (empty($this->token)) {
+        if (empty($this->getToken())) {
             return false;
         }
 
@@ -181,25 +222,29 @@ class Session
     }
 
     /**
-     * Get the users session cookie
+     * Get the user's session
+     *
+     * @return string
      */
     public function getToken()
     {
-        $this->token = $this->app['session']->get(Session::TOKENNAME);
+        return $this->token = $this->app['session']->get(self::TOKENNAME);
     }
 
     /**
-     * Set the users session cookie
-     *
-     * @param integer $id
+     * Set the user's session
      */
     private function setToken()
     {
-        // Create a unique token
-        $this->token = $this->app['randomgenerator']->generateString(32);
+        $this->app['session']->set(self::TOKENNAME, $this->provider->state);
+    }
 
-        // Set session cookie
-        $this->app['session']->set(Session::TOKENNAME, $this->token);
+    /**
+     * Clean out the user's session
+     */
+    private function clearToken()
+    {
+        $this->app['session']->remove(self::TOKENNAME);
     }
 
     /**
@@ -224,65 +269,36 @@ class Session
     }
 
     /**
-     * Login or logout of service provider via HybridAuth
+     * Create the appropriate OAuth provider
      *
-     * @param string $provider
-     * @param string $process
+     * @param string $providerName
      */
-    private function doHybridAuth($provider, $process = 'login')
+    private function setProvider($providerName)
     {
-        $hybridconfig = $this->config['auth']['hybridauth'];
+        /** @var \League\OAuth2\Client\Provider\ProviderInterface */
+        $providerClass = '\\League\\OAuth2\\Client\\Provider\\' . $providerName;
 
-        // Get the type early - because we might need to enable it
-        if (isset($hybridconfig['providers'][$provider]['type'])) {
-            $providertype = $hybridconfig['providers'][$provider]['type'];
-        } else {
-            $providertype = $provider;
+        if (!class_exists($providerClass)) {
+            throw new ProviderException('Invalid provider.');
         }
 
-        // Enable OpenID
-        if ($providertype == 'OpenID' && $hybridconfig['providers'][$provider]['enabled'] == true) {
-            $hybridconfig['providers']['OpenID']['enabled'] = true;
-        }
+        $config = $this->config['providers'][$providerName];
+        $config['redirectUri'] = $this->getCallbackUrl($providerName);
 
-        $provideroptions = array();
-        if ($providertype == 'OpenID' && !empty($hybridconfig['providers'][$provider]['openid_identifier'])) {
-            // Try to authenticate with the selected OpenID provider
-            $providerurl = $hybridconfig['providers'][$provider]['openid_identifier'];
-            $provideroptions["openid_identifier"] = $providerurl;
-        }
+        $httpClient = new GuzzleHttpHttpAdapter($this->app['guzzle.client']);
+        $this->provider = new $providerClass($config, $httpClient);
+    }
 
-        // Initialize the authentication with the modified config
-        $this->hybridauth = new \Hybrid_Auth($hybridconfig);
-
-        if ($process == 'login') {
-            // See if the user already has valid provider authentication data
-            if (! $this->hybridauth->isConnectedWith(strtolower($provider))) {
-                // Try to authenticate with the selected provider
-                $this->hybridadapter = $this->hybridauth->authenticate($providertype, $provideroptions);
-                $this->isnewauth = true;
-            } else {
-                // Get the provider's adapter
-                $this->hybridadapter = $this->hybridauth->getAdapter(strtolower($provider));
-            }
-
-            // Get HybridAuth's session data
-            $this->hybridsession = unserialize($this->hybridauth->getSessionData());
-
-            // Grab the user profile from HybridAuth
-            $this->hybridprofile = $this->hybridadapter->getUserProfile();
-        } else {
-            $records = new ClientRecords($this->app);
-            $records->getUserProfileBySession($this->token);
-            $provider = $records->user['provider'];
-
-            // Cancel our session
-            if ($this->hybridauth->isConnectedWith($provider)) {
-                // Get the provider's adapter
-                $this->hybridadapter = $this->hybridauth->getAdapter($provider);
-
-                $this->hybridadapter->logout();
-            }
-        }
+    /**
+     * Construct the authorisation URL with query parameters
+     *
+     * @param string $providerName
+     *
+     * @return string
+     */
+    private function getCallbackUrl($providerName)
+    {
+        $key = 'hauth.done';
+        return $this->app['resources']->getUrl('rooturl') . $this->config['basepath'] . "/endpoint?$key=$providerName";
     }
 }
