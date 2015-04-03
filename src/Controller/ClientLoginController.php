@@ -9,7 +9,6 @@ use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Symfony\Component\HttpFoundation;
 
 /**
  * Authentication controller
@@ -63,29 +62,7 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogin(Application $app, Request $request)
     {
-        $provider = $request->query->get('provider');
-
-        if ($provider) {
-            if ($provider == 'Password' && $this->config['auth']['password']['enabled']) {
-                // Attempt password login
-                $result = $app['clientlogin.session']->doLoginPassword();
-            } elseif ($this->config['auth']['hybridauth']['providers'][$provider]['enabled']) {
-                // Attempt oauth login
-                $result = $app['clientlogin.session']->doLoginOAuth($provider);
-            } else {
-                $result = array('result' => false, 'error' => '<pre>Error: Invalid or disabled provider</pre>');
-            }
-
-            if ($result['result']) {
-                // Login done, redirect
-                return new RedirectResponse($this->getRedirect($app, $request), Response::HTTP_FOUND);
-            } else {
-                return new Response($result['error'], Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-        } else {
-            // This shouldn't happen, just die here
-            return new Response('<pre>Provider not given</pre>', Response::HTTP_BAD_REQUEST);
-        }
+        return $app['clientlogin.session']->doLogin($request);
     }
 
     /**
@@ -118,7 +95,7 @@ class ClientLoginController implements ControllerProviderInterface
      * Get the redirect URL
      *
      * @param Application $app
-     * @param Request $request
+     * @param Request     $request
      *
      * @return string
      */
