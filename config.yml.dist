@@ -1,4 +1,4 @@
-# Templates (relative to assets/ directory)
+# Templates
 template:
     login: _login.twig
     password: _password.twig
@@ -23,7 +23,7 @@ providers:
         keys:
             id: "*** your ID here ***"
             secret: "*** your secret here ***"
-        scopes: [ openid, profile, email]
+        scopes: [ openid, profile, email ]
 
     Facebook:
         label: Sign in with Facebook
