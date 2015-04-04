@@ -5,7 +5,9 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 use Silex\Application;
 
 /**
- * Authiticated user record maintenance
+ * Authenticated user record maintenance
+ *
+ * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
 class ClientRecords
 {
@@ -214,15 +216,17 @@ class ClientRecords
     /**
      * Create a user profile record
      *
-     * @param string $provider
-     * @param array  $profile
-     * @param array  $sessiondata
+     * @param string        $provider
+     * @param ClientDetails $profile
+     * @param array         $sessiondata
      *
      * @return boolean
      */
-    public function doCreateUserProfile($provider, array $profile, array $sessiondata)
+    public function doCreateUserProfile($provider, ClientDetails $profile, array $sessiondata)
     {
         try {
+            $profile = $profile->getDetails();
+
             $count = $this->app['db']
                 ->createQueryBuilder()
                 ->insert($this->getTableNameProfiles())
@@ -269,13 +273,15 @@ class ClientRecords
     /**
      * Update a user profile record
      *
-     * @param string $provider
-     * @param array  $profile
-     * @param array  $sessiondata
+     * @param string        $provider
+     * @param ClientDetails $profile
+     * @param array         $sessiondata
      */
-    public function doUpdateUserProfile($provider, \Hybrid_User_Profile $profile, array $sessiondata)
+    public function doUpdateUserProfile($provider, ClientDetails $profile, array $sessiondata)
     {
         try {
+            $profile = $profile->getDetails();
+
             $this->app['db']
                 ->createQueryBuilder()
                 ->update($this->getTableNameProfiles())

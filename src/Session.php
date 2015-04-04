@@ -136,22 +136,25 @@ class Session
         $token = $this->provider->getAccessToken('authorization_code', ['code' => $this->app['request']->get('code')]);
 
         try {
-            // We got an access token, let's now get the user's details
+            /** \League\OAuth2\Client\Entity\User */
             $userDetails = $this->provider->getUserDetails($token);
+
+            $clientDetails = new ClientDetails();
+            $clientDetails->addOAuth2Client($userDetails);
 
             $records = new ClientRecords($this->app);
 
             // If user record doesn't exist, create it
-            $profilerecord = $records->getUserProfileByName($userDetails->name, $providerName);
+            $profilerecord = $records->getUserProfileByName($clientDetails->getClient()->name, $providerName);
             if ($profilerecord) {
-                $records->doUpdateUserProfile($providerName, $userDetails, $this->provider->state);
+                $records->doUpdateUserProfile($providerName, $clientDetails, $this->provider->state);
             } else {
-                $records->doCreateUserProfile($providerName, $userDetails, $this->provider->state);
+                $records->doCreateUserProfile($providerName, $clientDetails, $this->provider->state);
             }
 
             // Create the session if need be
-            if (!$records->getUserProfileBySession($this->token)) {
-                $records->doCreateUserSession($this->token);
+            if (!$records->getUserProfileBySession($this->getToken(self::TOKEN_SESSION))) {
+                $records->doCreateUserSession($this->getToken(self::TOKEN_SESSION));
             }
 
             // Event dispatcher
@@ -212,7 +215,7 @@ class Session
 
         // See if there is matching record, i.e. valid, unrevoked, token
         $records = new ClientRecords($this->app);
-        if ($records->getUserProfileBySession($this->token)) {
+        if ($records->getUserProfileBySession($this->getToken(self::TOKEN_SESSION))) {
             return true;
         } else {
             return false;
