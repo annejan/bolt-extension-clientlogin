@@ -170,7 +170,7 @@ abstract class AbstractProvider implements ProviderInterface
             'client_id'     => $this->clientId,
             'client_secret' => $this->clientSecret,
             'redirect_uri'  => $this->redirectUri,
-            'grant_type'    => $grant,
+            'grant_type'    => (string) $grant,
         ];
 
         $requestParams = $grant->prepRequestParams($defaultParams, $params);
