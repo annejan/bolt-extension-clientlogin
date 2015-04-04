@@ -6,6 +6,7 @@ use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
 use Ivory\HttpAdapter\GuzzleHttpHttpAdapter;
+use League\OAuth2\Client\Exception\IDPException;
 use League\OAuth2\Client\Provider\ProviderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -132,10 +133,10 @@ class Session
         // Set up chosen provider
         $this->setProvider($providerName);
 
-        // Try to get an access token (using the authorization code grant)
-        $token = $this->provider->getAccessToken('authorization_code', ['code' => $this->app['request']->get('code')]);
-
         try {
+            // Try to get an access token (using the authorization code grant)
+            $token = $this->provider->getAccessToken('authorization_code', ['code' => $request->get('code')]);
+
             /** \League\OAuth2\Client\Entity\User */
             $userDetails = $this->provider->getUserDetails($token);
 
@@ -164,6 +165,10 @@ class Session
             }
 
             return new RedirectResponse($this->getRedirectUrl());
+        } catch (IDPException $e) {
+            $this->app['logger.system']->critical('ClientLogin OAuth error: ' . (string) $e, ['event' => 'exception', 'exception' => $e]);
+
+            return new Response('There was a server error. Please contact the site administrator.', Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Exception $e) {
             $this->app['logger.system']->critical('ClientLogin had an error processing the user profile.', ['event' => 'exception', 'exception' => $e]);
 
