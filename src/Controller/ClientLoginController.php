@@ -80,10 +80,14 @@ class ClientLoginController implements ControllerProviderInterface
     {
         $this->clearRedirectUrl($app);
 
-        $app['clientlogin.session']->doLogout();
+        try {
+            $app['clientlogin.session']->doLogout();
 
-        // Logout done, redirect
-        return new RedirectResponse($app['clientlogin.session']->getRedirectUrl(), Response::HTTP_FOUND);
+            // Logout done, redirect
+            return new RedirectResponse($app['clientlogin.session']->getRedirectUrl(), Response::HTTP_FOUND);
+        } catch (\Exception $e) {
+            // @TODO
+        }
     }
 
     /**
@@ -106,8 +110,6 @@ class ClientLoginController implements ControllerProviderInterface
 
         // Given state must match previously stored one to mitigate CSRF attack
         if (!$app['clientlogin.session']->checkStateToken($request->get('state'))) {
-            $app['clientlogin.session']->clearStateToken();
-
             return new Response('Kittens!', Response::HTTP_FORBIDDEN);
         }
 

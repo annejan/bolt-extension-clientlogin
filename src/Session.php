@@ -18,8 +18,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Session
 {
-    /** @var string The name of our session */
-    const TOKENNAME = 'bolt_session_client';
+    /** @var string */
+    const TOKEN_SESSION = 'bolt_clientlogin_session';
+
+    /** @var string */
+    const TOKEN_STATE = 'bolt_clientlogin_state';
 
     /** @var string User cookie token */
     private $token;
@@ -43,8 +46,6 @@ class Session
     {
         $this->app = $app;
         $this->config = $this->app[Extension::CONTAINER]->config;
-
-        $this->getStateToken();
     }
 
     /**
@@ -67,8 +68,7 @@ class Session
         if ($this->doCheckLogin()) {
             $records = new ClientRecords($this->app);
 
-            $this->getStateToken();
-            $records->getUserProfileBySession($this->token);
+            $records->getUserProfileBySession($this->getToken(self::TOKEN_SESSION));
 
             // Event dispatcher
             if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
@@ -108,11 +108,11 @@ class Session
         // Set up chosen provider
         $this->setProvider($providerName);
 
-        // Save the current provider state
-        $this->setStateToken();
+        // Save the current provider state token
+        $token = $this->setToken(self::TOKEN_STATE);
 
         // Get the provider authorisation URL
-        $url = $this->provider->getAuthorizationUrl(['state' => $this->getStateToken()]);
+        $url = $this->provider->getAuthorizationUrl(['state' => $token]);
 
         return new RedirectResponse($url);
     }
@@ -173,17 +173,17 @@ class Session
      */
     public function doLogout()
     {
-        $this->getStateToken();
+        $token = $this->getToken(self::TOKEN_SESSION);
 
-        if ($this->token) {
+        if ($token) {
             $records = new ClientRecords($this->app);
-            $records->getUserProfileBySession($this->token);
+            $records->getUserProfileBySession($token);
 
             // Remove session from database
-            $records->doRemoveSession($this->token);
+            $records->doRemoveSession($token);
 
-            // Remove cookies
-            $this->app['session']->set(Session::TOKENNAME, null);
+            // Remove token
+            $this->removeToken(self::TOKEN_SESSION);
 
             // Event dispatcher
             if ($this->app['dispatcher']->hasListeners('clientlogin.Logout')) {
@@ -206,7 +206,7 @@ class Session
     public function doCheckLogin()
     {
         // Get client token
-        if (empty($this->getStateToken())) {
+        if (empty($this->getToken(self::TOKEN_SESSION))) {
             return false;
         }
 
@@ -220,43 +220,58 @@ class Session
     }
 
     /**
-     * Get the user's session
+     * Get $_SESSION[] token
+     *
+     * @param string $tokenName
      *
      * @return string
      */
-    private function getStateToken()
+    private function getToken($tokenName)
     {
-        return $this->token = $this->app['session']->get(self::TOKENNAME);
+        return $this->app['session']->get($tokenName);
     }
 
     /**
-     * Set the user's session
+     * Set a $_SESSION[] token
+     *
+     * @param string $tokenName
+     *
+     * @return string
      */
-    private function setStateToken()
+    private function setToken($tokenName)
     {
         // Create a unique token
-        $this->token = $this->app['randomgenerator']->generateString(32);
+        $token = $this->app['randomgenerator']->generateString(32);
 
-        $this->app['session']->set(self::TOKENNAME, $this->token);
+        $this->app['session']->set($tokenName, $token);
+
+        return $token;
     }
 
     /**
-     * Clean out the user's session
+     * Remove a $_SESSION[] token
+     *
+     * @param string $tokenName
      */
-    public function clearStateToken()
+    public function removeToken($tokenName)
     {
-        $this->app['session']->remove(self::TOKENNAME);
+        $this->app['session']->remove($tokenName);
     }
 
     /**
      * Check if a given state matches the saved one
      *
+     * @param string $state
+     *
      * @return boolean
      */
     public function checkStateToken($state)
     {
-        $stateToken = $this->getStateToken();
+        $stateToken = $this->getToken(self::TOKEN_STATE);
+        $this->removeToken(self::TOKEN_STATE);
+
         if (empty($state) || empty($stateToken) || $stateToken !== $state) {
+
             return false;
         }
 
