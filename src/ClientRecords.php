@@ -239,7 +239,7 @@ class ClientRecords
                     'lastupdate'   => ':lastupdate',
                 ])
                 ->setParameters([
-                    ':identifier'   => $profile->identifier,
+                    ':identifier'   => $profile->uid,
                     ':username'     => $profile->displayName,
                     ':provider'     => $provider,
                     ':providerdata' => json_encode($profile),
@@ -262,7 +262,7 @@ class ClientRecords
             $msg = sprintf("ClientLogin had an error creating %s profile for '%s' with identifier '%s'.",
                 $provider,
                 $profile->displayName,
-                $profile->identifier
+                $profile->uid
                 );
             $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
@@ -293,7 +293,7 @@ class ClientRecords
                     ':providerdata' => json_encode($profile),
                     ':sessiondata'  => json_encode($sessiondata),
                     ':lastupdate'   => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time())),
-                    ':identifier'   => $profile->identifier,
+                    ':identifier'   => $profile->uid,
                     ':provider'     => $provider,
                 ])
                 ->execute()
