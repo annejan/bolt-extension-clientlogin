@@ -22,7 +22,7 @@ class Session
     const TOKENNAME = 'bolt_session_client';
 
     /** @var string User cookie token */
-    public $token;
+    private $token;
 
     /** @var \Bolt\Application */
     private $app;
@@ -44,7 +44,7 @@ class Session
         $this->app = $app;
         $this->config = $this->app[Extension::CONTAINER]->config;
 
-        $this->getToken();
+        $this->getStateToken();
     }
 
     /**
@@ -56,7 +56,7 @@ class Session
      */
     public function doLogin(Request $request)
     {
-        $providerName = ucwords(strtolower($request->query->get('provider', '')));
+        $providerName = $this->getProviderName($request);
         $config = $this->config['providers'];
 
         if (empty($providerName)) {
@@ -67,7 +67,7 @@ class Session
         if ($this->doCheckLogin()) {
             $records = new ClientRecords($this->app);
 
-            $this->getToken();
+            $this->getStateToken();
             $records->getUserProfileBySession($this->token);
 
             // Event dispatcher
@@ -108,21 +108,29 @@ class Session
         // Set up chosen provider
         $this->setProvider($providerName);
 
-        // If we don't have an authorization code then get one
-        if (empty($this->app['request']->get('code'))) {
-            $this->clearToken();
+        // Save the current provider state
+        $this->setStateToken();
 
-            return new RedirectResponse($this->provider->getAuthorizationUrl());
-        }
+        // Get the provider authorisation URL
+        $url = $this->provider->getAuthorizationUrl(['state' => $this->getStateToken()]);
 
-        // Given state must match previously stored one to mitigate CSRF attack
-        $stateRequest = $this->app['request']->get('state');
-        $stateSession = $this->app['session']->get(Session::TOKENNAME);
-        if (empty($stateRequest) || $stateRequest !== $stateSession) {
-            $this->clearToken();
+        return new RedirectResponse($url);
+    }
 
-            return new Response(null, Response::HTTP_FORBIDDEN);
-        }
+    /**
+     * Check the OAuth callback
+     *
+     * @param Request $request
+     * @param string  $url
+     *
+     * @return Response
+     */
+    public function doCheckLoginOAuth(Request $request, $url)
+    {
+        $providerName = $this->getProviderName($request);
+
+        // Set up chosen provider
+        $this->setProvider($providerName);
 
         // Try to get an access token (using the authorization code grant)
         $token = $this->provider->getAccessToken('authorization_code', ['code' => $this->app['request']->get('code')]);
@@ -140,9 +148,6 @@ class Session
             } else {
                 $records->doCreateUserProfile($providerName, $userDetails, $this->provider->state);
             }
-
-            // User has either just been created or has no token, set it
-            $this->setToken();
 
             // Create the session if need be
             if (!$records->getUserProfileBySession($this->token)) {
@@ -168,9 +173,7 @@ class Session
      */
     public function doLogout()
     {
-        $this->getToken();
-
-        // Remove HA sessions
+        $this->getStateToken();
 
         if ($this->token) {
             $records = new ClientRecords($this->app);
@@ -203,7 +206,7 @@ class Session
     public function doCheckLogin()
     {
         // Get client token
-        if (empty($this->getToken())) {
+        if (empty($this->getStateToken())) {
             return false;
         }
 
@@ -221,7 +224,7 @@ class Session
      *
      * @return string
      */
-    public function getToken()
+    private function getStateToken()
     {
         return $this->token = $this->app['session']->get(self::TOKENNAME);
     }
@@ -229,17 +232,35 @@ class Session
     /**
      * Set the user's session
      */
-    private function setToken()
+    private function setStateToken()
     {
-        $this->app['session']->set(self::TOKENNAME, $this->provider->state);
+        // Create a unique token
+        $this->token = $this->app['randomgenerator']->generateString(32);
+
+        $this->app['session']->set(self::TOKENNAME, $this->token);
     }
 
     /**
      * Clean out the user's session
      */
-    private function clearToken()
+    public function clearStateToken()
     {
         $this->app['session']->remove(self::TOKENNAME);
+    }
+
+    /**
+     * Check if a given state matches the saved one
+     *
+     * @return boolean
+     */
+    public function checkStateToken($state)
+    {
+        $stateToken = $this->getStateToken();
+        if (empty($state) || empty($stateToken) || $stateToken !== $state) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -272,7 +293,30 @@ class Session
      */
     private function getCallbackUrl($providerName)
     {
-        $key = 'hauth.done';
+        $key = $this->config['response_noun'];
         return $this->app['resources']->getUrl('rooturl') . $this->config['basepath'] . "/endpoint?$key=$providerName";
+    }
+
+    /**
+     * Get a corrected provider name form a request
+     *
+     * @param Request $request
+     *
+     * @return string
+     */
+    private function getProviderName(Request $request)
+    {
+        $provider = $request->query->get('provider');
+
+        // Handle BC for old library
+        if (empty($provider)) {
+            $provider = $request->query->get('hauth_done');
+        }
+
+        if (empty($provider)) {
+            throw new ProviderException('Invalid provider.');
+        }
+
+        return ucwords(strtolower($provider));
     }
 }
