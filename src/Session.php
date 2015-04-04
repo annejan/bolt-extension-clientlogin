@@ -63,6 +63,22 @@ class Session
             return new Response('<pre>Provider not given</pre>', Response::HTTP_BAD_REQUEST);
         }
 
+        // Check for extisting token
+        if ($this->doCheckLogin()) {
+            $records = new ClientRecords($this->app);
+
+            $this->getToken();
+            $records->getUserProfileBySession($this->token);
+
+            // Event dispatcher
+            if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
+                $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
+                $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
+            }
+
+            return new RedirectResponse($this->getRedirectUrl());
+        }
+
         try {
             if ($providerName === 'Password' && $config['Password']['enabled']) {
                 return $this->doLoginPassword();
@@ -89,22 +105,6 @@ class Session
      */
     public function doLoginOAuth($providerName)
     {
-        // Check for extisting token
-        if ($this->doCheckLogin()) {
-            $records = new ClientRecords($this->app);
-
-            $this->getToken();
-            $records->getUserProfileBySession($this->token);
-
-            // Event dispatcher
-            if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
-                $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
-                $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
-            }
-
-            return new RedirectResponse($this->getRedirectUrl());
-        }
-
         // Set up chosen provider
         $this->setProvider($providerName);
 
