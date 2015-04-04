@@ -54,7 +54,7 @@ class ClientLoginController implements ControllerProviderInterface
     }
 
     /**
-     * Logout controller
+     * Login controller
      *
      * @param \Silex\Application $app
      * @param Request            $request
