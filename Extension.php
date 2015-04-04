@@ -146,9 +146,10 @@ class Extension extends BaseExtension
                 'button'   => '_button.twig',
                 'password' => '_password.twig'
             ],
-            'zocial'       => false,
-            'login_expiry' => 14,
-            'debug_mode'   => false
+            'zocial'        => false,
+            'login_expiry'  => 14,
+            'debug_mode'    => false,
+            'response_noun' => 'hauth.done'
         ];
     }
 }

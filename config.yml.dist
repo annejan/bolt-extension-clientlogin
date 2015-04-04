@@ -52,6 +52,9 @@ providers:
 # This path determines the location used to log in or out, like '/authenticate/login'
 basepath: authenticate
 
+# This is the key that is used in the provider callback. Changing this is NOT recommended.
+response_noun: provider
+
 # Number of days to allow login sessions to be valid for
 login_expiry: 14
 
