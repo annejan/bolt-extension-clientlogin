@@ -37,6 +37,13 @@ Google
 1. Under the 'APIs & auth' menu select 'APIs'
   1. Click the 'Google+ API' link (middle of the page at time of writing)
   1. Click the 'Enable API' button
+  1. Click the 'Explore this API' link
+  1. Click the 'Authorize requests using OAuth 2.0' switch (top right)
+  1. On the 'Authorize requests using OAuth 2.0' dialog enable:
+    * Authorize requests using OAuth 2.0 (Authorize requests using OAuth 2.0)
+    * Know who you are on Google (https://www.googleapis.com/auth/plus.me)
+    * View your email address (https://www.googleapis.com/auth/userinfo.email)
+    * View your basic profile info (https://www.googleapis.com/auth/userinfo.profile)
 1. Add the 'Client ID' and 'Client Secret' to your config.yml
 
 **NOTE** It may take as long as 10 minutes for the changes to propagate and the client ID and secret to work
