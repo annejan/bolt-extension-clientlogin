@@ -5,8 +5,6 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 use Bolt\BaseExtension;
 use Bolt\Events\CronEvent;
 use Bolt\Events\CronEvents;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * Login with OAuth1 or OAuth2
@@ -92,8 +90,6 @@ class Extension extends BaseExtension
      */
     private function setConfig()
     {
-        $basepath = $this->app['resources']->getUrl('rooturl') . $this->config['basepath'] . '/endpoint?hauth.done=';
-
         // Handle old provider config
         $providersConfig = [];
         foreach ($this->config['providers'] as $provider => $values) {
@@ -106,9 +102,6 @@ class Extension extends BaseExtension
             // Keys
             $providersConfig[$name]['clientId']     = $values['clientId']     ? : $values['keys']['id'];
             $providersConfig[$name]['clientSecret'] = $values['clientSecret'] ? : $values['keys']['secret'];
-
-            // Redirect URI
-            $providersConfig[$name]['redirectUri'] = $basepath . $name;
 
             // Scopes
             if (isset($values['scopes'])) {
