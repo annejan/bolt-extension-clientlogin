@@ -36,17 +36,17 @@ class ClientLoginController implements ControllerProviderInterface
         $ctr = $app['controllers_factory'];
 
         // Member login
-        $ctr->match('/login', array($this, 'authenticationLogin'))
+        $ctr->match('/login', [$this, 'authenticationLogin'])
             ->bind('authenticationLogin')
             ->method('GET');
 
         // Member logout
-        $ctr->match('/logout', array($this, 'authenticationLogout'))
+        $ctr->match('/logout', [$this, 'authenticationLogout'])
             ->bind('authenticationLogout')
             ->method('GET');
 
         // OAuth callback URI
-        $ctr->match('/endpoint', array($this, 'authenticationEndpoint'))
+        $ctr->match('/endpoint', [$this, 'authenticationEndpoint'])
             ->bind('authenticationEndpoint')
             ->method('GET|POST');
 

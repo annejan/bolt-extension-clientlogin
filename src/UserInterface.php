@@ -60,7 +60,7 @@ class UserInterface
         }
         // Render
         if (isset($this->config['auth']['hybridauth'])) {
-            $buttons = array();
+            $buttons = [];
 
             foreach ($this->config['auth']['hybridauth']['providers'] as $provider => $values) {
                 if ($values['enabled'] == true) {
@@ -128,11 +128,11 @@ class UserInterface
             $class = "{$provider}";
         }
 
-        $context = array(
+        $context = [
             'link'  => $link,
             'label' => $label,
             'class' => $class
-        );
+        ];
 
         $markup = $this->app['render']->render($this->config['template']['button'], $context);
 

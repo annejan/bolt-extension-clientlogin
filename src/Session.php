@@ -271,7 +271,6 @@ class Session
         $this->removeToken(self::TOKEN_STATE);
 
         if (empty($state) || empty($stateToken) || $stateToken !== $state) {
-
             return false;
         }
 

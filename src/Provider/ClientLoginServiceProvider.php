@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Provider;
 
 use Bolt\Extension\Bolt\ClientLogin\ClientRecords;
-use Bolt\Extension\Bolt\ClientLogin\Extension;
 use Bolt\Extension\Bolt\ClientLogin\Session;
 use Silex\Application;
 use Silex\ServiceProviderInterface;

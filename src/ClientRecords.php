@@ -2,7 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Silex\Application;
 
 /**
@@ -57,7 +56,7 @@ class ClientRecords
             }
         } catch (\Exception $e) {
             $msg = sprintf("ClientLogin had an error getting %s profile for %s from the database.", $username, $provider);
-            $this->app['logger.system']->critical($msg, array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -94,7 +93,7 @@ class ClientRecords
                 return true;
             }
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical("ClientLogin had an error getting profile with ID '$id' from the database.", array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical("ClientLogin had an error getting profile with ID '$id' from the database.", ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -133,12 +132,12 @@ class ClientRecords
                 }
 
                 // No user profile associtated with this token, remove it
-                $this->doRemoveSession(array('id' => $this->session['id']));
+                $this->doRemoveSession(['id' => $this->session['id']]);
             }
 
             return false;
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical("ClientLogin had an error getting profile with token '$token' from the database.", array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical("ClientLogin had an error getting profile with token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -172,7 +171,7 @@ class ClientRecords
                 return true;
             }
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical("ClientLogin had an error getting session with ID '$id' from the database.", array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical("ClientLogin had an error getting session with ID '$id' from the database.", ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -206,7 +205,7 @@ class ClientRecords
                 return true;
             }
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical("ClientLogin had an error getting session with token '$token' from the database.", array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical("ClientLogin had an error getting session with token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -227,22 +226,22 @@ class ClientRecords
             $count = $this->app['db']
                 ->createQueryBuilder()
                 ->insert($this->getTableNameProfiles())
-                ->values(array(
+                ->values([
                     'identifier'   => ':identifier',
                     'username'     => ':username',
                     'provider'     => ':provider',
                     'providerdata' => ':providerdata',
                     'sessiondata'  => ':sessiondata',
                     'lastupdate'   => ':lastupdate',
-                ))
-                ->setParameters(array(
+                ])
+                ->setParameters([
                     ':identifier'   => $profile->identifier,
                     ':username'     => $profile->displayName,
                     ':provider'     => $provider,
                     ':providerdata' => json_encode($profile),
                     ':sessiondata'  => json_encode($sessiondata),
                     ':lastupdate'   => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time()))
-                ))
+                ])
                 ->execute()
                 ->fetch()
             ;
@@ -261,11 +260,10 @@ class ClientRecords
                 $profile->displayName,
                 $profile->identifier
                 );
-            $this->app['logger.system']->critical($msg, array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
-
     }
 
     /**
@@ -285,20 +283,20 @@ class ClientRecords
                 ->set('sessiondata',  ':sessiondata')
                 ->set('lastupdate',   ':lastupdate')
                 ->where('identifier  = :identifier', 'provider = :provider')
-                ->setParameters(array(
+                ->setParameters([
                     ':providerdata' => json_encode($profile),
                     ':sessiondata'  => json_encode($sessiondata),
                     ':lastupdate'   => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time())),
                     ':identifier'   => $profile->identifier,
                     ':provider'     => $provider,
-                ))
+                ])
                 ->execute()
             ;
 
             return true;
         } catch (\Exception $e) {
             $msg = sprintf("ClientLogin had an error updating profile '%s' with identifier '%s'.", $provider, $profile->identifier);
-            $this->app['logger.system']->critical($msg, array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -310,23 +308,23 @@ class ClientRecords
             $this->app['db']
                 ->createQueryBuilder()
                 ->insert($this->getTableNameSessions())
-                ->values(array(
+                ->values([
                     'userid'   => ':userid',
                     'lastseen' => ':lastseen',
                     'token'    => ':token'
-                ))
-                ->setParameters(array(
+                ])
+                ->setParameters([
                     ':userid'   => $this->user['id'],
                     ':lastseen' => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time())),
                     ':token'    => $token
-                ))
+                ])
                 ->execute()
             ;
 
             return true;
         } catch (\Exception $e) {
             $msg = sprintf("ClientLogin had an error adding user ID '%s' token '%s' to the database.", $this->user['id'], $token);
-            $this->app['logger.system']->critical($msg, array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -367,7 +365,7 @@ class ClientRecords
 
             return true;
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical("ClientLogin had an error removing token '$token' from the database.", array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical("ClientLogin had an error removing token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -397,7 +395,7 @@ class ClientRecords
 
             return true;
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical('ClientLogin had an error removing expired sessions from the database.', array('event' => 'exception', 'exception' => $e));
+            $this->app['logger.system']->critical('ClientLogin had an error removing expired sessions from the database.', ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -450,14 +448,14 @@ class ClientRecords
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_name) {
                 $table = $schema->createTable($table_name);
-                $table->addColumn('id',           'integer', array('autoincrement' => true));
-                $table->addColumn('provider',     'string',  array('length' => 64));
-                $table->addColumn('identifier',   'string',  array('length' => 128));
-                $table->addColumn('username',     'string',  array('length' => 64));
+                $table->addColumn('id',           'integer', ['autoincrement' => true]);
+                $table->addColumn('provider',     'string',  ['length' => 64]);
+                $table->addColumn('identifier',   'string',  ['length' => 128]);
+                $table->addColumn('username',     'string',  ['length' => 64]);
                 $table->addColumn('providerdata', 'text');
                 $table->addColumn('sessiondata',  'text');
                 $table->addColumn('lastupdate',   'datetime');
-                $table->setPrimaryKey(array('id'));
+                $table->setPrimaryKey(['id']);
 
                 return $table;
             }
@@ -468,13 +466,13 @@ class ClientRecords
         $this->app['integritychecker']->registerExtensionTable(
             function ($schema) use ($table_name) {
                 $table = $schema->createTable($table_name);
-                $table->addColumn('id',       'integer', array('autoincrement' => true));
+                $table->addColumn('id',       'integer', ['autoincrement' => true]);
                 $table->addColumn('userid',   'integer');
-                $table->addColumn('token',    'string', array('length' => 64));
+                $table->addColumn('token',    'string', ['length' => 64]);
                 $table->addColumn('lastseen', 'datetime');
-                $table->setPrimaryKey(array('id'));
-                $table->addIndex(array('userid'));
-                $table->addIndex(array('token'));
+                $table->setPrimaryKey(['id']);
+                $table->addIndex(['userid']);
+                $table->addIndex(['token']);
 
                 return $table;
             }
