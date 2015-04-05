@@ -3,8 +3,8 @@
 namespace League\OAuth2\Client\Provider;
 
 use Closure;
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\BadResponseException;
+use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Service\Client as GuzzleClient;
 use League\OAuth2\Client\Exception\IDPException as IDPException;
 use League\OAuth2\Client\Grant\GrantInterface;
 use League\OAuth2\Client\Token\AccessToken as AccessToken;
@@ -31,7 +31,9 @@ abstract class AbstractProvider implements ProviderInterface
 
     public $responseType = 'json';
 
-    public $headers = null;
+    public $headers = [];
+
+    public $authorizationHeader;
 
     /**
      * @var GuzzleClient
@@ -179,17 +181,14 @@ abstract class AbstractProvider implements ProviderInterface
                     // No providers included with this library use get but 3rd parties may
                     $client = $this->getHttpClient();
                     $client->setBaseUrl($this->urlAccessToken() . '?' . $this->httpBuildQuery($requestParams, '', '&'));
-                    $request = $client->get(null, null, $requestParams)->send();
+                    $request = $client->get(null, $this->getHeaders(), $requestParams)->send();
                     $response = $request->getBody();
                     break;
                     // @codeCoverageIgnoreEnd
                 case 'POST':
                     $client = $this->getHttpClient();
-                    $url = $this->urlAccessToken();
-                    $options = [
-                        'body' => $requestParams
-                    ];
-                    $request = $client->post($url, $options);
+                    $client->setBaseUrl($this->urlAccessToken());
+                    $request = $client->post(null, $this->getHeaders(), $requestParams)->send();
                     $response = $request->getBody();
                     break;
                 // @codeCoverageIgnoreStart
@@ -214,7 +213,6 @@ abstract class AbstractProvider implements ProviderInterface
                 break;
             case 'string':
                 parse_str($response, $result);
-
                 break;
         }
 
@@ -332,21 +330,22 @@ abstract class AbstractProvider implements ProviderInterface
     {
         $url = $this->urlUserDetails($token);
 
-        return $this->fetchProviderData($url);
+        $headers = $this->getHeaders($token);
+
+        return $this->fetchProviderData($url, $headers);
     }
 
-    protected function fetchProviderData($url)
+    protected function fetchProviderData($url, array $headers = [])
     {
         try {
             $client = $this->getHttpClient();
+            $client->setBaseUrl($url);
 
-            $options = [];
-
-            if ($this->headers) {
-                $options['headers'] = $this->headers;
+            if ($headers) {
+                $client->setDefaultOption('headers', $headers);
             }
 
-            $request = $client->get($url, $options);
+            $request = $client->get()->send();
             $response = $request->getBody();
         } catch (BadResponseException $e) {
             // @codeCoverageIgnoreStart
@@ -358,6 +357,23 @@ abstract class AbstractProvider implements ProviderInterface
         return $response;
     }
 
+    protected function getAuthorizationHeaders($token)
+    {
+        $headers = [];
+        if ($this->authorizationHeader) {
+            $headers['Authorization'] = $this->authorizationHeader . ' ' . $token;
+        }
+        return $headers;
+    }
+
+    public function getHeaders($token = null)
+    {
+        $headers = $this->headers;
+        if ($token) {
+            $headers = array_merge($headers, $this->getAuthorizationHeaders($token));
+        }
+        return $headers;
+    }
 
     public function setRedirectHandler(Closure $handler)
     {
