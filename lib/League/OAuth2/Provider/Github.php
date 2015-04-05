@@ -3,13 +3,10 @@
 namespace League\OAuth2\Client\Provider;
 
 use League\OAuth2\Client\Entity\User;
-use League\OAuth2\Client\Token\AccessToken;
 
 class Github extends AbstractProvider
 {
     public $responseType = 'string';
-
-    public $authorizationHeader = 'token';
 
     public $domain = 'https://github.com';
 
@@ -25,23 +22,23 @@ class Github extends AbstractProvider
         return $this->domain.'/login/oauth/access_token';
     }
 
-    public function urlUserDetails(AccessToken $token)
+    public function urlUserDetails(\League\OAuth2\Client\Token\AccessToken $token)
     {
         if ($this->domain === 'https://github.com') {
-            return $this->apiDomain.'/user';
+            return $this->apiDomain.'/user?access_token='.$token;
         }
-        return $this->domain.'/api/v3/user';
+        return $this->domain.'/api/v3/user?access_token='.$token;
     }
 
-    public function urlUserEmails(AccessToken $token)
+    public function urlUserEmails(\League\OAuth2\Client\Token\AccessToken $token)
     {
         if ($this->domain === 'https://github.com') {
-            return $this->apiDomain.'/user/emails';
+            return $this->apiDomain.'/user/emails?access_token='.$token;
         }
-        return $this->domain.'/api/v3/user/emails';
+        return $this->domain.'/api/v3/user/emails?access_token='.$token;
     }
 
-    public function userDetails($response, AccessToken $token)
+    public function userDetails($response, \League\OAuth2\Client\Token\AccessToken $token)
     {
         $user = new User();
 
@@ -61,39 +58,37 @@ class Github extends AbstractProvider
         return $user;
     }
 
-    public function userUid($response, AccessToken $token)
+    public function userUid($response, \League\OAuth2\Client\Token\AccessToken $token)
     {
         return $response->id;
     }
 
-    public function getUserEmails(AccessToken $token)
+    public function getUserEmails(\League\OAuth2\Client\Token\AccessToken $token)
     {
         $response = $this->fetchUserEmails($token);
 
         return $this->userEmails(json_decode($response), $token);
     }
 
-    public function userEmail($response, AccessToken $token)
+    public function userEmail($response, \League\OAuth2\Client\Token\AccessToken $token)
     {
         return isset($response->email) && $response->email ? $response->email : null;
     }
 
-    public function userEmails($response, AccessToken $token)
+    public function userEmails($response, \League\OAuth2\Client\Token\AccessToken $token)
     {
         return $response;
     }
 
-    public function userScreenName($response, AccessToken $token)
+    public function userScreenName($response, \League\OAuth2\Client\Token\AccessToken $token)
     {
         return $response->name;
     }
 
-    protected function fetchUserEmails(AccessToken $token)
+    protected function fetchUserEmails(\League\OAuth2\Client\Token\AccessToken $token)
     {
         $url = $this->urlUserEmails($token);
 
-        $headers = $this->getHeaders($token);
-
-        return $this->fetchProviderData($url, $headers);
+        return $this->fetchProviderData($url);
     }
 }

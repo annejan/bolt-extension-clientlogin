@@ -6,7 +6,13 @@ use League\OAuth2\Client\Entity\User;
 
 class Eventbrite extends AbstractProvider
 {
-    public $authorizationHeader = 'Bearer';
+    public function __construct($options)
+    {
+        parent::__construct($options);
+        $this->headers = [
+            'Authorization' => 'Bearer',
+        ];
+    }
 
     public function urlAuthorize()
     {
@@ -20,7 +26,7 @@ class Eventbrite extends AbstractProvider
 
     public function urlUserDetails(\League\OAuth2\Client\Token\AccessToken $token)
     {
-        return 'https://www.eventbrite.com/json/user_get';
+        return 'https://www.eventbrite.com/json/user_get?access_token='.$token;
     }
 
     public function userDetails($response, \League\OAuth2\Client\Token\AccessToken $token)

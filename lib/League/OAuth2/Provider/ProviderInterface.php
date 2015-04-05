@@ -24,8 +24,6 @@ interface ProviderInterface
 
     public function getAccessToken($grant = 'authorization_code', $params = []);
 
-    public function getHeaders($token = null);
-
     public function getUserDetails(AccessToken $token);
 
     public function getUserUid(AccessToken $token);
