@@ -122,11 +122,11 @@ class Session
      * Check the OAuth callback
      *
      * @param Request $request
-     * @param string  $url
+     * @param string  $redirectUrl
      *
      * @return Response
      */
-    public function doCheckLoginOAuth(Request $request, $url)
+    public function doCheckLoginOAuth(Request $request, $redirectUrl)
     {
         $providerName = $this->getProviderName($request);
 
@@ -164,7 +164,7 @@ class Session
                 $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
             }
 
-            return new RedirectResponse($this->getRedirectUrl());
+            return new RedirectResponse($redirectUrl);
         } catch (IDPException $e) {
             $this->app['logger.system']->critical('ClientLogin OAuth error: ' . (string) $e, ['event' => 'exception', 'exception' => $e]);
 
