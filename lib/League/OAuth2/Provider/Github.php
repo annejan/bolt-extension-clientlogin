@@ -41,12 +41,32 @@ class Github extends AbstractProvider
         return $this->domain.'/api/v3/user/emails';
     }
 
+    private function reQueryEmail(AccessToken $token)
+    {
+        $emails = $this->getUserEmails($token);
+
+        if (empty($emails)) {
+            return null;
+        }
+
+        foreach ($emails as $email) {
+            if ($email->primary) {
+                return $email->email;
+            }
+        }
+    }
+
     public function userDetails($response, AccessToken $token)
     {
         $user = new User();
 
         $name = (isset($response->name)) ? $response->name : null;
-        $email = (isset($response->email)) ? $response->email : null;
+
+        if (isset($response->email) && isset($response->email)) {
+            $email = $this->reQueryEmail($token);
+        } else {
+            $email = (isset($response->email)) ? $response->email : null;
+        }
 
         $user->exchangeArray([
             'uid' => $response->id,
