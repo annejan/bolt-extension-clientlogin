@@ -302,8 +302,16 @@ class Session
         $config = $this->config['providers'][$providerName];
         $config['redirectUri'] = $this->getCallbackUrl($providerName);
 
-        $httpClient = new GuzzleHttpHttpAdapter($this->app['guzzle.client']);
-        $this->provider = new $providerClass($config, $httpClient);
+        /*
+         * Upcoming changes in League\OAuth2 have the following requirement for
+         * creating the provider… Be aware that this is really broken currently
+         * circa 2015-04-04
+         *
+         * $httpClient = new GuzzleHttpHttpAdapter($this->app['guzzle.client']);
+         * $this->provider = new $providerClass($config, $httpClient);
+         */
+
+        $this->provider = new $providerClass($config);
     }
 
     /**
