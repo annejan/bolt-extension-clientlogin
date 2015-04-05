@@ -148,19 +148,19 @@ class Session
             // If user record doesn't exist, create it
             $profilerecord = $records->getUserProfileByName($clientDetails->name, $providerName);
             if ($profilerecord) {
-                $records->doUpdateUserProfile($providerName, $clientDetails, $this->provider->state);
+                $records->doUpdateUserProfile($providerName, $clientDetails, json_encode($token));
             } else {
-                $records->doCreateUserProfile($providerName, $clientDetails, $this->provider->state);
+                $records->doCreateUserProfile($providerName, $clientDetails, json_encode($token));
             }
 
             // Create the session if need be
-            if (!$records->getUserProfileBySession($this->getToken(self::TOKEN_SESSION))) {
-                $records->doCreateUserSession($this->getToken(self::TOKEN_SESSION));
+            if (!$user = $records->getUserProfileBySession($this->getToken(self::TOKEN_SESSION))) {
+                $records->doCreateUserSession($clientDetails, $this->getToken(self::TOKEN_SESSION), $token);
             }
 
             // Event dispatcher
             if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
-                $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
+                $event = new ClientLoginEvent($user, $records->getTableNameProfiles());
                 $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
             }
 
