@@ -14,8 +14,72 @@ class ClientDetails
     /** @var mixed  */
     public $client = false;
 
+    protected $uid;
+    protected $nickname;
+    protected $name;
+    protected $firstName;
+    protected $lastName;
+    protected $email;
+    protected $location;
+    protected $description;
+    protected $imageUrl;
+    protected $urls;
+    protected $gender;
+    protected $locale;
+
+    /** @var string */
+    protected $json;
+
+    private $properties = [
+            'uid', 'nickname', 'name', 'firstName', 'lastName', 'email',
+            'location', 'description', 'imageUrl', 'urls', 'gender', 'locale'
+        ];
+
     public function __construct()
     {
+    }
+
+    /**
+     * @param string $name
+     *
+     * @throws \OutOfRangeException
+     *
+     * @return string
+     */
+    public function __get($name)
+    {
+        if (!property_exists($this, $name)) {
+            throw new \OutOfRangeException(sprintf(
+                '%s does not contain a property by the name of "%s"',
+                __CLASS__,
+                $name
+            ));
+        }
+
+        return $this->{$name};
+    }
+
+    /**
+     * @param string $property
+     * @param string $value
+     *
+     * @throws \OutOfRangeException
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\ClientDetails
+     */
+    public function __set($property, $value)
+    {
+        if (!property_exists($this, $property)) {
+            throw new \OutOfRangeException(sprintf(
+                '%s does not contain a property by the name of "%s"',
+                __CLASS__,
+                $property
+            ));
+        }
+
+        $this->$property = $value;
+
+        return $this;
     }
 
     /**
@@ -25,7 +89,24 @@ class ClientDetails
      */
     public function addOAuth2Client(User $client)
     {
-        $this->client = $client;
+        foreach ($this->properties as $property) {
+            try {
+                $this->{$property} = $client->{$property};
+            } catch (\Exception $e) {
+            }
+        }
+
+        $this->json = $this->getLeagueUserJson($client);
+    }
+
+    /**
+     * Return the profile data as JSON
+     *
+     * @return string
+     */
+    public function getProfileJson()
+    {
+        return $this->json;
     }
 
     /**
@@ -35,16 +116,22 @@ class ClientDetails
      */
     public function addPasswordClient(\stdClass $client)
     {
-        $this->client = $client;
     }
 
     /**
-     * Getter for client data
+     * Get a JSON representation of the User class for backwards compatibility
      *
-     * @return Ambigous <boolean, User, stdClass>
+     * This is ugly, and I will never admit to having written it! :-P
+     *
+     * @return string
      */
-    public function getClient()
+    private function getLeagueUserJson()
     {
-        return $this->client;
+        $json = [];
+        foreach ($this->properties as $property) {
+            $json[$property] = $this->{$property};
+        }
+
+        return json_encode($json);
     }
 }

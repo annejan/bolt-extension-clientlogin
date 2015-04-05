@@ -146,7 +146,7 @@ class Session
             $records = new ClientRecords($this->app);
 
             // If user record doesn't exist, create it
-            $profilerecord = $records->getUserProfileByName($clientDetails->getClient()->name, $providerName);
+            $profilerecord = $records->getUserProfileByName($clientDetails->name, $providerName);
             if ($profilerecord) {
                 $records->doUpdateUserProfile($providerName, $clientDetails, $this->provider->state);
             } else {
