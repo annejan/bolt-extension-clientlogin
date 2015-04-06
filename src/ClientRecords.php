@@ -31,7 +31,7 @@ class ClientRecords
     }
 
     /**
-     * Look up a users database profile
+     * Look up a users database profile by user name
      *
      * @param string $username
      * @param string $provider
@@ -47,6 +47,35 @@ class ClientRecords
                 ->from($this->getTableNameProfiles())
                 ->where('username = :username', 'provider = :provider')
                 ->setParameter(':username', $username)
+                ->setParameter(':provider', $provider)
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC)
+            ;
+        } catch (\Exception $e) {
+            $msg = sprintf("ClientLogin had an error getting %s profile for %s from the database.", $username, $provider);
+            $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Look up a users database profile by provider identifier
+     *
+     * @param string $identifier
+     * @param string $provider
+     *
+     * @return array|boolean
+     */
+    public function getUserProfileByIdentifier($identifier, $provider)
+    {
+        try {
+            return $this->app['db']
+                ->createQueryBuilder()
+                ->select('*')
+                ->from($this->getTableNameProfiles())
+                ->where('identifier = :identifier', 'provider = :provider')
+                ->setParameter(':identifier', $identifier)
                 ->setParameter(':provider', $provider)
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
