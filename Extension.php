@@ -111,70 +111,8 @@ class Extension extends BaseExtension
             }
         }
 
-        $providersConfig['Password']['form'] = $this->getPasswordFormFields();
-
         // Write it all back
         $this->config['providers'] = $providersConfig;
-    }
-
-    /**
-     * Symfony/Bolt Forms fields for the password auth
-     *
-     * @return array
-     */
-    private function getPasswordFormFields()
-    {
-        return [
-            'parent'       => '',
-            'notification' => ['enabled' => false],
-            'feedback'     => [
-                'success' => '',
-                'error'   => ''
-            ],
-            'fields'       => [
-                'username' => [
-                    'type'    => 'text',
-                    'options' => [
-                        'required'    => true,
-                        'label'       => 'Username',
-                        'constraints' => [
-                            'NotBlank',
-                            [
-                                'Length' => [
-                                    'min' => 5,
-                                    'max' => 64
-                                ]
-                            ]
-                        ],
-                        'attr'        => [
-                            'placeholder' => 'Enter your username'
-                        ]
-                    ]
-                ],
-                'password' => [
-                    'type' => 'password',
-                    'options' => [
-                        'required'    => true,
-                        'label'       => 'Password',
-                        'constraints' => [
-                            'NotBlank',
-                            [
-                                'Length' => [
-                                    'min' => 5,
-                                    'max' => 64
-                                ]
-                            ]
-                        ],
-                        'attr'        => [
-                            'placeholder' => 'Enter your password'
-                        ]
-                    ]
-                ],
-                'submit'   => [
-                    'type' => 'submit'
-                ]
-            ]
-        ];
     }
 
     /**

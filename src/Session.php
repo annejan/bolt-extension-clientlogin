@@ -89,8 +89,9 @@ class Session
      */
     public function doLoginPassword($returnpage)
     {
+        $formFields = FormFields::Password();
         $this->app['boltforms']->makeForm('password', 'form', [], []);
-        $this->app['boltforms']->addFieldArray('password', $this->config['providers']['Password']['form']['fields']);
+        $this->app['boltforms']->addFieldArray('password', $formFields['fields']);
         $message = '';
 
         if ($this->app['request']->getMethod() === 'POST') {
