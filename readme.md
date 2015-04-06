@@ -120,6 +120,10 @@ GitHub
 1. Click 'Register application'
 1. Add the 'Client ID' and 'Client Secret' to your config.yml
 
+Password
+--------
+To use the password authentication you also need to install BoltForms.
+
 Advanced Configuration
 ----------------------
 
