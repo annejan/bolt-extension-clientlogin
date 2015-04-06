@@ -5,6 +5,7 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
+use Hautelook\Phpass\PasswordHash;
 use Ivory\HttpAdapter\GuzzleHttpHttpAdapter;
 use League\OAuth2\Client\Exception\IDPException;
 use League\OAuth2\Client\Provider\ProviderInterface;
@@ -69,7 +70,7 @@ class Session
         }
 
         if ($providerName === 'Password' && $config['Password']['enabled']) {
-            return $this->doLoginPassword();
+            return $this->doLoginPassword($returnpage);
         } elseif ($config[$providerName]['enabled']) {
             return $this->doLoginOAuth($providerName);
         } else {
@@ -77,6 +78,71 @@ class Session
         }
 
         return new Response('', Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Do password login authentication
+     *
+     * @param string  $returnpage
+     *
+     * @return Response
+     */
+    public function doLoginPassword($returnpage)
+    {
+        $this->app['boltforms']->makeForm('password', 'form', [], []);
+        $this->app['boltforms']->addFieldArray('password', $this->config['providers']['Password']['form']['fields']);
+        $message = '';
+
+        if ($this->app['request']->getMethod() === 'POST') {
+            // Validate the form data
+            $formdata = $this->app['boltforms']->handleRequest('password');
+
+            // Validate password data
+            if ($formdata && $this->doCheckLoginPassword($formdata)) {
+                return new RedirectResponse($returnpage);
+            }
+        }
+
+        $fields = $this->app['boltforms']->getForm('password')->all();
+        $twigvalues = [
+            'parent'  => $this->config['template']['password_parent'],
+            'fields'  => $fields,
+            'message' => $message
+        ];
+
+        // Render the Twig_Markup
+        $html = $this->app['boltforms']->renderForm('password', $this->config['template']['password'], $twigvalues);
+
+        return new Response($html, Response::HTTP_OK);
+    }
+
+    /**
+     * Check the password login data
+     *
+     * @param array $formdata
+     *
+     * @return boolean
+     */
+    private function doCheckLoginPassword($formdata)
+    {
+        if (empty($formdata['username']) || empty($formdata['password'])) {
+            return new Response('No password data given', Response::HTTP_FORBIDDEN);
+        }
+
+        if (!$user = $this->app['clientlogin.records']->getUserProfileByIdentifier($formdata['username'], 'Password')) {
+            return false;
+        }
+
+        if (!$providerdata = json_decode($user['providerdata'], true)) {
+            return false;
+        }
+
+        $hasher = new PasswordHash(12, true);
+        if ($hasher->CheckPassword($formdata['password'], $providerdata['password'])) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -152,7 +218,7 @@ class Session
         $sessionToken = $this->setToken(self::TOKEN_SESSION);
 
         // If user record doesn't exist, create it
-        $profilerecord = $this->app['clientlogin.records']->getUserProfileByName($clientDetails->name, $providerName);
+        $profilerecord = $this->app['clientlogin.records']->getUserProfileByIdentifier($clientDetails->uid, $providerName);
 
         if ($profilerecord) {
             $this->app['clientlogin.records']->doUpdateUserProfile($providerName, $clientDetails, $providerToken);

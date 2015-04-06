@@ -38,7 +38,7 @@ class ClientLoginController implements ControllerProviderInterface
         // Member login
         $ctr->match('/login', [$this, 'authenticationLogin'])
             ->bind('authenticationLogin')
-            ->method('GET');
+            ->method('GET|POST');
 
         // Member logout
         $ctr->match('/logout', [$this, 'authenticationLogout'])
