@@ -25,17 +25,11 @@ class Session
     /** @var string */
     const TOKEN_STATE = 'bolt_clientlogin_state';
 
-    /** @var string User cookie token */
-    private $token;
-
     /** @var \Bolt\Application */
     private $app;
 
     /** @var array Extension config */
     private $config;
-
-    /** @var boolean Is this a new authentication */
-    private $isnewauth = false;
 
     /** @var \League\OAuth2\Client\Provider\ProviderInterface */
     private $provider;
@@ -67,14 +61,9 @@ class Session
         }
 
         // Check for extisting token
-        if ($this->doCheckLogin()) {
-            $this->app['clientlogin.records']->getUserProfileBySession($this->getToken(self::TOKEN_SESSION));
-
+        if ($user = $this->doCheckLogin()) {
             // Event dispatcher
-            if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
-                $event = new ClientLoginEvent($this->app['clientlogin.records']->user, $this->app['clientlogin.records']->getTableNameProfiles());
-                $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
-            }
+            $this->dispatchEvent('clientlogin.Login', $user);
 
             return new RedirectResponse($returnpage);
         }
@@ -174,26 +163,16 @@ class Session
         if ($profilerecord) {
             $this->app['clientlogin.records']->doUpdateUserProfile($providerName, $clientDetails, $providerToken);
         } else {
-            $this->app['clientlogin.records']->doCreateUserProfile($providerName, $clientDetails, $providerToken);
+            $profilerecord = $this->app['clientlogin.records']->doCreateUserProfile($providerName, $clientDetails, $providerToken);
         }
 
         // Create the session if need be
-        if (!$user = $this->app['clientlogin.records']->getUserProfileBySession($sessionToken)) {
+        if ($this->app['clientlogin.records']->getUserProfileBySession($sessionToken)) {
             $this->app['clientlogin.records']->doCreateUserSession($clientDetails, $sessionToken, $providerToken);
         }
 
         // Event dispatcher
-        try {
-            if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
-                $event = new ClientLoginEvent($user, $this->app['clientlogin.records']->getTableNameProfiles());
-                $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
-            }
-
-        } catch (\Exception $e) {
-            if ($this->config['debug_mode']) { dump($e); }
-
-            $this->app['logger.system']->critical('ClientLogin event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
-        }
+        $this->dispatchEvent('clientlogin.Login', $profilerecord);
 
         return new RedirectResponse($redirectUrl);
     }
@@ -213,7 +192,8 @@ class Session
             return new RedirectResponse($returnpage);
         }
 
-        $this->app['clientlogin.records']->getUserProfileBySession($token);
+        // Get user record
+        $profilerecord = $this->app['clientlogin.records']->getUserProfileBySession($token);
 
         // Remove session from database
         $this->app['clientlogin.records']->doRemoveSession($token);
@@ -222,40 +202,34 @@ class Session
         $this->removeToken(self::TOKEN_SESSION);
 
         // Event dispatcher
-        try {
-            if ($this->app['dispatcher']->hasListeners('clientlogin.Logout')) {
-                $event = new ClientLoginEvent($this->app['clientlogin.records']->user, $this->app['clientlogin.records']->getTableNameProfiles());
-                $this->app['dispatcher']->dispatch('clientlogin.Logout', $event);
-            }
-        } catch (\Exception $e) {
-            if ($this->config['debug_mode']) { dump($e); }
-
-            $this->app['logger.system']->critical('ClientLogin event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
+        if ($profilerecord) {
+            $this->dispatchEvent('clientlogin.Logout', $profilerecord);
         }
 
         return new RedirectResponse($returnpage);
     }
 
     /**
-     * Check if a visitor is logged in by session token
+     * Check if a visitor is logged in by session token.
      *
      * If session token doesn't exist we assume the user is not logged in.
      *
      * If session token does exist, we check for a valid database record, no
-     * record means the token has been revoked by the site administrator
+     * record means the token has been revoked by the site administrator.
      *
-     * @return bool True if user logged in, False is logged out
+     * @return array|boolean The user profile or FALSE
      */
     public function doCheckLogin()
     {
         // Get client token
-        if (empty($this->getToken(self::TOKEN_SESSION))) {
+        $token = $this->getToken(self::TOKEN_SESSION);
+        if (empty($token)) {
             return false;
         }
 
         // See if there is matching record, i.e. valid, unrevoked, token
-        if ($this->app['clientlogin.records']->getUserProfileBySession($this->getToken(self::TOKEN_SESSION))) {
-            return true;
+        if ($profile = $this->app['clientlogin.records']->getUserProfileBySession($token)) {
+            return $profile;
         } else {
             return false;
         }
@@ -382,5 +356,26 @@ class Session
         }
 
         return ucwords(strtolower($provider));
+    }
+
+    /**
+     * Dispatch event to any listeners.
+     *
+     * @param string $type Either 'clientlogin.Login' or 'clientlogin.Logout'
+     * @param array  $user
+     */
+    private function dispatchEvent($type, array $user)
+    {
+        if ($this->app['dispatcher']->hasListeners($type)) {
+            $tablename = $this->app['clientlogin.records']->getTableNameProfiles();
+            $event     = new ClientLoginEvent($user, $tablename);
+
+            try {
+                $this->app['dispatcher']->dispatch($type, $event);
+            } catch (\Exception $e) {
+                if ($this->config['debug_mode']) { dump($e); }
+                $this->app['logger.system']->critical('ClientLogin event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
+            }
+        }
     }
 }
