@@ -58,12 +58,13 @@ class UserInterface
         if ($redirect) {
             $target = '&redirect=' . urlencode($this->app['resources']->getUrl('current'));
         }
+
         // Render
-        if (isset($this->config['auth']['hybridauth'])) {
+        if (isset($this->config['providers'])) {
             $buttons = [];
 
-            foreach ($this->config['auth']['hybridauth']['providers'] as $provider => $values) {
-                if ($values['enabled'] == true) {
+            foreach ($this->config['providers'] as $provider => $values) {
+                if ($values['enabled'] === true && stristr($provider, 'Password') === false) {
                     $label = !empty($values['label']) ? $values['label'] : $provider;
                     $class = isset($values['type']) && $values['type'] == 'OpenID' ? 'openid' : $provider;
 
@@ -77,7 +78,7 @@ class UserInterface
             $html .= join("\n", $buttons);
         }
 
-        if (isset($this->config['auth']['password']) && $this->config['auth']['password']['enabled'] === true) {
+        if ($this->config['providers']['Password']['enabled'] === true) {
             $html .= '';
         }
 
