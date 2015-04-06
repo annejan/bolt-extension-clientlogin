@@ -138,9 +138,11 @@ class Extension extends BaseExtension
                         'label'       => 'Username',
                         'constraints' => [
                             'NotBlank',
-                            'Length' => [
-                                'min' => 5,
-                                'max' => 64
+                            [
+                                'Length' => [
+                                    'min' => 5,
+                                    'max' => 64
+                                ]
                             ]
                         ],
                         'attr'        => [
@@ -155,15 +157,20 @@ class Extension extends BaseExtension
                         'label'       => 'Password',
                         'constraints' => [
                             'NotBlank',
-                            'Length' => [
-                                'min' => 6,
-                                'max' => 64
+                            [
+                                'Length' => [
+                                    'min' => 5,
+                                    'max' => 64
+                                ]
                             ]
                         ],
                         'attr'        => [
                             'placeholder' => 'Enter your password'
                         ]
                     ]
+                ],
+                'submit'   => [
+                    'type' => 'submit'
                 ]
             ]
         ];
