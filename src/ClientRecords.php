@@ -81,7 +81,7 @@ class ClientRecords
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
         } catch (\Exception $e) {
-            $msg = sprintf("ClientLogin had an error getting %s profile for %s from the database.", $username, $provider);
+            $msg = sprintf("ClientLogin had an error getting %s profile for %s from the database.", $identifier, $provider);
             $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
             return false;
@@ -152,7 +152,7 @@ class ClientRecords
 
             return false;
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical("ClientLogin had an error getting profile with token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
+            $this->app['logger.system']->critical("ClientLogin had an error getting profile from the database.", ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -208,7 +208,7 @@ class ClientRecords
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical("ClientLogin had an error getting session with PHP token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
+            $this->app['logger.system']->critical("ClientLogin had an error getting session from the database.", ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -236,7 +236,7 @@ class ClientRecords
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical("ClientLogin had an error getting session with provider token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
+            $this->app['logger.system']->critical("ClientLogin had an error getting session from the database.", ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -360,7 +360,7 @@ class ClientRecords
 
             return true;
         } catch (\Exception $e) {
-            $msg = sprintf("ClientLogin had an error adding user ID '%s' token '%s' to the database.", $this->user['id'], $token);
+            $msg = sprintf("ClientLogin had an error adding user ID '%s' token to the database.", $this->user['id']);
             $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
             return false;
@@ -402,7 +402,7 @@ class ClientRecords
 
             return true;
         } catch (\Exception $e) {
-            $this->app['logger.system']->critical("ClientLogin had an error removing token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
+            $this->app['logger.system']->critical("ClientLogin had an error removing token from the database.", ['event' => 'exception', 'exception' => $e]);
 
             return false;
         }
@@ -506,7 +506,7 @@ class ClientRecords
                 $table->addColumn('id',       'integer', ['autoincrement' => true]);
                 $table->addColumn('userid',   'integer');
                 $table->addColumn('session',  'string', ['length' => 64]);
-                $table->addColumn('token',    'string', ['notnull' => false, 'default' => null]);
+                $table->addColumn('token',    'text',   ['notnull' => false, 'default' => null]);
                 $table->addColumn('lastseen', 'datetime');
                 $table->setPrimaryKey(['id']);
                 $table->addIndex(['userid']);
