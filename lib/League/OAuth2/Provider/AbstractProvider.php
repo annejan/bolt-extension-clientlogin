@@ -3,8 +3,8 @@
 namespace League\OAuth2\Client\Provider;
 
 use Closure;
-use Guzzle\Http\Exception\BadResponseException;
-use Guzzle\Service\Client as GuzzleClient;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\BadResponseException;
 use League\OAuth2\Client\Exception\IDPException as IDPException;
 use League\OAuth2\Client\Grant\GrantInterface;
 use League\OAuth2\Client\Token\AccessToken as AccessToken;
@@ -169,7 +169,7 @@ abstract class AbstractProvider implements ProviderInterface
             'client_id'     => $this->clientId,
             'client_secret' => $this->clientSecret,
             'redirect_uri'  => $this->redirectUri,
-            'grant_type'    => $grant,
+            'grant_type'    => (string) $grant,
         ];
 
         $requestParams = $grant->prepRequestParams($defaultParams, $params);
@@ -187,8 +187,11 @@ abstract class AbstractProvider implements ProviderInterface
                     // @codeCoverageIgnoreEnd
                 case 'POST':
                     $client = $this->getHttpClient();
-                    $client->setBaseUrl($this->urlAccessToken());
-                    $request = $client->post(null, $this->getHeaders(), $requestParams)->send();
+                    $url = $this->urlAccessToken();
+                    $options = [
+                        'body' => $requestParams
+                    ];
+                    $request = $client->post($url, $options);
                     $response = $request->getBody();
                     break;
                 // @codeCoverageIgnoreStart
@@ -339,13 +342,13 @@ abstract class AbstractProvider implements ProviderInterface
     {
         try {
             $client = $this->getHttpClient();
-            $client->setBaseUrl($url);
+            $options = [];
 
             if ($headers) {
-                $client->setDefaultOption('headers', $headers);
+                $options['headers'] = $headers;
             }
 
-            $request = $client->get()->send();
+            $request = $client->get($url, $options);
             $response = $request->getBody();
         } catch (BadResponseException $e) {
             // @codeCoverageIgnoreStart
