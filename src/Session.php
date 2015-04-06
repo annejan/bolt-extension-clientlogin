@@ -234,7 +234,7 @@ class Session
      *
      * @return string
      */
-    private function getToken($tokenName)
+    public function getToken($tokenName)
     {
         return $this->app['session']->get($tokenName);
     }
