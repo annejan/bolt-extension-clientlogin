@@ -74,8 +74,8 @@ class ClientRecords
                 ->createQueryBuilder()
                 ->select('*')
                 ->from($this->getTableNameProfiles())
-                ->where('identifier = :identifier')
-                ->setParameter(':identifier', $id)
+                ->where('id = :id')
+                ->setParameter(':id', $id)
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
@@ -303,12 +303,12 @@ class ClientRecords
     /**
      * Create a user's session record
      *
-     * @param ClientDetails $user
-     * @param string        $token
+     * @param array  $user
+     * @param string $token
      *
      * @return boolean
      */
-    public function doCreateUserSession(ClientDetails $user, $session, $token)
+    public function doCreateUserSession(array $user, $session, $token)
     {
         try {
             $this->app['db']
@@ -321,7 +321,7 @@ class ClientRecords
                     'token'    => ':token'
                 ])
                 ->setParameters([
-                    ':userid'   => $user->uid,
+                    ':userid'   => $user['id'],
                     ':lastseen' => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time())),
                     ':session'  => $session,
                     ':token'    => $token
