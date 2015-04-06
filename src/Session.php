@@ -53,10 +53,11 @@ class Session
      * Do OAuth login authentication
      *
      * @param Request $request
+     * @param string  $returnpage
      *
      * @return Response
      */
-    public function doLogin(Request $request)
+    public function doLogin(Request $request, $returnpage)
     {
         $providerName = $this->getProviderName($request);
         $config = $this->config['providers'];
@@ -75,7 +76,7 @@ class Session
                 $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
             }
 
-            return new RedirectResponse($this->getRedirectUrl());
+            return new RedirectResponse($returnpage);
         }
 
         try {

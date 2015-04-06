@@ -63,9 +63,9 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogin(Application $app, Request $request)
     {
-        $this->setRedirectUrl($app);
+        $returnpage = $this->setRedirectUrl($app);
 
-        return $app['clientlogin.session']->doLogin($request);
+        return $app['clientlogin.session']->doLogin($request, $returnpage);
     }
 
     /**
@@ -132,6 +132,8 @@ class ClientLoginController implements ControllerProviderInterface
         }
 
         $app['session']->set(self::TOKENNAME, $returnpage);
+
+        return $returnpage;
     }
 
     /**
