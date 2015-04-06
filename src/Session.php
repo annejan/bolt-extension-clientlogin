@@ -135,10 +135,13 @@ class Session
 
         try {
             // Try to get an access token (using the authorization code grant)
-            $token = $this->provider->getAccessToken('authorization_code', ['code' => $request->get('code')]);
+            $providerToken = $this->provider->getAccessToken('authorization_code', ['code' => $request->get('code')]);
 
             /** \League\OAuth2\Client\Entity\User */
-            $userDetails = $this->provider->getUserDetails($token);
+            $userDetails = $this->provider->getUserDetails($providerToken);
+
+            // Set/get a session token
+            $sessionToken = $this->setToken(self::TOKEN_SESSION);
 
             $clientDetails = new ClientDetails();
             $clientDetails->addOAuth2Client($userDetails);
@@ -148,14 +151,14 @@ class Session
             // If user record doesn't exist, create it
             $profilerecord = $records->getUserProfileByName($clientDetails->name, $providerName);
             if ($profilerecord) {
-                $records->doUpdateUserProfile($providerName, $clientDetails, json_encode($token));
+                $records->doUpdateUserProfile($providerName, $clientDetails, json_encode($providerToken));
             } else {
-                $records->doCreateUserProfile($providerName, $clientDetails, json_encode($token));
+                $records->doCreateUserProfile($providerName, $clientDetails, json_encode($providerToken));
             }
 
             // Create the session if need be
-            if (!$user = $records->getUserProfileBySession($this->getToken(self::TOKEN_SESSION))) {
-                $records->doCreateUserSession($clientDetails, $this->getToken(self::TOKEN_SESSION), $token);
+            if (!$user = $records->getUserProfileBySession($sessionToken)) {
+                $records->doCreateUserSession($clientDetails, $sessionToken, $providerToken);
             }
 
             // Event dispatcher
