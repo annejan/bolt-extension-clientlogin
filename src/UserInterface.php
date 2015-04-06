@@ -61,25 +61,22 @@ class UserInterface
 
         // Render
         if (isset($this->config['providers'])) {
-            $buttons = [];
+            $link    = $this->app['resources']->getUrl('root') . $this->config['basepath'] . '/login?provider=';
+            $context = [];
 
             foreach ($this->config['providers'] as $provider => $values) {
-                if ($values['enabled'] === true && stristr($provider, 'Password') === false) {
-                    $label = !empty($values['label']) ? $values['label'] : $provider;
-                    $class = isset($values['type']) && $values['type'] == 'OpenID' ? 'openid' : $provider;
-
-                    $buttons[] = $this->doFormatButton(
-                        $this->app['resources']->getUrl('root') . $this->config['basepath'] . '/login?provider=' . $provider . $target,
-                        $class,
-                        $label);
+                if ($values['enabled'] !== true) {
+                    continue;
                 }
+
+                $context['providers'][$provider] = [
+                    'link'  => $link . $provider . $target,
+                    'label' => !empty($values['label']) ? $values['label'] : $provider,
+                    'class' => $this->getClass(strtolower($provider), $values)
+                ];
             }
 
-            $html .= join("\n", $buttons);
-        }
-
-        if ($this->config['providers']['Password']['enabled'] === true) {
-            $html .= '';
+            $html = $this->app['render']->render($this->config['template']['button'], $context);
         }
 
         return new \Twig_Markup($html, 'UTF-8');
@@ -111,32 +108,19 @@ class UserInterface
     }
 
     /**
-     * Simple function to format the HTML for a button.
+     * Get a button's class
      *
-     * @param string $link
      * @param string $provider
-     * @param string $label
+     * @param array  $values
      *
-     * @return \Twig_Markup
+     * @return string
      */
-    private function doFormatButton($link, $provider, $label)
+    private function getClass($provider, $values)
     {
-        $provider = strtolower(String::makeSafe($provider));
-
-        if ($this->config['zocial']) {
-            $class = "zocial {$provider}";
-        } else {
-            $class = "{$provider}";
+        if(isset($values['type']) && $values['type'] == 'OpenID') {
+             return $this->config['zocial'] ? 'zocial openid' : 'openid';
         }
 
-        $context = [
-            'link'  => $link,
-            'label' => $label,
-            'class' => $class
-        ];
-
-        $markup = $this->app['render']->render($this->config['template']['button'], $context);
-
-        return new \Twig_Markup($markup, 'UTF-8');
+        return $this->config['zocial'] ? "zocial $provider" : $provider;
     }
 }
