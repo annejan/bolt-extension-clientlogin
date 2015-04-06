@@ -67,13 +67,11 @@ class Session
 
         // Check for extisting token
         if ($this->doCheckLogin()) {
-            $records = new ClientRecords($this->app);
-
-            $records->getUserProfileBySession($this->getToken(self::TOKEN_SESSION));
+            $this->app['clientlogin.records']->getUserProfileBySession($this->getToken(self::TOKEN_SESSION));
 
             // Event dispatcher
             if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
-                $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
+                $event = new ClientLoginEvent($this->app['clientlogin.records']->user, $this->app['clientlogin.records']->getTableNameProfiles());
                 $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
             }
 
@@ -146,24 +144,22 @@ class Session
             $clientDetails = new ClientDetails();
             $clientDetails->addOAuth2Client($userDetails);
 
-            $records = new ClientRecords($this->app);
-
             // If user record doesn't exist, create it
-            $profilerecord = $records->getUserProfileByName($clientDetails->name, $providerName);
+            $profilerecord = $this->app['clientlogin.records']->getUserProfileByName($clientDetails->name, $providerName);
             if ($profilerecord) {
-                $records->doUpdateUserProfile($providerName, $clientDetails, json_encode($providerToken));
+                $this->app['clientlogin.records']->doUpdateUserProfile($providerName, $clientDetails, json_encode($providerToken));
             } else {
-                $records->doCreateUserProfile($providerName, $clientDetails, json_encode($providerToken));
+                $this->app['clientlogin.records']->doCreateUserProfile($providerName, $clientDetails, json_encode($providerToken));
             }
 
             // Create the session if need be
-            if (!$user = $records->getUserProfileBySession($sessionToken)) {
-                $records->doCreateUserSession($clientDetails, $sessionToken, $providerToken);
+            if (!$user = $this->app['clientlogin.records']->getUserProfileBySession($sessionToken)) {
+                $this->app['clientlogin.records']->doCreateUserSession($clientDetails, $sessionToken, $providerToken);
             }
 
             // Event dispatcher
             if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
-                $event = new ClientLoginEvent($user, $records->getTableNameProfiles());
+                $event = new ClientLoginEvent($user, $this->app['clientlogin.records']->getTableNameProfiles());
                 $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
             }
 
@@ -187,18 +183,17 @@ class Session
         $token = $this->getToken(self::TOKEN_SESSION);
 
         if ($token) {
-            $records = new ClientRecords($this->app);
-            $records->getUserProfileBySession($token);
+            $this->app['clientlogin.records']->getUserProfileBySession($token);
 
             // Remove session from database
-            $records->doRemoveSession($token);
+            $this->app['clientlogin.records']->doRemoveSession($token);
 
             // Remove token
             $this->removeToken(self::TOKEN_SESSION);
 
             // Event dispatcher
             if ($this->app['dispatcher']->hasListeners('clientlogin.Logout')) {
-                $event = new ClientLoginEvent($records->user, $records->getTableNameProfiles());
+                $event = new ClientLoginEvent($this->app['clientlogin.records']->user, $this->app['clientlogin.records']->getTableNameProfiles());
                 $this->app['dispatcher']->dispatch('clientlogin.Logout', $event);
             }
         }
@@ -222,8 +217,7 @@ class Session
         }
 
         // See if there is matching record, i.e. valid, unrevoked, token
-        $records = new ClientRecords($this->app);
-        if ($records->getUserProfileBySession($this->getToken(self::TOKEN_SESSION))) {
+        if ($this->app['clientlogin.records']->getUserProfileBySession($this->getToken(self::TOKEN_SESSION))) {
             return true;
         } else {
             return false;
