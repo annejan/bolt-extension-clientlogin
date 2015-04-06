@@ -125,6 +125,7 @@ class Extension extends BaseExtension
     private function getPasswordFormFields()
     {
         return [
+            'parent'       => '',
             'notification' => ['enabled' => false],
             'feedback'     => [
                 'success' => '',
@@ -203,9 +204,10 @@ class Extension extends BaseExtension
             ],
             'basepath' => 'authenticate',
             'template' => [
-                'profile'  => '_profile.twig',
-                'button'   => '_button.twig',
-                'password' => '_password.twig'
+                'profile'         => '_profile.twig',
+                'button'          => '_button.twig',
+                'password'        => '_password.twig',
+                'password_parent' => 'password.twig'
             ],
             'zocial'        => false,
             'login_expiry'  => 14,
