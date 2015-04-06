@@ -100,6 +100,9 @@ class Session
 
             // Validate password data
             if ($formdata && $this->doCheckLoginPassword($formdata)) {
+                // Event dispatcher
+                //$this->dispatchEvent('clientlogin.Login', $formdata);
+
                 return new RedirectResponse($returnpage);
             }
         }
