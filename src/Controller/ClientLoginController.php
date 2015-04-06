@@ -122,7 +122,7 @@ class ClientLoginController implements ControllerProviderInterface
         if ($returnpage) {
             $returnpage = str_replace($app['resources']->getUrl('hosturl'), '', $returnpage);
         } else {
-            $returnpage = $this->app['resources']->getUrl('hosturl');
+            $returnpage = $app['resources']->getUrl('hosturl');
         }
 
         $app['session']->set(self::TOKENNAME, $returnpage);
@@ -139,7 +139,13 @@ class ClientLoginController implements ControllerProviderInterface
      */
     private function getRedirectUrl($app)
     {
-        return $app['session']->get(self::TOKENNAME);
+        $returnpage = $app['session']->get(self::TOKENNAME);
+
+        if ($returnpage) {
+            return $returnpage;
+        }
+
+        return $app['resources']->getUrl('hosturl');
     }
 
     /**
