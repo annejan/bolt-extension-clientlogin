@@ -138,49 +138,63 @@ class Session
             /** \League\OAuth2\Client\Entity\User */
             $userDetails = $this->provider->getUserDetails($providerToken);
 
-            // Set/get a session token
-            $sessionToken = $this->setToken(self::TOKEN_SESSION);
-
             $clientDetails = new ClientDetails();
             $clientDetails->addOAuth2Client($userDetails);
+        } catch (IDPException $e) {
+            if ($this->config['debug_mode']) { dump($e); }
 
-            // If user record doesn't exist, create it
-            $profilerecord = $this->app['clientlogin.records']->getUserProfileByName($clientDetails->name, $providerName);
-            if ($profilerecord) {
-                $this->app['clientlogin.records']->doUpdateUserProfile($providerName, $clientDetails, json_encode($providerToken));
-            } else {
-                $this->app['clientlogin.records']->doCreateUserProfile($providerName, $clientDetails, json_encode($providerToken));
-            }
+            $this->app['logger.system']->critical('ClientLogin OAuth error: ' . (string) $e, ['event' => 'exception', 'exception' => $e]);
 
-            // Create the session if need be
-            if (!$user = $this->app['clientlogin.records']->getUserProfileBySession($sessionToken)) {
-                $this->app['clientlogin.records']->doCreateUserSession($clientDetails, $sessionToken, $providerToken);
-            }
+            return new Response("The provider $providerName returned an error. Please contact this site's administrator.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
+        return $this->doCompleteLogin($providerName, $clientDetails, $redirectUrl, json_encode($providerToken));
+    }
+
+    /**
+     * Complete the login process, set the session token and update teh database
+     * records.
+     *
+     * @param string        $providerName
+     * @param ClientDetails $clientDetails
+     * @param string        $redirectUrl
+     * @param string        $providerToken
+     *
+     * @return Response
+     */
+    private function doCompleteLogin($providerName, ClientDetails $clientDetails, $redirectUrl, $providerToken = null)
+    {
+        // Set and get a session token
+        $sessionToken = $this->setToken(self::TOKEN_SESSION);
+
+        // If user record doesn't exist, create it
+        $profilerecord = $this->app['clientlogin.records']->getUserProfileByName($clientDetails->name, $providerName);
+
+        if ($profilerecord) {
+            $this->app['clientlogin.records']->doUpdateUserProfile($providerName, $clientDetails, $providerToken);
+        } else {
+            $this->app['clientlogin.records']->doCreateUserProfile($providerName, $clientDetails, $providerToken);
+        }
+
+        // Create the session if need be
+        if (!$user = $this->app['clientlogin.records']->getUserProfileBySession($sessionToken)) {
+            $this->app['clientlogin.records']->doCreateUserSession($clientDetails, $sessionToken, $providerToken);
+        }
+
+        try {
             // Event dispatcher
             if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
                 $event = new ClientLoginEvent($user, $this->app['clientlogin.records']->getTableNameProfiles());
                 $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
             }
 
-            return new RedirectResponse($redirectUrl);
-        } catch (IDPException $e) {
-            if ($this->config['debug_mode']) {
-                dump($e);
-            }
-
-            $this->app['logger.system']->critical('ClientLogin OAuth error: ' . (string) $e, ['event' => 'exception', 'exception' => $e]);
-
-            return new Response("The provider $providerName returned an error. Please contact this site's administrator.", Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Exception $e) {
-            if ($this->config['debug_mode']) {
-                dump($e);
-            }
+            if ($this->config['debug_mode']) { dump($e); }
 
-            $this->app['logger.system']->critical('ClientLogin had an error processing the user profile.', ['event' => 'exception', 'exception' => $e]);
-
-            return new Response('There was a server error. Please contact the site administrator.', Response::HTTP_INTERNAL_SERVER_ERROR);
+            $this->app['logger.system']->critical('ClientLogin event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
         }
+
+        return new RedirectResponse($redirectUrl);
     }
 
     /**
