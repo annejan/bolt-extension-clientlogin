@@ -152,7 +152,7 @@ class Session
      *
      * @return Response
      */
-    public function doLoginOAuth($providerName)
+    private function doLoginOAuth($providerName)
     {
         // Set up chosen provider
         $this->setProvider($providerName);
@@ -198,7 +198,7 @@ class Session
             return new Response("The provider $providerName returned an error. Please contact this site's administrator.", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->doCompleteLogin($providerName, $clientDetails, $redirectUrl, json_encode($providerToken));
+        return $this->doCompleteLoginOAuth($providerName, $clientDetails, $redirectUrl, json_encode($providerToken));
     }
 
     /**
@@ -212,7 +212,7 @@ class Session
      *
      * @return Response
      */
-    private function doCompleteLogin($providerName, ClientDetails $clientDetails, $redirectUrl, $providerToken = null)
+    private function doCompleteLoginOAuth($providerName, ClientDetails $clientDetails, $redirectUrl, $providerToken = null)
     {
         // Set and get a session token
         $sessionToken = $this->setToken(self::TOKEN_SESSION);
