@@ -36,12 +36,12 @@ class ClientRecords
      * @param string $username
      * @param string $provider
      *
-     * @return array|null
+     * @return array|boolean
      */
     public function getUserProfileByName($username, $provider)
     {
         try {
-            $user = $this->app['db']
+            return $this->app['db']
                 ->createQueryBuilder()
                 ->select('*')
                 ->from($this->getTableNameProfiles())
@@ -51,17 +51,11 @@ class ClientRecords
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
-
-            if (empty($this->user['id'])) {
-                return null;
-            } else {
-                return $user;
-            }
         } catch (\Exception $e) {
             $msg = sprintf("ClientLogin had an error getting %s profile for %s from the database.", $username, $provider);
             $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
-            return null;
+            return false;
         }
     }
 
@@ -71,34 +65,24 @@ class ClientRecords
      * @param string $username
      * @param string $provider
      *
-     * @return array|null
+     * @return array|boolean
      */
     public function getUserProfileByID($id)
     {
-        if ($this->user) {
-            return true;
-        }
-
         try {
-            $user = $this->app['db']
+            return $this->app['db']
                 ->createQueryBuilder()
                 ->select('*')
                 ->from($this->getTableNameProfiles())
-                ->where('id = :id')
-                ->setParameter(':id', $id)
+                ->where('identifier = :identifier')
+                ->setParameter(':identifier', $id)
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
-
-            if (empty($this->user['id'])) {
-                return null;
-            } else {
-                return $user;
-            }
         } catch (\Exception $e) {
             $this->app['logger.system']->critical("ClientLogin had an error getting profile with ID '$id' from the database.", ['event' => 'exception', 'exception' => $e]);
 
-            return null;
+            return false;
         }
     }
 
@@ -110,7 +94,7 @@ class ClientRecords
      *
      * @param string $token The PHP session or provider token to query
      *
-     * @return array|null
+     * @return array|boolean
      */
     public function getUserProfileBySession($token)
     {
@@ -137,11 +121,11 @@ class ClientRecords
                 $this->doRemoveSession(['id' => $this->session['id']]);
             }
 
-            return null;
+            return false;
         } catch (\Exception $e) {
             $this->app['logger.system']->critical("ClientLogin had an error getting profile with token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
 
-            return null;
+            return false;
         }
     }
 
@@ -150,13 +134,13 @@ class ClientRecords
      *
      * @param integer $id
      *
-     * @return array|null
+     * @return array|boolean
      */
     public function getUserSessionByID($id)
     {
         // Get the assocaited session
         try {
-            $session = $this->app['db']
+            return $this->app['db']
                 ->createQueryBuilder()
                 ->select('*')
                 ->from($this->getTableNameSessions())
@@ -166,16 +150,10 @@ class ClientRecords
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
-
-            if (empty($this->session['id'])) {
-                return null;
-            } else {
-                return $session;
-            }
         } catch (\Exception $e) {
             $this->app['logger.system']->critical("ClientLogin had an error getting session with ID '$id' from the database.", ['event' => 'exception', 'exception' => $e]);
 
-            return null;
+            return false;
         }
     }
 
@@ -184,13 +162,13 @@ class ClientRecords
      *
      * @param string $token
      *
-     * @return array|null
+     * @return array|boolean
      */
     public function getSessionBySessionToken($token)
     {
         // Get the assocaited session
         try {
-            $session = $this->app['db']
+            return $this->app['db']
                 ->createQueryBuilder()
                 ->select('*')
                 ->from($this->getTableNameSessions())
@@ -200,16 +178,10 @@ class ClientRecords
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
-
-            if (empty($this->session['id'])) {
-                return null;
-            } else {
-                return $session;
-            }
         } catch (\Exception $e) {
             $this->app['logger.system']->critical("ClientLogin had an error getting session with PHP token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
 
-            return null;
+            return false;
         }
     }
 
@@ -218,13 +190,13 @@ class ClientRecords
      *
      * @param \League\OAuth2\Client\Token\AccessToken $token
      *
-     * @return array|null
+     * @return array|boolean
      */
     public function getSessionByProviderToken(AccessToken $token)
     {
         // Get the assocaited session
         try {
-            $session = $this->app['db']
+            return $this->app['db']
                 ->createQueryBuilder()
                 ->select('*')
                 ->from($this->getTableNameSessions())
@@ -234,16 +206,10 @@ class ClientRecords
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
-
-            if (empty($this->session['id'])) {
-                return null;
-            } else {
-                return $session;
-            }
         } catch (\Exception $e) {
             $this->app['logger.system']->critical("ClientLogin had an error getting session with provider token '$token' from the database.", ['event' => 'exception', 'exception' => $e]);
 
-            return null;
+            return false;
         }
     }
 
@@ -254,7 +220,7 @@ class ClientRecords
      * @param ClientDetails $profile
      * @param string        $sessiondata
      *
-     * @return boolean
+     * @return array|boolean
      */
     public function doCreateUserProfile($provider, ClientDetails $profile, $sessiondata)
     {
@@ -282,10 +248,7 @@ class ClientRecords
             ;
 
             if ($count) {
-                $this->user = null;
-                $this->getUserProfileByName($profile->name, $provider);
-
-                return true;
+                return $this->getUserProfileByName($profile->name, $provider);
             } else {
                 return false;
             }
