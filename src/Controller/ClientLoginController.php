@@ -78,16 +78,10 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogout(Application $app, Request $request)
     {
+        $returnpage = $this->getRedirectUrl($app);
         $this->clearRedirectUrl($app);
 
-        try {
-            $app['clientlogin.session']->doLogout();
-
-            // Logout done, redirect
-            return new RedirectResponse($app['clientlogin.session']->getRedirectUrl(), Response::HTTP_FOUND);
-        } catch (\Exception $e) {
-            // @TODO
-        }
+        return $app['clientlogin.session']->doLogout($returnpage);
     }
 
     /**

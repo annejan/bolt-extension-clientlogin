@@ -182,8 +182,8 @@ class Session
             $this->app['clientlogin.records']->doCreateUserSession($clientDetails, $sessionToken, $providerToken);
         }
 
+        // Event dispatcher
         try {
-            // Event dispatcher
             if ($this->app['dispatcher']->hasListeners('clientlogin.Login')) {
                 $event = new ClientLoginEvent($user, $this->app['clientlogin.records']->getTableNameProfiles());
                 $this->app['dispatcher']->dispatch('clientlogin.Login', $event);
@@ -200,26 +200,40 @@ class Session
 
     /**
      * Logout session
+     *
+     * @param string  $redirectUrl
+     *
+     * @return RedirectResponse
      */
-    public function doLogout()
+    public function doLogout($returnpage)
     {
         $token = $this->getToken(self::TOKEN_SESSION);
 
-        if ($token) {
-            $this->app['clientlogin.records']->getUserProfileBySession($token);
+        if (!$token) {
+            return new RedirectResponse($returnpage);
+        }
 
-            // Remove session from database
-            $this->app['clientlogin.records']->doRemoveSession($token);
+        $this->app['clientlogin.records']->getUserProfileBySession($token);
 
-            // Remove token
-            $this->removeToken(self::TOKEN_SESSION);
+        // Remove session from database
+        $this->app['clientlogin.records']->doRemoveSession($token);
 
-            // Event dispatcher
+        // Remove token
+        $this->removeToken(self::TOKEN_SESSION);
+
+        // Event dispatcher
+        try {
             if ($this->app['dispatcher']->hasListeners('clientlogin.Logout')) {
                 $event = new ClientLoginEvent($this->app['clientlogin.records']->user, $this->app['clientlogin.records']->getTableNameProfiles());
                 $this->app['dispatcher']->dispatch('clientlogin.Logout', $event);
             }
+        } catch (\Exception $e) {
+            if ($this->config['debug_mode']) { dump($e); }
+
+            $this->app['logger.system']->critical('ClientLogin event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
         }
+
+        return new RedirectResponse($returnpage);
     }
 
     /**
