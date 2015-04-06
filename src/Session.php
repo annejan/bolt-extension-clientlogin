@@ -165,10 +165,18 @@ class Session
 
             return new RedirectResponse($redirectUrl);
         } catch (IDPException $e) {
+            if ($this->config['debug_mode']) {
+                dump($e);
+            }
+
             $this->app['logger.system']->critical('ClientLogin OAuth error: ' . (string) $e, ['event' => 'exception', 'exception' => $e]);
 
             return new Response("The provider $providerName returned an error. Please contact this site's administrator.", Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Exception $e) {
+            if ($this->config['debug_mode']) {
+                dump($e);
+            }
+
             $this->app['logger.system']->critical('ClientLogin had an error processing the user profile.', ['event' => 'exception', 'exception' => $e]);
 
             return new Response('There was a server error. Please contact the site administrator.', Response::HTTP_INTERNAL_SERVER_ERROR);
