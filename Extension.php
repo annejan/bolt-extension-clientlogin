@@ -47,7 +47,7 @@ class Extension extends BaseExtension
         /*
          * Backend
          */
-        if ($this->app['config']->getWhichEnd() === 'backend') {
+        if ($this->app['config']->getWhichEnd() === 'backend' || $this->app['config']->getWhichEnd() === 'cli') {
             // Check & create database tables if required
             $this->app['clientlogin.records']->dbCheck();
         }
