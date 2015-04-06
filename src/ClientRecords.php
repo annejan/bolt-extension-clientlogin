@@ -506,7 +506,7 @@ class ClientRecords
                 $table->addColumn('id',       'integer', ['autoincrement' => true]);
                 $table->addColumn('userid',   'integer');
                 $table->addColumn('session',  'string', ['length' => 64]);
-                $table->addColumn('token',    'string', ['length' => 128, 'notnull' => false, 'default' => null]);
+                $table->addColumn('token',    'string', ['notnull' => false, 'default' => null]);
                 $table->addColumn('lastseen', 'datetime');
                 $table->setPrimaryKey(['id']);
                 $table->addIndex(['userid']);
