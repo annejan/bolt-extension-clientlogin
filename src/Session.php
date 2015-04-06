@@ -68,18 +68,12 @@ class Session
             return new RedirectResponse($returnpage);
         }
 
-        try {
-            if ($providerName === 'Password' && $config['Password']['enabled']) {
-                return $this->doLoginPassword();
-            } elseif ($config[$providerName]['enabled']) {
-                return $this->doLoginOAuth($providerName);
-            } else {
-                return new Response('<pre>Error: Invalid or disabled provider</pre>', Response::HTTP_FORBIDDEN);
-            }
-        } catch (\Exception $e) {
-            $this->app['logger.system']->critical('ClientLogin had an error processing a login.', ['event' => 'exception', 'exception' => $e]);
-
-            return new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
+        if ($providerName === 'Password' && $config['Password']['enabled']) {
+            return $this->doLoginPassword();
+        } elseif ($config[$providerName]['enabled']) {
+            return $this->doLoginOAuth($providerName);
+        } else {
+            return new Response('<pre>Error: Invalid or disabled provider</pre>', Response::HTTP_FORBIDDEN);
         }
 
         return new Response('', Response::HTTP_FORBIDDEN);
@@ -167,8 +161,8 @@ class Session
         }
 
         // Create the session if need be
-        if ($this->app['clientlogin.records']->getUserProfileBySession($sessionToken)) {
-            $this->app['clientlogin.records']->doCreateUserSession($clientDetails, $sessionToken, $providerToken);
+        if (!$this->app['clientlogin.records']->getUserProfileBySession($sessionToken)) {
+            $this->app['clientlogin.records']->doCreateUserSession($profilerecord, $sessionToken, $providerToken);
         }
 
         // Event dispatcher
