@@ -5,6 +5,8 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 use Bolt\BaseExtension;
 use Bolt\Events\CronEvent;
 use Bolt\Events\CronEvents;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 /**
  * Login with OAuth1 or OAuth2
@@ -69,6 +71,14 @@ class Extension extends BaseExtension
          * Scheduled cron listener
          */
         $this->app['dispatcher']->addListener(CronEvents::CRON_DAILY, [$this, 'cronDaily']);
+
+        /*
+         * Debug logger
+         */
+        if ($this->config['debug_mode']) {
+            $debuglog = $this->app['resources']->getPath('cache') . '/authenticate.log';
+            $this->app['logger.system']->pushHandler(new StreamHandler($debuglog, Logger::DEBUG));
+        }
     }
 
     /**
