@@ -100,13 +100,13 @@ class ClientLoginController implements ControllerProviderInterface
         // Check 'code' isn't empty
         $code = $app['request']->get('code');
         if (empty($code)) {
-            $html = '<h1>Authentication Error!</h1><p>Oh... look... kitten...</p><img src="http://emergencykitten.com/img/random" />';
+            $html = '<h1>Authentication Code Error!</h1><p>Oh... look... kitten...</p><img src="http://emergencykitten.com/img/random" />';
             return new Response($html, Response::HTTP_FORBIDDEN);
         }
 
         // Given state must match previously stored one to mitigate CSRF attack
         if (!$app['clientlogin.session']->checkStateToken($request->get('state'))) {
-            $html = '<h1>Authentication Error!</h1><p>Oh... look... kitten...</p><img src="http://emergencykitten.com/img/random" />';
+            $html = '<h1>Authentication Token Error!</h1><p>Oh... look... kitten...</p><img src="http://emergencykitten.com/img/random" />';
             return new Response($html, Response::HTTP_FORBIDDEN);
         }
 

@@ -40,7 +40,7 @@ class Session
      */
     public function __construct(Application $app)
     {
-        $this->app = $app;
+        $this->app    = $app;
         $this->config = $this->app[Extension::CONTAINER]->config;
     }
 
@@ -194,6 +194,8 @@ class Session
 
             $clientDetails = new ClientDetails();
             $clientDetails->addOAuth2Client($userDetails);
+
+            $this->app['logger.system']->debug('Response from provider received', $userDetails);
         } catch (IDPException $e) {
             if ($this->config['debug_mode']) { dump($e); }
 
@@ -295,6 +297,8 @@ class Session
         if ($profile = $this->app['clientlogin.records']->getUserProfileBySession($token)) {
             return $profile;
         } else {
+            $this->app['logger.system']->debug('No valid profile found for token', $token);
+
             return false;
         }
     }
@@ -308,6 +312,8 @@ class Session
      */
     public function getToken($tokenName)
     {
+        $this->app['logger.system']->debug("Getting '$tokenName' token.");
+
         return $this->app['session']->get($tokenName);
     }
 
@@ -323,7 +329,13 @@ class Session
         // Create a unique token
         $token = $this->app['randomgenerator']->generateString(32);
 
+        $this->app['logger.system']->debug("Setting '$tokenName' token with value '$token'");
+
         $this->app['session']->set($tokenName, $token);
+
+        if (empty($this->getToken($tokenName))) {
+            throw new \Exception('[ClientLogin] Unable to create a Symfony session token!');
+        }
 
         return $token;
     }
@@ -335,6 +347,8 @@ class Session
      */
     public function removeToken($tokenName)
     {
+        $this->app['logger.system']->debug("Removing '$tokenName' token.");
+
         $this->app['session']->remove($tokenName);
     }
 
@@ -351,6 +365,8 @@ class Session
         $this->removeToken(self::TOKEN_STATE);
 
         if (empty($state) || empty($stateToken) || $stateToken !== $state) {
+            $this->app['logger.system']->error("Mismatch of state token '$state' against saved '$stateToken'");
+
             return false;
         }
 
@@ -364,6 +380,8 @@ class Session
      */
     private function setProvider($providerName)
     {
+        $this->app['logger.system']->debug("Creating provider $providerName");
+
         /** @var \League\OAuth2\Client\Provider\ProviderInterface */
         $providerClass = '\\League\\OAuth2\\Client\\Provider\\' . $providerName;
 
