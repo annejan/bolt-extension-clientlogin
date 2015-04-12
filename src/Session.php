@@ -40,8 +40,8 @@ class Session
      */
     public function __construct(Application $app)
     {
-        $this->app    = $app;
-        $this->config = $this->app[Extension::CONTAINER]->config;
+        $this->app     = $app;
+        $this->config  = $this->app[Extension::CONTAINER]->config;
     }
 
     /**
@@ -195,7 +195,7 @@ class Session
             $clientDetails = new ClientDetails();
             $clientDetails->addOAuth2Client($userDetails);
 
-            $this->app['logger.system']->debug('Response from provider received', $userDetails);
+            $this->app['logger.system']->debug('Response from provider received', $userDetails->getArrayCopy());
         } catch (IDPException $e) {
             if ($this->config['debug_mode']) { dump($e); }
 
@@ -297,7 +297,7 @@ class Session
         if ($profile = $this->app['clientlogin.records']->getUserProfileBySession($token)) {
             return $profile;
         } else {
-            $this->app['logger.system']->debug('No valid profile found for token', $token);
+            $this->app['logger.system']->debug("No valid profile found for token '$token'");
 
             return false;
         }
@@ -314,7 +314,7 @@ class Session
     {
         $this->app['logger.system']->debug("Getting '$tokenName' token.");
 
-        return $this->app['session']->get($tokenName);
+        return $this->app['clientlogin.session.handler']->get($tokenName);
     }
 
     /**
@@ -331,7 +331,7 @@ class Session
 
         $this->app['logger.system']->debug("Setting '$tokenName' token with value '$token'");
 
-        $this->app['session']->set($tokenName, $token);
+        $this->app['clientlogin.session.handler']->set($tokenName, $token);
 
         if (empty($this->getToken($tokenName))) {
             throw new \Exception('[ClientLogin] Unable to create a Symfony session token!');
@@ -349,7 +349,7 @@ class Session
     {
         $this->app['logger.system']->debug("Removing '$tokenName' token.");
 
-        $this->app['session']->remove($tokenName);
+        $this->app['clientlogin.session.handler']->remove($tokenName);
     }
 
     /**

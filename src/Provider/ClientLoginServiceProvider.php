@@ -4,6 +4,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Provider;
 
 use Bolt\Extension\Bolt\ClientLogin\ClientRecords;
 use Bolt\Extension\Bolt\ClientLogin\Session;
+use Symfony\Component\HttpFoundation\Session\Session as SessionHandler;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
@@ -16,6 +17,14 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
                 $session = new Session($app);
 
                 return $session;
+            }
+        );
+
+        $app['clientlogin.session.handler'] = $app->share(
+            function ($app) {
+                $handler = new SessionHandler();
+
+                return $handler;
             }
         );
 
