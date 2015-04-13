@@ -31,7 +31,7 @@ class Database
      * @param string $username
      * @param string $provider
      *
-     * @return array|boolean
+     * @return \Bolt\Extension\Bolt\ClientLogin\Client|boolean
      */
     public function getUserProfileByName($username, $provider)
     {
@@ -93,7 +93,7 @@ class Database
      * @param string $username
      * @param string $provider
      *
-     * @return array|boolean
+     * @return \Bolt\Extension\Bolt\ClientLogin\Client|boolean
      */
     public function getUserProfileByID($id)
     {
@@ -124,7 +124,7 @@ class Database
      *
      * @param string $token The PHP session or provider token to query
      *
-     * @return array|boolean
+     * @return \Bolt\Extension\Bolt\ClientLogin\Client|boolean
      */
     public function getUserProfileBySession($token)
     {
@@ -142,9 +142,9 @@ class Database
 
             if (!empty($session['userid'])) {
                 // Check we've got a valid record
-                if ($profile = $this->getUserProfileByID($session['userid'])) {
+                if ($user = $this->getUserProfileByID($session['userid'])) {
                     // User records are all good
-                    return $profile;
+                    return $user;
                 }
 
                 // No user profile associtated with this token, remove it
