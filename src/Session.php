@@ -8,7 +8,6 @@ use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
 use Hautelook\Phpass\PasswordHash;
 use Ivory\HttpAdapter\GuzzleHttpHttpAdapter;
 use League\OAuth2\Client\Exception\IDPException;
-use League\OAuth2\Client\Provider\ProviderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,7 +82,7 @@ class Session
     /**
      * Do password login authentication
      *
-     * @param string  $returnpage
+     * @param string $returnpage
      *
      * @return Response
      */
@@ -197,7 +196,9 @@ class Session
 
             $this->app['logger.system']->debug('Response from provider received', $userDetails->getArrayCopy());
         } catch (IDPException $e) {
-            if ($this->config['debug_mode']) { dump($e); }
+            if ($this->config['debug_mode']) {
+                dump($e);
+            }
 
             $this->app['logger.system']->critical('ClientLogin OAuth error: ' . (string) $e, ['event' => 'exception', 'exception' => $e]);
 
@@ -211,10 +212,10 @@ class Session
      * Complete the login process, set the session token and update teh database
      * records.
      *
-     * @param string        $providerName
+     * @param string $providerName
      * @param Client $clientDetails
-     * @param string        $redirectUrl
-     * @param string        $providerToken
+     * @param string $redirectUrl
+     * @param string $providerToken
      *
      * @return Response
      */
@@ -246,7 +247,7 @@ class Session
     /**
      * Logout session
      *
-     * @param string  $redirectUrl
+     * @param string $redirectUrl
      *
      * @return RedirectResponse
      */
@@ -443,7 +444,7 @@ class Session
     /**
      * Dispatch event to any listeners.
      *
-     * @param string        $type Either 'clientlogin.Login' or 'clientlogin.Logout'
+     * @param string $type Either 'clientlogin.Login' or 'clientlogin.Logout'
      * @param Client $user
      */
     private function dispatchEvent($type, Client $user)

@@ -117,8 +117,8 @@ class UserInterface
      */
     private function getClass($provider, $values)
     {
-        if(isset($values['type']) && $values['type'] == 'OpenID') {
-             return $this->config['zocial'] ? 'zocial openid' : 'openid';
+        if (isset($values['type']) && $values['type'] == 'OpenID') {
+            return $this->config['zocial'] ? 'zocial openid' : 'openid';
         }
 
         return $this->config['zocial'] ? "zocial $provider" : $provider;

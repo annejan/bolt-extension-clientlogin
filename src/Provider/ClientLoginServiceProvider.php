@@ -4,9 +4,9 @@ namespace Bolt\Extension\Bolt\ClientLogin\Provider;
 
 use Bolt\Extension\Bolt\ClientLogin\Database;
 use Bolt\Extension\Bolt\ClientLogin\Session;
-use Symfony\Component\HttpFoundation\Session\Session as SessionHandler;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
+use Symfony\Component\HttpFoundation\Session\Session as SessionHandler;
 
 class ClientLoginServiceProvider implements ServiceProviderInterface
 {

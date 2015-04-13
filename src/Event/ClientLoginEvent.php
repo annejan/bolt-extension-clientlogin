@@ -15,7 +15,7 @@ class ClientLoginEvent extends Event
 
     /**
      * @param Client $user
-     * @param string        $tablename
+     * @param string $tablename
      */
     public function __construct(Client $user, $tablename)
     {

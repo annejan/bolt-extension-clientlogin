@@ -33,9 +33,8 @@ class Client
     protected $json;
 
     private $properties = [
-            'id','provider', 'uid', 'nickname', 'name', 'firstName', 'lastName',
-            'email', 'location', 'description', 'imageUrl', 'urls', 'gender',
-            'locale'
+            'uid', 'nickname', 'name', 'firstName', 'lastName', 'email',
+            'location', 'description', 'imageUrl', 'urls', 'gender', 'locale'
         ];
 
     public function __construct()
@@ -105,9 +104,9 @@ class Client
 
         $class->id          = $user['id'];
         $class->provider    = $user['provider'];
-        $class->uid         = $data['identifier'];
+        $class->uid         = isset($data['identifier']) ? $data['identifier'] : $data['uid'];
         $class->nickname    = $data['nickname'];
-        $class->name        = $data['name'];;
+        $class->name        = $data['name'];
         $class->firstName   = $data['firstName'];
         $class->lastName    = $data['lastName'];
         $class->email       = $data['email'];

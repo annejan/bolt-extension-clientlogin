@@ -2,7 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
-use Bolt\Extension\Bolt\ClientLogin\Client;
 use League\OAuth2\Client\Token\AccessToken;
 use Silex\Application;
 
@@ -246,9 +245,9 @@ class Database
     /**
      * Create a user profile record
      *
-     * @param string        $provider
+     * @param string $provider
      * @param Client $profile
-     * @param string        $sessiondata
+     * @param string $sessiondata
      *
      * @return array|boolean
      */
@@ -297,9 +296,9 @@ class Database
     /**
      * Update a user profile record
      *
-     * @param string        $provider
+     * @param string $provider
      * @param Client $profile
-     * @param string        $sessiondata
+     * @param string $sessiondata
      */
     public function doUpdateUserProfile($provider, Client $profile, $sessiondata)
     {
@@ -333,12 +332,12 @@ class Database
     /**
      * Create a user's session record
      *
-     * @param array  $user
+     * @param Client $user
      * @param string $token
      *
      * @return boolean
      */
-    public function doCreateUserSession(array $user, $session, $token)
+    public function doCreateUserSession(Client $user, $session, $token)
     {
         try {
             $this->app['db']
@@ -351,7 +350,7 @@ class Database
                     'token'    => ':token'
                 ])
                 ->setParameters([
-                    ':userid'   => $user['id'],
+                    ':userid'   => $user->id,
                     ':lastseen' => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time())),
                     ':session'  => $session,
                     ':token'    => $token
@@ -361,7 +360,7 @@ class Database
 
             return true;
         } catch (\Exception $e) {
-            $msg = sprintf("ClientLogin had an error adding user ID '%s' token to the database.", $user['id']);
+            $msg = sprintf("ClientLogin had an error adding user ID '%s' token to the database.", $user->id);
             $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
             return false;

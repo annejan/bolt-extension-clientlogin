@@ -44,7 +44,7 @@ class FormFields
                     ]
                 ],
                 'password' => [
-                    'type' => 'password',
+                    'type'    => 'password',
                     'options' => [
                         'required'    => true,
                         'label'       => 'Password',
