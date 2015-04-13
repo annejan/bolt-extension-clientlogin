@@ -2,7 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Provider;
 
-use Bolt\Extension\Bolt\ClientLogin\ClientRecords;
+use Bolt\Extension\Bolt\ClientLogin\Database;
 use Bolt\Extension\Bolt\ClientLogin\Session;
 use Symfony\Component\HttpFoundation\Session\Session as SessionHandler;
 use Silex\Application;
@@ -28,9 +28,9 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $app['clientlogin.records'] = $app->share(
+        $app['clientlogin.db'] = $app->share(
             function ($app) {
-                $records = new ClientRecords($app);
+                $records = new Database($app);
 
                 return $records;
             }

@@ -133,7 +133,7 @@ class Session
             return new Response('No password data given', Response::HTTP_FORBIDDEN);
         }
 
-        if (!$user = $this->app['clientlogin.records']->getUserProfileByIdentifier($formdata['username'], 'Password')) {
+        if (!$user = $this->app['clientlogin.db']->getUserProfileByIdentifier($formdata['username'], 'Password')) {
             return false;
         }
 
@@ -224,17 +224,17 @@ class Session
         $sessionToken = $this->setToken(self::TOKEN_SESSION);
 
         // If user record doesn't exist, create it
-        $profilerecord = $this->app['clientlogin.records']->getUserProfileByIdentifier($clientDetails->uid, $providerName);
+        $profilerecord = $this->app['clientlogin.db']->getUserProfileByIdentifier($clientDetails->uid, $providerName);
 
         if ($profilerecord) {
-            $this->app['clientlogin.records']->doUpdateUserProfile($providerName, $clientDetails, $providerToken);
+            $this->app['clientlogin.db']->doUpdateUserProfile($providerName, $clientDetails, $providerToken);
         } else {
-            $profilerecord = $this->app['clientlogin.records']->doCreateUserProfile($providerName, $clientDetails, $providerToken);
+            $profilerecord = $this->app['clientlogin.db']->doCreateUserProfile($providerName, $clientDetails, $providerToken);
         }
 
         // Create the session if need be
-        if (!$this->app['clientlogin.records']->getUserProfileBySession($sessionToken)) {
-            $this->app['clientlogin.records']->doCreateUserSession($profilerecord, $sessionToken, $providerToken);
+        if (!$this->app['clientlogin.db']->getUserProfileBySession($sessionToken)) {
+            $this->app['clientlogin.db']->doCreateUserSession($profilerecord, $sessionToken, $providerToken);
         }
 
         // Event dispatcher
@@ -259,10 +259,10 @@ class Session
         }
 
         // Get user record
-        $profilerecord = $this->app['clientlogin.records']->getUserProfileBySession($token);
+        $profilerecord = $this->app['clientlogin.db']->getUserProfileBySession($token);
 
         // Remove session from database
-        $this->app['clientlogin.records']->doRemoveSession($token);
+        $this->app['clientlogin.db']->doRemoveSession($token);
 
         // Remove token
         $this->removeToken(self::TOKEN_SESSION);
@@ -294,7 +294,7 @@ class Session
         }
 
         // See if there is matching record, i.e. valid, unrevoked, token
-        if ($profile = $this->app['clientlogin.records']->getUserProfileBySession($token)) {
+        if ($profile = $this->app['clientlogin.db']->getUserProfileBySession($token)) {
             return $profile;
         } else {
             $this->app['logger.system']->debug("No valid profile found for token '$token'");
@@ -449,7 +449,7 @@ class Session
     private function dispatchEvent($type, Client $user)
     {
         if ($this->app['dispatcher']->hasListeners($type)) {
-            $tablename = $this->app['clientlogin.records']->getTableNameProfiles();
+            $tablename = $this->app['clientlogin.db']->getTableNameProfiles();
             $event     = new ClientLoginEvent($user, $tablename);
 
             try {

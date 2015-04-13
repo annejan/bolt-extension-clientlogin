@@ -11,7 +11,7 @@ use Silex\Application;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class ClientRecords
+class Database
 {
     /** @var \Silex\Application */
     private $app;

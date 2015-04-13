@@ -191,10 +191,10 @@ To get information about the current visitor:
 ```php
 if ($this->app['clientlogin.session']->doCheckLogin()) {
     // User is logged in
-    if ($this->app['clientlogin.records']->getUserProfileBySession($this->app['clientlogin.session']->token)) {
-        $username = $this->app['clientlogin.records']->user['username'];
-        $provider = $this->app['clientlogin.records']->user['provider'];
-        $providerdata = json_decode($this->app['clientlogin.records']->user['providerdata']);
+    if ($this->app['clientlogin.db']->getUserProfileBySession($this->app['clientlogin.session']->token)) {
+        $username = $this->app['clientlogin.db']->user['username'];
+        $provider = $this->app['clientlogin.db']->user['provider'];
+        $providerdata = json_decode($this->app['clientlogin.db']->user['providerdata']);
     }
 }
 ```

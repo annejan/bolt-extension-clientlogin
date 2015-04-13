@@ -51,7 +51,7 @@ class Extension extends BaseExtension
          */
         if ($this->app['config']->getWhichEnd() === 'backend' || $this->app['config']->getWhichEnd() === 'cli') {
             // Check & create database tables if required
-            $this->app['clientlogin.records']->dbCheck();
+            $this->app['clientlogin.db']->dbCheck();
         }
 
         /*
@@ -89,7 +89,7 @@ class Extension extends BaseExtension
     public function cronDaily(CronEvent $event)
     {
         $event->output->writeln("<comment>ClientLogin: Clearing old sessions</comment>");
-        $record = new ClientRecords($this->app);
+        $record = new Database($this->app);
         $record->doRemoveExpiredSessions();
     }
 
