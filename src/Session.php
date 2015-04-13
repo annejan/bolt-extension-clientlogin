@@ -192,7 +192,7 @@ class Session
             /** \League\OAuth2\Client\Entity\User */
             $userDetails = $this->provider->getUserDetails($providerToken);
 
-            $clientDetails = new ClientDetails();
+            $clientDetails = new Client();
             $clientDetails->addOAuth2Client($userDetails);
 
             $this->app['logger.system']->debug('Response from provider received', $userDetails->getArrayCopy());
@@ -212,13 +212,13 @@ class Session
      * records.
      *
      * @param string        $providerName
-     * @param ClientDetails $clientDetails
+     * @param Client $clientDetails
      * @param string        $redirectUrl
      * @param string        $providerToken
      *
      * @return Response
      */
-    private function doCompleteLoginOAuth($providerName, ClientDetails $clientDetails, $redirectUrl, $providerToken = null)
+    private function doCompleteLoginOAuth($providerName, Client $clientDetails, $redirectUrl, $providerToken = null)
     {
         // Set and get a session token
         $sessionToken = $this->setToken(self::TOKEN_SESSION);
@@ -443,10 +443,10 @@ class Session
     /**
      * Dispatch event to any listeners.
      *
-     * @param string $type Either 'clientlogin.Login' or 'clientlogin.Logout'
-     * @param array  $user
+     * @param string        $type Either 'clientlogin.Login' or 'clientlogin.Logout'
+     * @param Client $user
      */
-    private function dispatchEvent($type, array $user)
+    private function dispatchEvent($type, Client $user)
     {
         if ($this->app['dispatcher']->hasListeners($type)) {
             $tablename = $this->app['clientlogin.records']->getTableNameProfiles();
@@ -455,7 +455,10 @@ class Session
             try {
                 $this->app['dispatcher']->dispatch($type, $event);
             } catch (\Exception $e) {
-                if ($this->config['debug_mode']) { dump($e); }
+                if ($this->config['debug_mode']) {
+                    dump($e);
+                }
+
                 $this->app['logger.system']->critical('ClientLogin event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
             }
         }

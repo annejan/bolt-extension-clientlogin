@@ -9,11 +9,13 @@ use League\OAuth2\Client\Entity\User;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class ClientDetails
+class Client
 {
     /** @var mixed  */
     public $client = false;
 
+    protected $id;
+    protected $provider;
     protected $uid;
     protected $nickname;
     protected $name;
@@ -31,8 +33,9 @@ class ClientDetails
     protected $json;
 
     private $properties = [
-            'uid', 'nickname', 'name', 'firstName', 'lastName', 'email',
-            'location', 'description', 'imageUrl', 'urls', 'gender', 'locale'
+            'id','provider', 'uid', 'nickname', 'name', 'firstName', 'lastName',
+            'email', 'location', 'description', 'imageUrl', 'urls', 'gender',
+            'locale'
         ];
 
     public function __construct()
@@ -65,7 +68,7 @@ class ClientDetails
      *
      * @throws \OutOfRangeException
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\ClientDetails
+     * @return \Bolt\Extension\Bolt\ClientLogin\Client
      */
     public function __set($property, $value)
     {
@@ -80,6 +83,42 @@ class ClientDetails
         $this->$property = $value;
 
         return $this;
+    }
+
+    /**
+     * Create a class instance from our database records.
+     *
+     * Just… don't… ask… :-/
+     *
+     * @param array|boolean $user
+     */
+    public static function createFromDbRecord($user)
+    {
+        if ($user === false) {
+            return false;
+        }
+
+        $classname = get_called_class();
+        $class = new $classname();
+
+        $data = json_decode($user['providerdata'], true);
+
+        $class->id          = $user['id'];
+        $class->provider    = $user['provider'];
+        $class->uid         = $data['identifier'];
+        $class->nickname    = $data['nickname'];
+        $class->name        = $data['name'];;
+        $class->firstName   = $data['firstName'];
+        $class->lastName    = $data['lastName'];
+        $class->email       = $data['email'];
+        $class->location    = $data['location'];
+        $class->description = $data['description'];
+        $class->imageUrl    = $data['imageUrl'];
+        $class->urls        = $data['urls'];
+        $class->gender      = $data['gender'];
+        $class->locale      = $data['locale'];
+
+        return $class;
     }
 
     /**

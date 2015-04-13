@@ -2,6 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Bolt\Extension\Bolt\ClientLogin\Client;
 use League\OAuth2\Client\Token\AccessToken;
 use Silex\Application;
 
@@ -12,12 +13,6 @@ use Silex\Application;
  */
 class ClientRecords
 {
-    /** @var array User's profile record */
-    public $user = false;
-
-    /** @var array User's session record */
-    public $session = false;
-
     /** @var \Silex\Application */
     private $app;
 
@@ -41,7 +36,7 @@ class ClientRecords
     public function getUserProfileByName($username, $provider)
     {
         try {
-            return $this->app['db']
+            $user = $this->app['db']
                 ->createQueryBuilder()
                 ->select('*')
                 ->from($this->getTableNameProfiles())
@@ -51,6 +46,8 @@ class ClientRecords
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
+
+            return Client::createFromDbRecord($user);
         } catch (\Exception $e) {
             $msg = sprintf("ClientLogin had an error getting %s profile for %s from the database.", $username, $provider);
             $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
@@ -70,7 +67,7 @@ class ClientRecords
     public function getUserProfileByIdentifier($identifier, $provider)
     {
         try {
-            return $this->app['db']
+            $user = $this->app['db']
                 ->createQueryBuilder()
                 ->select('*')
                 ->from($this->getTableNameProfiles())
@@ -80,6 +77,8 @@ class ClientRecords
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
+
+            return Client::createFromDbRecord($user);
         } catch (\Exception $e) {
             $msg = sprintf("ClientLogin had an error getting %s profile for %s from the database.", $identifier, $provider);
             $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
@@ -99,7 +98,7 @@ class ClientRecords
     public function getUserProfileByID($id)
     {
         try {
-            return $this->app['db']
+            $user = $this->app['db']
                 ->createQueryBuilder()
                 ->select('*')
                 ->from($this->getTableNameProfiles())
@@ -108,6 +107,8 @@ class ClientRecords
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC)
             ;
+
+            return Client::createFromDbRecord($user);
         } catch (\Exception $e) {
             $this->app['logger.system']->critical("ClientLogin had an error getting profile with ID '$id' from the database.", ['event' => 'exception', 'exception' => $e]);
 
@@ -246,12 +247,12 @@ class ClientRecords
      * Create a user profile record
      *
      * @param string        $provider
-     * @param ClientDetails $profile
+     * @param Client $profile
      * @param string        $sessiondata
      *
      * @return array|boolean
      */
-    public function doCreateUserProfile($provider, ClientDetails $profile, $sessiondata)
+    public function doCreateUserProfile($provider, Client $profile, $sessiondata)
     {
         try {
             $count = $this->app['db']
@@ -297,10 +298,10 @@ class ClientRecords
      * Update a user profile record
      *
      * @param string        $provider
-     * @param ClientDetails $profile
+     * @param Client $profile
      * @param string        $sessiondata
      */
-    public function doUpdateUserProfile($provider, ClientDetails $profile, $sessiondata)
+    public function doUpdateUserProfile($provider, Client $profile, $sessiondata)
     {
         try {
             $this->app['db']
@@ -360,7 +361,7 @@ class ClientRecords
 
             return true;
         } catch (\Exception $e) {
-            $msg = sprintf("ClientLogin had an error adding user ID '%s' token to the database.", $this->user['id']);
+            $msg = sprintf("ClientLogin had an error adding user ID '%s' token to the database.", $user['id']);
             $this->app['logger.system']->critical($msg, ['event' => 'exception', 'exception' => $e]);
 
             return false;
