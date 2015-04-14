@@ -61,7 +61,7 @@ class Session
         }
 
         // Check for extisting token
-        if ($user = $this->doCheckLogin()) {
+        if ($user = $this->isLoggedIn()) {
             // Event dispatcher
             $this->dispatchEvent('clientlogin.Login', $user);
 
@@ -69,9 +69,9 @@ class Session
         }
 
         if ($providerName === 'Password' && $config['Password']['enabled']) {
-            return $this->doLoginPassword($returnpage);
+            return $this->loginPassword($returnpage);
         } elseif ($config[$providerName]['enabled']) {
-            return $this->doLoginOAuth($providerName);
+            return $this->loginOAuth($providerName);
         } else {
             return new Response('<pre>Error: Invalid or disabled provider</pre>', Response::HTTP_FORBIDDEN);
         }
@@ -86,7 +86,7 @@ class Session
      *
      * @return Response
      */
-    public function doLoginPassword($returnpage)
+    private function loginPassword($returnpage)
     {
         $formFields = FormFields::Password();
         $this->app['boltforms']->makeForm('password', 'form', [], []);
@@ -98,7 +98,7 @@ class Session
             $formdata = $this->app['boltforms']->handleRequest('password');
 
             // Validate password data
-            if ($formdata && $this->doCheckLoginPassword($formdata)) {
+            if ($formdata && $this->loginCheckPassword($formdata)) {
                 // Event dispatcher
                 //$this->dispatchEvent('clientlogin.Login', $formdata);
 
@@ -126,7 +126,7 @@ class Session
      *
      * @return boolean
      */
-    private function doCheckLoginPassword($formdata)
+    private function loginCheckPassword($formdata)
     {
         if (empty($formdata['username']) || empty($formdata['password'])) {
             return new Response('No password data given', Response::HTTP_FORBIDDEN);
@@ -155,7 +155,7 @@ class Session
      *
      * @return Response
      */
-    private function doLoginOAuth($providerName)
+    private function loginOAuth($providerName)
     {
         // Set up chosen provider
         $this->setProvider($providerName);
@@ -177,7 +177,7 @@ class Session
      *
      * @return Response
      */
-    public function doCheckLoginOAuth(Request $request, $redirectUrl)
+    public function loginCheckOAuth(Request $request, $redirectUrl)
     {
         $providerName = $this->getProviderName($request);
 
@@ -205,11 +205,11 @@ class Session
             return new Response("The provider $providerName returned an error. Please contact this site's administrator.", Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->doCompleteLoginOAuth($providerName, $clientDetails, $redirectUrl, json_encode($providerToken));
+        return $this->loginComplete($providerName, $clientDetails, $redirectUrl, json_encode($providerToken));
     }
 
     /**
-     * Complete the login process, set the session token and update teh database
+     * Complete the login process, set the session token and update the database
      * records.
      *
      * @param string $providerName
@@ -219,7 +219,7 @@ class Session
      *
      * @return Response
      */
-    private function doCompleteLoginOAuth($providerName, Client $clientDetails, $redirectUrl, $providerToken = null)
+    private function loginComplete($providerName, Client $clientDetails, $redirectUrl, $providerToken = null)
     {
         // Set and get a session token
         $sessionToken = $this->setToken(self::TOKEN_SESSION);
@@ -251,7 +251,7 @@ class Session
      *
      * @return RedirectResponse
      */
-    public function doLogout($returnpage)
+    public function logout($returnpage)
     {
         $token = $this->getToken(self::TOKEN_SESSION);
 
@@ -286,7 +286,7 @@ class Session
      *
      * @return array|boolean The user profile or FALSE
      */
-    public function doCheckLogin()
+    public function isLoggedIn()
     {
         // Get client token
         $token = $this->getToken(self::TOKEN_SESSION);

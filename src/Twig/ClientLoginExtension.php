@@ -47,7 +47,7 @@ class ClientLoginExtension extends \Twig_Extension
 
     public function getHasAuth()
     {
-        if ($this->app['clientlogin.session']->doCheckLogin()) {
+        if ($this->app['clientlogin.session']->isLoggedIn()) {
             return true;
         } else {
             return false;

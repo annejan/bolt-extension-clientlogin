@@ -35,7 +35,7 @@ class UserInterface
      */
     public function doDisplayAuth($redirect)
     {
-        if ($this->app['clientlogin.session']->doCheckLogin()) {
+        if ($this->app['clientlogin.session']->isLoggedIn()) {
             return $this->doDisplayLogout($redirect);
         } else {
             return $this->doDisplayLogin($redirect);
