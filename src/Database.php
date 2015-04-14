@@ -510,7 +510,7 @@ class Database
                 $table->addColumn('lastseen', 'datetime');
                 $table->setPrimaryKey(['id']);
                 $table->addIndex(['userid']);
-                $table->addIndex(['token']);
+                $table->addIndex(['session']);
 
                 return $table;
             }
