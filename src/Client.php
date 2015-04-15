@@ -2,6 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Hautelook\Phpass\PasswordHash;
 use League\OAuth2\Client\Entity\User;
 
 /**
@@ -28,6 +29,7 @@ class Client
     protected $urls;
     protected $gender;
     protected $locale;
+    protected $password;
 
     /** @var string */
     protected $json;
@@ -116,6 +118,31 @@ class Client
         $class->urls        = $data['urls'];
         $class->gender      = $data['gender'];
         $class->locale      = $data['locale'];
+
+        return $class;
+    }
+
+    public static function createPasswordAuth($username, $password)
+    {
+        $hasher = new PasswordHash(12, true);
+        $password = $hasher->HashPassword($password);
+
+        $classname = get_called_class();
+        $class = new $classname();
+
+        $class->uid         = $username;
+        $class->password    = $password;
+        $class->nickname    = '';
+        $class->name        = '';
+        $class->firstName   = '';
+        $class->lastName    = '';
+        $class->email       = '';
+        $class->location    = '';
+        $class->description = '';
+        $class->imageUrl    = '';
+        $class->urls        = '';
+        $class->gender      = '';
+        $class->locale      = '';
 
         return $class;
     }
