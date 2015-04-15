@@ -98,11 +98,8 @@ class Session
             $formdata = $this->app['boltforms']->handleRequest('password');
 
             // Validate password data
-            if ($formdata && $this->loginCheckPassword($formdata)) {
-                // Event dispatcher
-                //$this->dispatchEvent('clientlogin.Login', $formdata);
-
-                return new RedirectResponse($returnpage);
+            if ($formdata) {
+                return $this->loginCheckPassword($formdata, $returnpage);
             }
         }
 
@@ -126,26 +123,32 @@ class Session
      *
      * @return boolean
      */
-    private function loginCheckPassword($formdata)
+    private function loginCheckPassword($formdata, $redirectUrl)
     {
         if (empty($formdata['username']) || empty($formdata['password'])) {
             return new Response('No password data given', Response::HTTP_FORBIDDEN);
         }
 
-        if (!$user = $this->app['clientlogin.db']->getUserProfileByIdentifier($formdata['username'], 'Password')) {
-            return false;
+        // @TODO
+        // As with OAuth sessions we need to handle registration, for now we
+        // just create a profile
+        if ($user = $this->app['clientlogin.db']->getUserProfileByIdentifier($formdata['username'], 'Password')) {
+            $clientDetails = Client::createFromDbRecord($user);
+        } else {
+            $clientDetails = Client::createPasswordAuth($formdata['username'], $formdata['password']);
         }
 
-        if (!$providerdata = json_decode($user['providerdata'], true)) {
-            return false;
-        }
+        $clientDetails->provider = 'Password';
 
         $hasher = new PasswordHash(12, true);
-        if ($hasher->CheckPassword($formdata['password'], $providerdata['password'])) {
-            return true;
+        if (!$hasher->CheckPassword($formdata['password'], $clientDetails->password)) {
+            return new Response('Password invalid.', Response::HTTP_FORBIDDEN);
         }
 
-        return false;
+        // Event dispatcher
+        $this->dispatchEvent('clientlogin.Login', $clientDetails);
+
+        return $this->loginComplete('Password', $clientDetails, $redirectUrl, '{}');
     }
 
     /**

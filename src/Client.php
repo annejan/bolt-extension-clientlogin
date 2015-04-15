@@ -132,8 +132,8 @@ class Client
 
         $class->uid         = $username;
         $class->password    = $password;
-        $class->nickname    = '';
-        $class->name        = '';
+        $class->nickname    = $username;
+        $class->name        = $username;
         $class->firstName   = '';
         $class->lastName    = '';
         $class->email       = '';
@@ -143,6 +143,7 @@ class Client
         $class->urls        = '';
         $class->gender      = '';
         $class->locale      = '';
+        $class->json        = json_encode(['password' => $password]);
 
         return $class;
     }
