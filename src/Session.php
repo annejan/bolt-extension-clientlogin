@@ -145,9 +145,6 @@ class Session
             return new Response('Password invalid.', Response::HTTP_FORBIDDEN);
         }
 
-        // Event dispatcher
-        $this->dispatchEvent('clientlogin.Login', $clientDetails);
-
         return $this->loginComplete('Password', $clientDetails, $redirectUrl, '{}');
     }
 
