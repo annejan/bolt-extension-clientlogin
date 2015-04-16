@@ -113,6 +113,7 @@ class Client implements \JsonSerializable
 
         $class->id          = $user['id'];
         $class->provider    = $user['provider'];
+        $class->password    = isset($data['password'])   ? $data['password']   : '';
         $class->uid         = isset($data['identifier']) ? $data['identifier'] : $data['uid'];
         $class->nickname    = $data['nickname'];
         $class->name        = $data['name'];
