@@ -147,13 +147,9 @@ class Session
         // @TODO
         // As with OAuth sessions we need to handle registration, for now we
         // just create a profile
-        if ($user = $this->app['clientlogin.db']->getUserProfileByIdentifier($formdata['username'], 'Password')) {
-            $clientDetails = Client::createFromDbRecord($user);
-        } else {
+        if (!$clientDetails = $this->app['clientlogin.db']->getUserProfileByIdentifier($formdata['username'], 'Password')) {
             $clientDetails = Client::createPasswordAuth($formdata['username'], $formdata['password']);
         }
-
-        $clientDetails->provider = 'Password';
 
         $hasher = new PasswordHash(12, true);
         if (!$hasher->CheckPassword($formdata['password'], $clientDetails->password)) {

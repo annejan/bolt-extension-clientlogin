@@ -138,6 +138,7 @@ class Client implements \JsonSerializable
         $class = new $classname();
 
         $class->uid         = $username;
+        $class->provider    = 'Password';
         $class->password    = $password;
         $class->nickname    = $username;
         $class->name        = $username;

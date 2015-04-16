@@ -61,7 +61,7 @@ class Database
      * @param string $identifier
      * @param string $provider
      *
-     * @return array|boolean
+     * @return \Bolt\Extension\Bolt\ClientLogin\Client|boolean
      */
     public function getUserProfileByIdentifier($identifier, $provider)
     {
