@@ -25,6 +25,7 @@ class ExtensionTest extends BoltUnitTest
         $this->extension = new Extension($this->app);
         $this->app['extensions']->register($this->extension);
         $this->name = $this->extension->getName();
+        $this->app['extensions']->initialize();
     }
 
     public function testExtensionRegister()
@@ -45,7 +46,9 @@ class ExtensionTest extends BoltUnitTest
 
     public function testCronDaily()
     {
-        $this->app['extensions.' . $this->name]->initialize();
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
 
         $command = new CronRunner($this->app);
         $tester = new CommandTester($command);
