@@ -52,7 +52,7 @@ class Client implements \JsonSerializable
             ));
         }
 
-        return $this->{$name};
+        return $this->{$name} ? : '';
     }
 
     /**
