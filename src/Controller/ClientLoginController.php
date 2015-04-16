@@ -65,7 +65,9 @@ class ClientLoginController implements ControllerProviderInterface
     {
         $returnpage = $this->setRedirectUrl($app);
 
-        return $app['clientlogin.session']->doLogin($request, $returnpage);
+        $app['clientlogin.session']->doLogin($request, $returnpage);
+
+        return $app['clientlogin.session']->getResponse();
     }
 
     /**
@@ -81,7 +83,9 @@ class ClientLoginController implements ControllerProviderInterface
         $returnpage = $this->getRedirectUrl($app);
         $this->clearRedirectUrl($app);
 
-        return $app['clientlogin.session']->logout($returnpage);
+        $app['clientlogin.session']->logout($returnpage);
+
+        return $app['clientlogin.session']->getResponse();
     }
 
     /**
@@ -110,7 +114,9 @@ class ClientLoginController implements ControllerProviderInterface
             return new Response($html, Response::HTTP_FORBIDDEN);
         }
 
-        return $app['clientlogin.session']->loginCheckOAuth($request, $url);
+        $app['clientlogin.session']->loginCheckOAuth($request, $url);
+
+        return $app['clientlogin.session']->getResponse();
     }
 
     /**

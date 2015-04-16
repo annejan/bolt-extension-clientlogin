@@ -34,6 +34,9 @@ class Session
     /** @var \League\OAuth2\Client\Provider\ProviderInterface */
     private $provider;
 
+    /** @var \Symfony\Component\HttpFoundation\Response */
+    private $response;
+
     /**
      * @param Application $app
      */
@@ -44,12 +47,34 @@ class Session
     }
 
     /**
+     * Get the final response object that will be returned to the request
+     *
+     * @return Response
+     */
+    public function getResponse()
+    {
+        if ($this->response instanceof Response) {
+            return $this->response;
+        }
+
+        throw new \UnexpectedValueException('Invalid reponse object set for ClientLogin session.');
+    }
+
+    /**
+     * Set a reponse object
+     *
+     * @param Response
+     */
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
+    }
+
+    /**
      * Do OAuth login authentication
      *
      * @param Request $request
      * @param string  $returnpage
-     *
-     * @return Response
      */
     public function doLogin(Request $request, $returnpage)
     {
@@ -57,34 +82,26 @@ class Session
         $config = $this->config['providers'];
 
         if (empty($providerName)) {
-            return new Response('<pre>Provider not given</pre>', Response::HTTP_BAD_REQUEST);
-        }
+            $this->setResponse(new Response('<pre>Provider not given</pre>', Response::HTTP_BAD_REQUEST));
+        } elseif ($user = $this->isLoggedIn()) {
+            // Check for extisting token
+            $this->setResponse(new RedirectResponse($returnpage));
 
-        // Check for extisting token
-        if ($user = $this->isLoggedIn()) {
             // Event dispatcher
             $this->dispatchEvent('clientlogin.Login', $user);
-
-            return new RedirectResponse($returnpage);
-        }
-
-        if ($providerName === 'Password' && $config['Password']['enabled']) {
-            return $this->loginPassword($returnpage);
+        } elseif ($providerName === 'Password' && $config['Password']['enabled']) {
+            $this->loginPassword($returnpage);
         } elseif ($config[$providerName]['enabled']) {
-            return $this->loginOAuth($providerName);
+            $this->loginOAuth($providerName);
         } else {
-            return new Response('<pre>Error: Invalid or disabled provider</pre>', Response::HTTP_FORBIDDEN);
+            $this->setResponse(new Response('<pre>Error: Invalid or disabled provider</pre>', Response::HTTP_FORBIDDEN));
         }
-
-        return new Response('', Response::HTTP_FORBIDDEN);
     }
 
     /**
      * Do password login authentication
      *
      * @param string $returnpage
-     *
-     * @return Response
      */
     private function loginPassword($returnpage)
     {
@@ -113,20 +130,18 @@ class Session
         // Render the Twig_Markup
         $html = $this->app['boltforms']->renderForm('password', $this->config['template']['password'], $twigvalues);
 
-        return new Response($html, Response::HTTP_OK);
+        $this->setResponse(new Response($html, Response::HTTP_OK));
     }
 
     /**
      * Check the password login data
      *
      * @param array $formdata
-     *
-     * @return boolean
      */
     private function loginCheckPassword($formdata, $redirectUrl)
     {
         if (empty($formdata['username']) || empty($formdata['password'])) {
-            return new Response('No password data given', Response::HTTP_FORBIDDEN);
+            return $this->setResponse(new Response('No password data given', Response::HTTP_FORBIDDEN));
         }
 
         // @TODO
@@ -142,18 +157,16 @@ class Session
 
         $hasher = new PasswordHash(12, true);
         if (!$hasher->CheckPassword($formdata['password'], $clientDetails->password)) {
-            return new Response('Password invalid.', Response::HTTP_FORBIDDEN);
+            return $this->setResponse(new Response('Password invalid.', Response::HTTP_FORBIDDEN));
         }
 
-        return $this->loginComplete('Password', $clientDetails, $redirectUrl, '{}');
+        $this->loginComplete('Password', $clientDetails, $redirectUrl, '{}');
     }
 
     /**
      * Do OAuth login authentication
      *
      * @param string Provider name to authenticate with
-     *
-     * @return Response
      */
     private function loginOAuth($providerName)
     {
@@ -166,7 +179,7 @@ class Session
         // Get the provider authorisation URL
         $url = $this->provider->getAuthorizationUrl(['state' => $token]);
 
-        return new RedirectResponse($url);
+        $this->setResponse(new RedirectResponse($url));
     }
 
     /**
@@ -174,8 +187,6 @@ class Session
      *
      * @param Request $request
      * @param string  $redirectUrl
-     *
-     * @return Response
      */
     public function loginCheckOAuth(Request $request, $redirectUrl)
     {
@@ -202,10 +213,12 @@ class Session
 
             $this->app['logger.system']->critical('ClientLogin OAuth error: ' . (string) $e, ['event' => 'exception', 'exception' => $e]);
 
-            return new Response("The provider $providerName returned an error. Please contact this site's administrator.", Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response = new Response("The provider $providerName returned an error. Please contact this site's administrator.", Response::HTTP_INTERNAL_SERVER_ERROR);
+
+            return $this->setResponse($response);
         }
 
-        return $this->loginComplete($providerName, $clientDetails, $redirectUrl, json_encode($providerToken));
+        $this->loginComplete($providerName, $clientDetails, $redirectUrl, json_encode($providerToken));
     }
 
     /**
@@ -216,8 +229,6 @@ class Session
      * @param Client $clientDetails
      * @param string $redirectUrl
      * @param string $providerToken
-     *
-     * @return Response
      */
     private function loginComplete($providerName, Client $clientDetails, $redirectUrl, $providerToken = null)
     {
@@ -238,25 +249,24 @@ class Session
             $this->app['clientlogin.db']->doCreateUserSession($profilerecord, $sessionToken, $providerToken);
         }
 
+        // Set the response now, it might get changed in the event
+        $this->setResponse(new RedirectResponse($redirectUrl));
+
         // Event dispatcher
         $this->dispatchEvent('clientlogin.Login', $profilerecord);
-
-        return new RedirectResponse($redirectUrl);
     }
 
     /**
      * Logout session
      *
      * @param string $redirectUrl
-     *
-     * @return RedirectResponse
      */
     public function logout($returnpage)
     {
         $token = $this->getToken(self::TOKEN_SESSION);
 
         if (!$token) {
-            return new RedirectResponse($returnpage);
+            return $this->setResponse(new RedirectResponse($returnpage));
         }
 
         // Get user record
@@ -268,12 +278,13 @@ class Session
         // Remove token
         $this->removeToken(self::TOKEN_SESSION);
 
+        // Set the response now, it might get changed in the event
+        $this->setResponse(new RedirectResponse($returnpage));
+
         // Event dispatcher
         if ($profilerecord) {
             $this->dispatchEvent('clientlogin.Logout', $profilerecord);
         }
-
-        return new RedirectResponse($returnpage);
     }
 
     /**
