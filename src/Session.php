@@ -294,11 +294,15 @@ class Session
         // Get client token
         $token = $this->getToken(self::TOKEN_SESSION);
         if (empty($token)) {
+            $this->app['logger.system']->debug('No token for ' .  self::TOKEN_SESSION);
+
             return false;
         }
 
         // See if there is matching record, i.e. valid, unrevoked, token
         if ($profile = $this->app['clientlogin.db']->getUserProfileBySession($token)) {
+            $this->app['logger.system']->debug("Validiated profile token '$token'");
+
             return $profile;
         } else {
             $this->app['logger.system']->debug("No valid profile found for token '$token'");
@@ -316,9 +320,11 @@ class Session
      */
     public function getToken($tokenName)
     {
-        $this->app['logger.system']->debug("Getting '$tokenName' token.");
+        $token = $this->app['clientlogin.session.handler']->get($tokenName);;
 
-        return $this->app['clientlogin.session.handler']->get($tokenName);
+        $this->app['logger.system']->debug("Getting '$tokenName' token: $token.");
+
+        return $token;
     }
 
     /**
@@ -333,7 +339,7 @@ class Session
         // Create a unique token
         $token = $this->app['randomgenerator']->generateString(32);
 
-        $this->app['logger.system']->debug("Setting '$tokenName' token with value '$token'");
+        $this->app['logger.system']->debug("Setting '$tokenName': '$token'");
 
         $this->app['clientlogin.session.handler']->set($tokenName, $token);
 
