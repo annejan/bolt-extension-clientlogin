@@ -269,7 +269,7 @@ class Database
                     ':identifier'   => $profile->uid,
                     ':username'     => $profile->name,
                     ':provider'     => $provider,
-                    ':providerdata' => $profile->getJson(),
+                    ':providerdata' => json_encode($profile),
                     ':sessiondata'  => $sessiondata,
                     ':lastupdate'   => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time()))
                 ])
@@ -311,7 +311,7 @@ class Database
                 ->set('lastupdate',   ':lastupdate')
                 ->where('identifier  = :identifier', 'provider = :provider')
                 ->setParameters([
-                    ':providerdata' => $profile->getJson(),
+                    ':providerdata' => json_encode($profile),
                     ':sessiondata'  => $sessiondata,
                     ':lastupdate'   => date('Y-m-d H:i:s', $this->app['request']->server->get('REQUEST_TIME', time())),
                     ':identifier'   => $profile->uid,

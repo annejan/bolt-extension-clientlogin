@@ -10,7 +10,7 @@ use League\OAuth2\Client\Entity\User;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Client
+class Client implements \JsonSerializable
 {
     /** @var mixed  */
     public $client = false;
@@ -30,14 +30,6 @@ class Client
     protected $gender;
     protected $locale;
     protected $password;
-
-    /** @var string */
-    protected $json;
-
-    private $properties = [
-            'uid', 'nickname', 'name', 'firstName', 'lastName', 'email',
-            'location', 'description', 'imageUrl', 'urls', 'gender', 'locale'
-        ];
 
     public function __construct()
     {
@@ -84,6 +76,21 @@ class Client
         $this->$property = $value;
 
         return $this;
+    }
+
+    /**
+     * Valid output for json_encode()
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        $arr = [];
+        foreach(array_keys(get_class_vars(__CLASS__)) as $property) {
+            $arr[$property] = $this->$property;
+        }
+
+        return $arr;
     }
 
     /**
@@ -143,7 +150,6 @@ class Client
         $class->urls        = '';
         $class->gender      = '';
         $class->locale      = '';
-        $class->json        = json_encode(['password' => $password]);
 
         return $class;
     }
@@ -155,24 +161,12 @@ class Client
      */
     public function addOAuth2Client(User $client)
     {
-        foreach ($this->properties as $property) {
+        foreach(array_keys(get_class_vars(__CLASS__)) as $property) {
             try {
                 $this->{$property} = $client->{$property};
             } catch (\Exception $e) {
             }
         }
-
-        $this->json = $this->getLeagueUserJson($client);
-    }
-
-    /**
-     * Return the profile data as JSON
-     *
-     * @return string
-     */
-    public function getJson()
-    {
-        return $this->json;
     }
 
     /**
@@ -182,22 +176,5 @@ class Client
      */
     public function addPasswordClient(\stdClass $client)
     {
-    }
-
-    /**
-     * Get a JSON representation of the User class for backwards compatibility
-     *
-     * This is ugly, and I will never admit to having written it! :-P
-     *
-     * @return string
-     */
-    private function getLeagueUserJson()
-    {
-        $json = [];
-        foreach ($this->properties as $property) {
-            $json[$property] = $this->{$property};
-        }
-
-        return json_encode($json);
     }
 }
