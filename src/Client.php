@@ -170,7 +170,7 @@ class Client
      *
      * @return string
      */
-    public function getProfileJson()
+    public function getJson()
     {
         return $this->json;
     }
