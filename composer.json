@@ -39,11 +39,11 @@
 			"Guzzle\\" : "lib/Guzzle/"
 		}
 	},
-    "autoload-dev" : {
-        "psr-4" : {
-             "Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/"
-         }
-     },
+	"autoload-dev" : {
+		"psr-4" : {
+			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/"
+		}
+	},
 	"extra" : {
 		"branch-alias" : {
 			"dev-master" : "2.2.x-dev"
