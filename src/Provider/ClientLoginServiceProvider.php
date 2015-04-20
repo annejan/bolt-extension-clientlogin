@@ -7,6 +7,8 @@ use Bolt\Extension\Bolt\ClientLogin\Session;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\HttpFoundation\Session\Session as SessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 
 class ClientLoginServiceProvider implements ServiceProviderInterface
 {
@@ -22,7 +24,9 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
 
         $app['clientlogin.session.handler'] = $app->share(
             function ($app) {
-                $handler = new SessionHandler();
+                $options = ['cookie_lifetime' => 3600, 'cookie_httponly' => false];
+                $storage = new NativeSessionStorage($options, new NativeFileSessionHandler());
+                $handler = new SessionHandler($storage);
 
                 return $handler;
             }
