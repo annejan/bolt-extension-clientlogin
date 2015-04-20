@@ -326,7 +326,7 @@ class Session
     {
         $token = $this->app['clientlogin.session.handler']->get($tokenName);;
 
-        $this->app['logger.system']->debug("Getting '$tokenName' token: $token.");
+        $this->app['logger.system']->debug("Getting '$tokenName' token. Value: '$token'.");
 
         return $token;
     }
@@ -343,7 +343,7 @@ class Session
         // Create a unique token
         $token = $this->app['randomgenerator']->generateString(32);
 
-        $this->app['logger.system']->debug("Setting '$tokenName': '$token'");
+        $this->app['logger.system']->debug("Setting '$tokenName' token. Value: '$token'");
 
         $this->app['clientlogin.session.handler']->set($tokenName, $token);
 
@@ -361,7 +361,7 @@ class Session
      */
     public function removeToken($tokenName)
     {
-        $this->app['logger.system']->debug("Removing '$tokenName' token.");
+        $this->app['logger.system']->debug("Clearing '$tokenName' token.");
 
         $this->app['clientlogin.session.handler']->remove($tokenName);
     }
