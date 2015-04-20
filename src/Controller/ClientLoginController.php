@@ -6,6 +6,7 @@ use Bolt\Extension\Bolt\ClientLogin\Extension;
 use Bolt\Extension\Bolt\ClientLogin\Session;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -67,7 +68,23 @@ class ClientLoginController implements ControllerProviderInterface
 
         $app['clientlogin.session']->doLogin($request, $returnpage);
 
-        return $app['clientlogin.session']->getResponse();
+        $response = $app['clientlogin.session']->getResponse();
+
+        // If we have a good response, set a cookie
+        if (!$response->isClientError()) {
+            $expire = '+' . $this->config['login_expiry'] . ' days';
+            $value = $app['randomgenerator']->generateString(32);
+            $cookie = new Cookie('bolt_clientlogin', $value, $expire, '/', null, false, false);
+            $response->headers->setCookie($cookie);
+
+            $app['logger.system']->debug('Setting cookie: ' . $cookie);
+        } else {
+            $app['logger.system']->debug('Session returned a bad status code: ' . $response->getStatusCode());
+        }
+
+        // Prepare and send headers
+        $response->prepare($request);
+        $response->send();
     }
 
     /**
@@ -85,7 +102,16 @@ class ClientLoginController implements ControllerProviderInterface
 
         $app['clientlogin.session']->logout($returnpage);
 
-        return $app['clientlogin.session']->getResponse();
+        $response = $app['clientlogin.session']->getResponse();
+
+        if (!$response->isClientError()) {
+            $app['logger.system']->debug('Clearing cookie:');
+            $response->headers->clearCookie('bolt_clientlogin');
+        } else {
+            $app['logger.system']->debug('Session returned a bad status code: ' . $response->getStatusCode());
+        }
+
+        return $response;
     }
 
     /**
