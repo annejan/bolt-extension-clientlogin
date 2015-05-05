@@ -22,15 +22,7 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $app['clientlogin.session.handler'] = $app->share(
-            function ($app) {
-                $options = ['cookie_lifetime' => 3600, 'cookie_httponly' => false];
-                $storage = new NativeSessionStorage($options, new NativeFileSessionHandler());
-                $handler = new SessionHandler($storage);
-
-                return $handler;
-            }
-        );
+        $app['clientlogin.session.handler'] = $app['session'];
 
         $app['clientlogin.db'] = $app->share(
             function ($app) {
