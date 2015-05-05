@@ -91,6 +91,8 @@ class UserInterface
      */
     public function doDisplayLogout($redirect)
     {
+        $target = ''; // empty target
+
         if ($redirect) {
             $target = '?redirect=' . urlencode($this->app['resources']->getUrl('current'));
         }
@@ -99,12 +101,15 @@ class UserInterface
             $this->config['label']['logout'] = 'Logout';
         }
 
-        $logoutlink = $this->doFormatButton(
-            $this->app['resources']->getUrl('root') . $this->config['basepath'].'/logout' . $target,
-            '',
-            $this->config['label']['logout']);
+        $context['providers']['logout'] = [
+            'link'  => $this->app['resources']->getUrl('root') . $this->config['basepath'].'/logout' . $target,
+            'label' => $this->config['label']['logout'],
+            'class' => 'logout'
+        ];
 
-        return new \Twig_Markup($logoutlink, 'UTF-8');
+        $html = $this->app['render']->render($this->config['template']['button'], $context);
+
+        return new \Twig_Markup($html, 'UTF-8');
     }
 
     /**
