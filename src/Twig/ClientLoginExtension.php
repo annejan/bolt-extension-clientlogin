@@ -39,6 +39,7 @@ class ClientLoginExtension extends \Twig_Extension
     {
         return [
             'hasauth'       => new \Twig_Function_Method($this, 'getHasAuth'),
+            'profile'       => new \Twig_Function_Method($this, 'getWhoAmI'),
             'displayauth'   => new \Twig_Function_Method($this, 'getDisplayAuth'),
             'displaylogin'  => new \Twig_Function_Method($this, 'getDisplayLogin'),
             'displaylogout' => new \Twig_Function_Method($this, 'getDisplayLogout')
@@ -56,6 +57,46 @@ class ClientLoginExtension extends \Twig_Extension
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Get profile if user is logged in
+     * If the userr is not logged in just return empty array values
+     *
+     * @return array
+     */
+    public function getWhoAmI()
+    {
+        $visitor = array(
+            'id' => null,
+            'username' => null,
+            'email' => null,
+            'provider' => null
+        );
+        $profile = $this->app['clientlogin.session']->isLoggedIn();
+        if ($profile) {
+            //dump($profile);
+            $visitor['id'] = $profile->id;
+            $visitor['provider'] = $profile->provider;
+            // do some testing for sensible defaults
+            if($profile->name) {
+                $visitor['username'] = $profile->name;
+            } elseif ($profile->firstName && $profile->lastName) {
+                $visitor['username'] = $profile->firstName . ' ' . $profile->lastName;
+            } elseif ($profile->lastName) {
+                $visitor['username'] = $profile->lastName;
+            } elseif ($profile->nickname) {
+                $visitor['username'] = $profile->nickname;
+            } else {
+                $visitor['username'] = "user ". $profile->id;
+            }
+            if(!empty($profile->email)) {
+                $visitor['email'] = $profile->email;
+            }
+            return $visitor;
+        } else {
+            return $visitor;
         }
     }
 
