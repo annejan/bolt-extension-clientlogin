@@ -3,8 +3,8 @@
 namespace League\OAuth2\Client\Provider;
 
 use Closure;
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\BadResponseException;
+use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Service\Client as GuzzleClient;
 use League\OAuth2\Client\Exception\IDPException as IDPException;
 use League\OAuth2\Client\Grant\GrantInterface;
 use League\OAuth2\Client\Token\AccessToken as AccessToken;
@@ -169,7 +169,7 @@ abstract class AbstractProvider implements ProviderInterface
             'client_id'     => $this->clientId,
             'client_secret' => $this->clientSecret,
             'redirect_uri'  => $this->redirectUri,
-            'grant_type'    => (string) $grant,
+            'grant_type'    => $grant,
         ];
 
         $requestParams = $grant->prepRequestParams($defaultParams, $params);
@@ -187,11 +187,8 @@ abstract class AbstractProvider implements ProviderInterface
                     // @codeCoverageIgnoreEnd
                 case 'POST':
                     $client = $this->getHttpClient();
-                    $url = $this->urlAccessToken();
-                    $options = [
-                        'body' => $requestParams
-                    ];
-                    $request = $client->post($url, $options);
+                    $client->setBaseUrl($this->urlAccessToken());
+                    $request = $client->post(null, $this->getHeaders(), $requestParams)->send();
                     $response = $request->getBody();
                     break;
                 // @codeCoverageIgnoreStart
@@ -205,19 +202,7 @@ abstract class AbstractProvider implements ProviderInterface
             // @codeCoverageIgnoreEnd
         }
 
-        switch ($this->responseType) {
-            case 'json':
-                $result = json_decode($response, true);
-
-                if (JSON_ERROR_NONE !== json_last_error()) {
-                    $result = [];
-                }
-
-                break;
-            case 'string':
-                parse_str($response, $result);
-                break;
-        }
+        $result = $this->prepareResponse($response);
 
         if (isset($result['error']) && ! empty($result['error'])) {
             // @codeCoverageIgnoreStart
@@ -228,6 +213,34 @@ abstract class AbstractProvider implements ProviderInterface
         $result = $this->prepareAccessTokenResult($result);
 
         return $grant->handleResponse($result);
+    }
+
+    /**
+     * Prepare the response, parsing according to configuration and returning
+     * the response as an array.
+     *
+     * @param  string $response
+     * @return array
+     */
+    protected function prepareResponse($response)
+    {
+        $result = [];
+
+        switch ($this->responseType) {
+            case 'json':
+                $json = json_decode($response, true);
+
+                if (JSON_ERROR_NONE === json_last_error()) {
+                    $result = $json;
+                }
+
+                break;
+            case 'string':
+                parse_str($response, $result);
+                break;
+        }
+
+        return $result;
     }
 
     /**
@@ -342,18 +355,19 @@ abstract class AbstractProvider implements ProviderInterface
     {
         try {
             $client = $this->getHttpClient();
-            $options = [];
+            $client->setBaseUrl($url);
 
             if ($headers) {
-                $options['headers'] = $headers;
+                $client->setDefaultOption('headers', $headers);
             }
 
-            $request = $client->get($url, $options);
+            $request = $client->get()->send();
             $response = $request->getBody();
         } catch (BadResponseException $e) {
             // @codeCoverageIgnoreStart
-            $raw_response = explode("\n", $e->getResponse());
-            throw new IDPException(end($raw_response));
+            $response = $e->getResponse()->getBody();
+            $result = $this->prepareResponse($response);
+            throw new IDPException($result);
             // @codeCoverageIgnoreEnd
         }
 
