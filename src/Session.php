@@ -347,7 +347,9 @@ class Session
 
         $this->app['clientlogin.session.handler']->set($tokenName, $token);
 
-        if (empty($this->getToken($tokenName))) {
+        $token = $this->getToken($tokenName);
+
+        if (empty($token)) {
             throw new \Exception('[ClientLogin] Unable to create a Symfony session token!');
         }
 
