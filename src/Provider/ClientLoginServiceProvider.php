@@ -6,9 +6,6 @@ use Bolt\Extension\Bolt\ClientLogin\Database;
 use Bolt\Extension\Bolt\ClientLogin\Session;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
-use Symfony\Component\HttpFoundation\Session\Session as SessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 
 class ClientLoginServiceProvider implements ServiceProviderInterface
 {

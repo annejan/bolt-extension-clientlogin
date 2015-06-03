@@ -324,7 +324,7 @@ class Session
      */
     public function getToken($tokenName)
     {
-        $token = $this->app['session']->get($tokenName);;
+        $token = $this->app['session']->get($tokenName);
 
         $this->app['logger.system']->debug("Getting '$tokenName' token. Value: '$token'.");
 

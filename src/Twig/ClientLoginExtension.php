@@ -69,9 +69,9 @@ class ClientLoginExtension extends \Twig_Extension
     public function getWhoAmI()
     {
         $visitor = array(
-            'id' => null,
+            'id'       => null,
             'username' => null,
-            'email' => null,
+            'email'    => null,
             'provider' => null
         );
         $profile = $this->app['clientlogin.session']->isLoggedIn();
@@ -80,7 +80,7 @@ class ClientLoginExtension extends \Twig_Extension
             $visitor['id'] = $profile->id;
             $visitor['provider'] = $profile->provider;
             // do some testing for sensible defaults
-            if($profile->name) {
+            if ($profile->name) {
                 $visitor['username'] = $profile->name;
             } elseif ($profile->firstName && $profile->lastName) {
                 $visitor['username'] = $profile->firstName . ' ' . $profile->lastName;
@@ -91,7 +91,7 @@ class ClientLoginExtension extends \Twig_Extension
             } else {
                 $visitor['username'] = "user ". $profile->id;
             }
-            if(!empty($profile->email)) {
+            if (!empty($profile->email)) {
                 $visitor['email'] = $profile->email;
             }
             return $visitor;

@@ -86,7 +86,7 @@ class Client implements \JsonSerializable
     public function jsonSerialize()
     {
         $arr = [];
-        foreach(array_keys(get_class_vars(__CLASS__)) as $property) {
+        foreach (array_keys(get_class_vars(__CLASS__)) as $property) {
             $arr[$property] = $this->$property;
         }
 
@@ -163,7 +163,7 @@ class Client implements \JsonSerializable
      */
     public function addOAuth2Client(User $client)
     {
-        foreach(array_keys(get_class_vars(__CLASS__)) as $property) {
+        foreach (array_keys(get_class_vars(__CLASS__)) as $property) {
             try {
                 $this->{$property} = $client->{$property};
             } catch (\Exception $e) {

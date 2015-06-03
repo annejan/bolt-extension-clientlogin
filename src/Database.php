@@ -468,7 +468,7 @@ class Database
         $prefix = $this->app['config']->get('general/database/prefix', 'bolt_');
 
         // Make sure prefix ends in '_'
-        if ($prefix[ strlen($prefix)-1 ] != '_') {
+        if ($prefix[ strlen($prefix) - 1 ] != '_') {
             $prefix .= '_';
         }
 
