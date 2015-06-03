@@ -22,8 +22,6 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $app['clientlogin.session.handler'] = $app['session'];
-
         $app['clientlogin.db'] = $app->share(
             function ($app) {
                 $records = new Database($app);

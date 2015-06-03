@@ -324,7 +324,7 @@ class Session
      */
     public function getToken($tokenName)
     {
-        $token = $this->app['clientlogin.session.handler']->get($tokenName);;
+        $token = $this->app['session']->get($tokenName);;
 
         $this->app['logger.system']->debug("Getting '$tokenName' token. Value: '$token'.");
 
@@ -345,7 +345,7 @@ class Session
 
         $this->app['logger.system']->debug("Setting '$tokenName' token. Value: '$token'");
 
-        $this->app['clientlogin.session.handler']->set($tokenName, $token);
+        $this->app['session']->set($tokenName, $token);
 
         $token = $this->getToken($tokenName);
 
@@ -365,7 +365,7 @@ class Session
     {
         $this->app['logger.system']->debug("Clearing '$tokenName' token.");
 
-        $this->app['clientlogin.session.handler']->remove($tokenName);
+        $this->app['session']->remove($tokenName);
     }
 
     /**

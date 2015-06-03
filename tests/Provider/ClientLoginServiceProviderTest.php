@@ -25,11 +25,11 @@ class ClientLoginServiceProviderTest extends BoltUnitTest
         $app['extensions']->register($extension);
 
         $this->assertNotEmpty($app['clientlogin.session']);
-//         $this->assertNotEmpty($app['clientlogin.session.handler']);
+//         $this->assertNotEmpty($app['session']);
         $this->assertNotEmpty($app['clientlogin.db']);
 
         $this->assertInstanceOf('Bolt\Extension\Bolt\ClientLogin\Session', $app['clientlogin.session']);
-//         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Session', $app['clientlogin.session.handler']);
+//         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Session', $app['session']);
         $this->assertInstanceOf('Bolt\Extension\Bolt\ClientLogin\Database', $app['clientlogin.db']);
 
         $app->boot();
