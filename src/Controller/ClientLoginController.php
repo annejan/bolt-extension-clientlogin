@@ -82,9 +82,7 @@ class ClientLoginController implements ControllerProviderInterface
             $app['logger.system']->debug('Session returned a bad status code: ' . $response->getStatusCode());
         }
 
-        // Prepare and send headers
-        $response->prepare($request);
-        $response->send();
+        return $response;
     }
 
     /**
