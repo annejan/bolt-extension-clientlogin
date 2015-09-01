@@ -24,7 +24,10 @@
 	"prefer-stable" : true,
 	"autoload" : {
 		"files" : [
-			"init.php"
+			"init.php",
+			"lib/GuzzleHttp/Guzzle/functions_include.php",
+			"lib/GuzzleHttp/Promise/functions_include.php",
+			"lib/GuzzleHttp/Psr7/functions_include.php"
 		],
 		"psr-4" : {
 			"Bolt\\Extension\\Bolt\\ClientLogin\\" : [
