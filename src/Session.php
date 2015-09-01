@@ -195,8 +195,8 @@ class Session
             // Try to get an access token (using the authorization code grant)
             $providerToken = $this->provider->getAccessToken('authorization_code', ['code' => $request->get('code')]);
 
-            /** \League\OAuth2\Client\Entity\User */
-            $userDetails = $this->provider->getUserDetails($providerToken);
+            /** \League\OAuth2\Client\Provider\ResourceOwnerInterface */
+            $userDetails = $this->provider->getResourceOwner($providerToken);
 
             $clientDetails = new Client();
             $clientDetails->addOAuth2Client($userDetails);
