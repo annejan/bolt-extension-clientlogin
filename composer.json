@@ -32,11 +32,13 @@
 				"src/"
 			],
 			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
-			"Ivory\\HttpAdapter\\" : "lib/Ivory/HttpAdapter/",
-			"League\\OAuth1\\" : "lib/League/OAuth1/",
 			"League\\OAuth2\\Client\\" : "lib/League/OAuth2/",
-			"Psr\\Http\\Message\\" : "lib/Psr/Http/",
-			"Guzzle\\" : "lib/Guzzle/"
+			"GuzzleHttp\\" : [
+				"lib/GuzzleHttp",
+				"lib/GuzzleHttp/Guzzle",
+				"lib/GuzzleHttp/Promise",
+				"lib/GuzzleHttp/Psr7"
+			]
 		}
 	},
 	"autoload-dev" : {
@@ -46,7 +48,8 @@
 	},
 	"extra" : {
 		"branch-alias" : {
-			"dev-master" : "2.2.x-dev"
+			"dev-master" : "2.2.x-dev",
+			"dev-development" : "2.3.x-dev"
 		}
 	}
 }
