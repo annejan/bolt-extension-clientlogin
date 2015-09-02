@@ -64,7 +64,7 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogin(Application $app, Request $request)
     {
-        $returnpage = $this->setRedirectUrl($app);
+        $returnpage = $this->setRedirectUrl($app, $request);
 
         $app['clientlogin.session']->doLogin($request, $returnpage);
 
@@ -126,7 +126,7 @@ class ClientLoginController implements ControllerProviderInterface
         $this->clearRedirectUrl($app);
 
         // Check 'code' isn't empty
-        $code = $app['request']->get('code');
+        $code = $request->get('code');
         if (empty($code)) {
             $html = '<h1>Authentication Code Error!</h1><p>Oh... look... kitten...</p><img src="http://emergencykitten.com/img/random" />';
             return new Response($html, Response::HTTP_FORBIDDEN);
@@ -147,10 +147,11 @@ class ClientLoginController implements ControllerProviderInterface
      * Save the redirect URL
      *
      * @param \Silex\Application $app
+     * @param Request            $request
      */
-    private function setRedirectUrl(Application $app)
+    private function setRedirectUrl(Application $app, Request $request)
     {
-        $returnpage = $app['request']->get('redirect');
+        $returnpage = $request->get('redirect');
 
         if ($returnpage) {
             $returnpage = str_replace($app['resources']->getUrl('hosturl'), '', $returnpage);
