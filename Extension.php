@@ -45,6 +45,7 @@ class Extension extends BaseExtension
          * Register ourselves as a service
          */
         $this->app->register(new Provider\ClientLoginServiceProvider($this->app));
+        $this->app['twig']->addExtension(new Twig\ClientLoginExtension($this->app));
 
         /*
          * Backend
@@ -52,14 +53,6 @@ class Extension extends BaseExtension
         if ($this->app['config']->getWhichEnd() === 'backend' || $this->app['config']->getWhichEnd() === 'cli') {
             // Check & create database tables if required
             $this->app['clientlogin.db']->dbCheck();
-        }
-
-        /*
-         * Frontend
-         */
-        if ($this->app['config']->getWhichEnd() === 'frontend') {
-            // Twig functions
-            $this->app['twig']->addExtension(new Twig\ClientLoginExtension($this->app));
         }
 
         /*
