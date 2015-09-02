@@ -4,6 +4,8 @@ namespace League\OAuth2\Client\Provider;
 
 class GoogleResourceOwner implements ResourceOwnerInterface
 {
+    use ClientLoginTrait;
+
     /**
      * @var array
      */

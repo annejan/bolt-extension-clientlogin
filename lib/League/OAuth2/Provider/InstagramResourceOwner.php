@@ -2,6 +2,8 @@
 
 class InstagramResourceOwner implements ResourceOwnerInterface
 {
+    use ClientLoginTrait;
+
     /**
      * Raw response
      *

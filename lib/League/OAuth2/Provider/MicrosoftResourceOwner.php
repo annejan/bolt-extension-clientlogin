@@ -4,6 +4,8 @@ use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 
 class MicrosoftResourceOwner implements ResourceOwnerInterface
 {
+    use ClientLoginTrait;
+
     /**
      * Raw response
      *

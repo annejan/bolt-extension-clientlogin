@@ -2,6 +2,8 @@
 
 class GithubResourceOwner implements ResourceOwnerInterface
 {
+    use ClientLoginTrait;
+
     /**
      * Domain
      *
