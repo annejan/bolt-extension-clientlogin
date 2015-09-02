@@ -69,7 +69,7 @@ class GoogleResourceOwner implements ResourceOwnerInterface
      *
      * @return string|null
      */
-    public function getAvatar()
+    public function getImageurl()
     {
         if (!empty($this->response['image']['url'])) {
             return $this->response['image']['url'];
