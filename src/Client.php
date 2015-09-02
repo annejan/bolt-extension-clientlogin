@@ -139,9 +139,7 @@ class Client implements \JsonSerializable
      */
     public function createFromResourceOwnerInterface($provider, ResourceOwnerInterface $user)
     {
-        $this->id        = $user->getId();
         $this->provider  = $provider;
-        $this->password  = null;
         $this->uid       = $user->getId();
         $this->nickname  = $user->getNickname();
         $this->name      = $user->getName();
