@@ -5,6 +5,7 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use Hautelook\Phpass\PasswordHash;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +25,7 @@ class Session
     private $app;
     /** @var array Extension config */
     private $config;
-    /** @var \League\OAuth2\Client\Provider\ProviderInterface */
+    /** @var \League\OAuth2\Client\Provider\AbstractProvider */
     private $provider;
     /** @var \Symfony\Component\HttpFoundation\Response */
     private $response;
@@ -34,8 +35,8 @@ class Session
      */
     public function __construct(Application $app)
     {
-        $this->app     = $app;
-        $this->config  = $this->app[Extension::CONTAINER]->config;
+        $this->app    = $app;
+        $this->config = $this->app[Extension::CONTAINER]->config;
     }
 
     /**
@@ -165,7 +166,7 @@ class Session
         $token = $this->setToken(self::TOKEN_STATE);
 
         // Get the provider authorisation URL
-        $url = $this->provider->getAuthorizationUrl(['state' => $token]);
+        $url = $this->getProvider()->getAuthorizationUrl(['state' => $token]);
 
         $this->setResponse(new RedirectResponse($url));
     }
@@ -185,10 +186,10 @@ class Session
 
         try {
             // Try to get an access token (using the authorization code grant)
-            $providerToken = $this->provider->getAccessToken('authorization_code', ['code' => $request->get('code')]);
+            $providerToken = $this->getProvider()->getAccessToken('authorization_code', ['code' => $request->get('code')]);
 
             /** \League\OAuth2\Client\Provider\ResourceOwnerInterface */
-            $providerDetails = $this->provider->getResourceOwner($providerToken);
+            $providerDetails = $this->getProvider()->getResourceOwner($providerToken);
             $clientDetails = (new Client())->createFromResourceOwnerInterface($providerName, $providerDetails);
 
             $this->app['logger.system']->debug('Response from provider received', $providerDetails->toArray());
@@ -388,7 +389,7 @@ class Session
     {
         $this->app['logger.system']->debug("Creating provider $providerName");
 
-        /** @var \League\OAuth2\Client\Provider\ProviderInterface */
+        /** @var \League\OAuth2\Client\Provider\AbstractProvider */
         $providerClass = '\\League\\OAuth2\\Client\\Provider\\' . $providerName;
 
         if (!class_exists($providerClass)) {
@@ -398,7 +399,18 @@ class Session
         $config = $this->config['providers'][$providerName];
         $config['redirectUri'] = $this->getCallbackUrl($providerName);
         $collaborators = ['httpClient' => new \GuzzleHttp\Client()];
+
         $this->provider = new $providerClass($config, $collaborators);
+    }
+
+    /**
+     * Get the session OAuth provider.
+     *
+     * @return \League\OAuth2\Client\Provider\AbstractProvider
+     */
+    private function getProvider()
+    {
+        return $this->provider;
     }
 
     /**
