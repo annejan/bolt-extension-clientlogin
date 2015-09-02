@@ -77,6 +77,18 @@ class GithubResourceOwner implements ResourceOwnerInterface
     }
 
     /**
+     * Get resource avatar URL
+     *
+     * @return string|null
+     */
+    public function getImageurl()
+    {
+        if (!empty($this->response['avatar_url'])) {
+            return $this->response['avatar_url'];
+        }
+    }
+
+    /**
      * Set resource owner domain
      *
      * @param  string $domain
