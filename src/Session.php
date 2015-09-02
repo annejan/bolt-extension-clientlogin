@@ -17,21 +17,15 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Session
 {
-    /** @var string */
     const TOKEN_SESSION = 'bolt_clientlogin_session';
-
-    /** @var string */
     const TOKEN_STATE = 'bolt_clientlogin_state';
 
     /** @var \Bolt\Application */
     private $app;
-
     /** @var array Extension config */
     private $config;
-
     /** @var \League\OAuth2\Client\Provider\ProviderInterface */
     private $provider;
-
     /** @var \Symfony\Component\HttpFoundation\Response */
     private $response;
 
