@@ -6,8 +6,6 @@ use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
 use Hautelook\Phpass\PasswordHash;
-use Ivory\HttpAdapter\GuzzleHttpHttpAdapter;
-use League\OAuth2\Client\Exception\IDPException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -196,13 +194,11 @@ class Session
             $providerToken = $this->provider->getAccessToken('authorization_code', ['code' => $request->get('code')]);
 
             /** \League\OAuth2\Client\Provider\ResourceOwnerInterface */
-            $userDetails = $this->provider->getResourceOwner($providerToken);
+            $providerDetails = $this->provider->getResourceOwner($providerToken);
+            $clientDetails = (new Client())->createFromResourceOwnerInterface($providerName, $providerDetails);
 
-            $clientDetails = new Client();
-            $clientDetails->addOAuth2Client($userDetails);
-
-            $this->app['logger.system']->debug('Response from provider received', $userDetails->getArrayCopy());
-        } catch (IDPException $e) {
+            $this->app['logger.system']->debug('Response from provider received', $providerDetails->toArray());
+        } catch (\Exception $e) {
             if ($this->config['debug_mode']) {
                 dump($e);
             }

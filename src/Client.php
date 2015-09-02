@@ -3,7 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin;
 
 use Hautelook\Phpass\PasswordHash;
-use League\OAuth2\Client\Entity\User;
+use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 
 /**
  * Client details class
@@ -130,6 +130,30 @@ class Client implements \JsonSerializable
         return $class;
     }
 
+    /**
+     * Add an OAuth2 client data
+     *
+     * @param \League\OAuth2\Client\Provider\ResourceOwnerInterface $user
+     *
+     * @return Client
+     */
+    public function createFromResourceOwnerInterface($provider, ResourceOwnerInterface $user)
+    {
+        $this->id        = $user->getId();
+        $this->provider  = $provider;
+        $this->password  = null;
+        $this->uid       = $user->getId();
+        $this->nickname  = $user->getNickname();
+        $this->name      = $user->getName();
+        $this->firstName = $user->getFirstName();
+        $this->lastName  = $user->getLastName();
+        $this->email     = $user->getEmail();
+        $this->imageUrl  = $user->getImageurl();
+        $this->urls      = $user->getUrl();
+
+        return $this;
+    }
+
     public static function createPasswordAuth($username, $password)
     {
         $hasher = new PasswordHash(12, true);
@@ -154,21 +178,6 @@ class Client implements \JsonSerializable
         $class->locale      = '';
 
         return $class;
-    }
-
-    /**
-     * Add an OAuth2 client data
-     *
-     * @param \League\OAuth2\Client\Entity\User $client
-     */
-    public function addOAuth2Client(User $client)
-    {
-        foreach (array_keys(get_class_vars(__CLASS__)) as $property) {
-            try {
-                $this->{$property} = $client->{$property};
-            } catch (\Exception $e) {
-            }
-        }
     }
 
     /**
