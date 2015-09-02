@@ -107,6 +107,6 @@ class Google extends AbstractProvider
 
     protected function createResourceOwner(array $response, AccessToken $token)
     {
-        return new GoogleUser($response);
+        return new GoogleResourceOwner($response);
     }
 }
