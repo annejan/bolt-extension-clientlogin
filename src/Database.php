@@ -15,13 +15,13 @@ class Database
     /** @var \Silex\Application */
     private $app;
 
-    /** @var Extension config array */
+    /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     private $config;
 
     public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->config = $this->app[Extension::CONTAINER]->config;
+        $this->config = $app['clientlogin.config'];
     }
 
     /**
@@ -415,10 +415,10 @@ class Database
      */
     public function doRemoveExpiredSessions()
     {
-        if (empty($this->config['login_expiry'])) {
+        if (empty($this->config->get('login_expiry'))) {
             $maxage = 14;
         } else {
-            $maxage = $this->config['login_expiry'];
+            $maxage = $this->config->get('login_expiry');
         }
 
         try {

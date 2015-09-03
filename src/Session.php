@@ -23,7 +23,7 @@ class Session
 
     /** @var \Bolt\Application */
     private $app;
-    /** @var array Extension config */
+    /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     private $config;
     /** @var \League\OAuth2\Client\Provider\AbstractProvider */
     private $provider;
@@ -36,7 +36,7 @@ class Session
     public function __construct(Application $app)
     {
         $this->app    = $app;
-        $this->config = $this->app[Extension::CONTAINER]->config;
+        $this->config = $app['clientlogin.config'];
     }
 
     /**
@@ -72,7 +72,6 @@ class Session
     public function doLogin(Request $request, $returnpage)
     {
         $providerName = $this->getProviderName($request);
-        $config = $this->config['providers'];
 
         if (empty($providerName)) {
             $this->setResponse(new Response('<pre>Provider not given</pre>', Response::HTTP_BAD_REQUEST));
@@ -82,9 +81,9 @@ class Session
 
             // Event dispatcher
             $this->dispatchEvent('clientlogin.Login', $user);
-        } elseif ($providerName === 'Password' && $config['Password']['enabled']) {
+        } elseif ($providerName === 'Password' && $this->config->getProvider('Password')['enabled']) {
             $this->loginPassword($returnpage);
-        } elseif ($config[$providerName]['enabled']) {
+        } elseif ($this->config->getProvider($providerName)['enabled']) {
             $this->loginOAuth($providerName);
         } else {
             $this->setResponse(new Response('<pre>Error: Invalid or disabled provider</pre>', Response::HTTP_FORBIDDEN));
@@ -115,13 +114,13 @@ class Session
 
         $fields = $this->app['boltforms']->getForm('password')->all();
         $twigvalues = [
-            'parent'  => $this->config['template']['password_parent'],
+            'parent'  => $this->config->getTemplate('password_parent'),
             'fields'  => $fields,
             'message' => $message
         ];
 
         // Render the Twig_Markup
-        $html = $this->app['boltforms']->renderForm('password', $this->config['template']['password'], $twigvalues);
+        $html = $this->app['boltforms']->renderForm('password', $this->config->getTemplate('password'), $twigvalues);
 
         $this->setResponse(new Response($html, Response::HTTP_OK));
     }
@@ -194,7 +193,7 @@ class Session
 
             $this->app['logger.system']->debug('Response from provider received', $providerDetails->toArray());
         } catch (\Exception $e) {
-            if ($this->config['debug_mode']) {
+            if ($this->config->get('debug_mode')) {
                 dump($e);
             }
 
@@ -396,7 +395,7 @@ class Session
             throw new ProviderException('Invalid provider.');
         }
 
-        $config = $this->config['providers'][$providerName];
+        $config = $this->config->getProvider($providerName);
         $config['redirectUri'] = $this->getCallbackUrl($providerName);
         $collaborators = ['httpClient' => new \GuzzleHttp\Client()];
 
@@ -422,8 +421,8 @@ class Session
      */
     private function getCallbackUrl($providerName)
     {
-        $key = $this->config['response_noun'];
-        return $this->app['resources']->getUrl('rooturl') . $this->config['basepath'] . "/endpoint?$key=$providerName";
+        $key = $this->config->get('response_noun');
+        return $this->app['resources']->getUrl('rooturl') . $this->config->get('basepath') . "/endpoint?$key=$providerName";
     }
 
     /**
@@ -464,7 +463,7 @@ class Session
             try {
                 $this->app['dispatcher']->dispatch($type, $event);
             } catch (\Exception $e) {
-                if ($this->config['debug_mode']) {
+                if ($this->config->get('debug_mode')) {
                     dump($e);
                 }
 

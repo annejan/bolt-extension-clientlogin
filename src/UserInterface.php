@@ -14,14 +14,13 @@ class UserInterface
 {
     /** @var \Bolt\Application */
     private $app;
-
-    /** @var array Extension config */
+    /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     private $config;
 
     public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->config = $this->app[Extension::CONTAINER]->config;
+        $this->config = $app['clientlogin.config'];
 
         $this->app['twig.loader.filesystem']->addPath(dirname(__DIR__) . '/assets');
     }
@@ -60,24 +59,22 @@ class UserInterface
         }
 
         // Render
-        if (isset($this->config['providers'])) {
-            $link    = $this->app['resources']->getUrl('root') . $this->config['basepath'] . '/login?provider=';
-            $context = [];
+        $link    = $this->app['resources']->getUrl('root') . $this->config->get('basepath') . '/login?provider=';
+        $context = [];
 
-            foreach ($this->config['providers'] as $provider => $values) {
-                if ($values['enabled'] !== true) {
-                    continue;
-                }
-
-                $context['providers'][$provider] = [
-                    'link'  => $link . $provider . $target,
-                    'label' => !empty($values['label']) ? $values['label'] : $provider,
-                    'class' => $this->getClass(strtolower($provider), $values)
-                ];
+        foreach ($this->config->get('providers') as $provider => $values) {
+            if ($values['enabled'] !== true) {
+                continue;
             }
 
-            $html = $this->app['render']->render($this->config['template']['button'], $context);
+            $context['providers'][$provider] = [
+                'link'  => $link . $provider . $target,
+                'label' => !empty($values['label']) ? $values['label'] : $provider,
+                'class' => $this->getClass(strtolower($provider), $values)
+            ];
         }
+
+        $html = $this->app['render']->render($this->config->getTemplate('button'), $context);
 
         return new \Twig_Markup($html, 'UTF-8');
     }
@@ -97,17 +94,17 @@ class UserInterface
             $target = '?redirect=' . urlencode($this->app['resources']->getUrl('current'));
         }
 
-        if (empty($this->config['label']['logout'])) {
-            $this->config['label']['logout'] = 'Logout';
-        }
-
-        $context['providers']['logout'] = [
-            'link'  => $this->app['resources']->getUrl('root') . $this->config['basepath'].'/logout' . $target,
-            'label' => $this->config['label']['logout'],
-            'class' => 'logout'
+        $context = [
+            'providers' => [
+                'logout' => [
+                    'link'  => $this->app['resources']->getUrl('root') . $this->config->get('basepath') . '/logout' . $target,
+                    'label' => $this->config->getLabel('logout') ?: 'Logout',
+                    'class' => 'logout'
+                ]
+            ]
         ];
 
-        $html = $this->app['render']->render($this->config['template']['button'], $context);
+        $html = $this->app['render']->render($this->config->getTemplate('button'), $context);
 
         return new \Twig_Markup($html, 'UTF-8');
     }
@@ -123,9 +120,9 @@ class UserInterface
     private function getClass($provider, $values)
     {
         if (isset($values['type']) && $values['type'] == 'OpenID') {
-            return $this->config['zocial'] ? 'zocial openid' : 'openid';
+            return $this->config->get('zocial') ? 'zocial openid' : 'openid';
         }
 
-        return $this->config['zocial'] ? "zocial $provider" : $provider;
+        return $this->config->get('zocial') ? "zocial $provider" : $provider;
     }
 }

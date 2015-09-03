@@ -21,7 +21,7 @@ class ClientLoginController implements ControllerProviderInterface
     /** @var string */
     const TOKENNAME = 'bolt_clientlogin_redirect';
 
-    /** @var array Extension config */
+    /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     private $config;
 
     /**
@@ -31,7 +31,7 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function connect(Application $app)
     {
-        $this->config = $app[Extension::CONTAINER]->config;
+        $this->config = $app['clientlogin.config'];
 
         /** @var $ctr \Silex\ControllerCollection */
         $ctr = $app['controllers_factory'];
@@ -65,14 +65,24 @@ class ClientLoginController implements ControllerProviderInterface
     public function authenticationLogin(Application $app, Request $request)
     {
         $returnpage = $this->setRedirectUrl($app, $request);
+        if($authCookie = $request->cookies->get('bolt_clientlogin')) {
+            $app['logger.system']->debug('Login request with existing cookie: ' . $authCookie);
 
-        $app['clientlogin.session']->doLogin($request, $returnpage);
+            // User has a cookie, check it's valid
 
-        $response = $app['clientlogin.session']->getResponse();
+            //
+        } else {
+            // Do the login processing
+            $app['clientlogin.session']->doLogin($request, $returnpage);
+            $response = $app['clientlogin.session']->getResponse();
+        }
+
+
+
 
         // If we have a good response, set a cookie
         if (!$response->isClientError()) {
-            $expire = '+' . $this->config['login_expiry'] . ' days';
+            $expire = '+' . $this->config->get('login_expiry') . ' days';
             $value = $app['randomgenerator']->generateString(32);
             $cookie = new Cookie('bolt_clientlogin', $value, $expire, '/', null, false, false);
             $response->headers->setCookie($cookie);
