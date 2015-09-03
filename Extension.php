@@ -37,14 +37,14 @@ class Extension extends BaseExtension
     public function initialize()
     {
         /*
-         * Config
+         * Configuration provider
          */
         $this->setConfig();
 
         /*
          * Register ourselves as a service
          */
-        $this->app->register(new Provider\ClientLoginServiceProvider($this->app));
+        $this->app->register(new Provider\ClientLoginServiceProvider($this->config));
         $this->app['twig']->addExtension(new Twig\ClientLoginExtension($this->app));
 
         /*
