@@ -123,6 +123,11 @@ class Extension extends BaseExtension
             }
         }
 
+        // Handle old debug parameter
+        if (isset($this->config['debug_mode'])) {
+            $this->config['debug']['enabled'] = (boolean) $this->config['debug_mode'];
+        }
+
         // Write it all back
         $this->config['providers'] = $providersConfig;
     }
@@ -161,7 +166,9 @@ class Extension extends BaseExtension
             ],
             'zocial'        => false,
             'login_expiry'  => 14,
-            'debug_mode'    => false,
+            'debug'         => [
+                'enabled' => false,
+            ],
             'response_noun' => 'hauth.done'
         ];
     }
