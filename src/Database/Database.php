@@ -50,4 +50,18 @@ class Database
         $this->profileTableName = $profileTableName;
         $this->sessionTableName = $sessionTableName;
     }
+
+    /**
+     * Execute a query and fetch the result as an associative array.
+     *
+     * @param \Doctrine\DBAL\Query\QueryBuilder
+     *
+     * @return array|false
+     */
+    private function fetchArray(QueryBuilder $query)
+    {
+        return $query
+            ->execute()
+            ->fetch(\PDO::FETCH_ASSOC);
+    }
 }
