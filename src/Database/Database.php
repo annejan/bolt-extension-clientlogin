@@ -80,6 +80,19 @@ class Database
     }
 
     /**
+     * Remove a single session record.
+     *
+     * @param string $sessionId
+     */
+    public function removeSession($sessionId)
+    {
+        $query = $this->getSessionQuery()
+            ->queryRemoveSession()
+            ->setParameter(':session', $sessionId);
+        $this->executeQuery($query);
+    }
+
+    /**
      * Get the profile query builder.
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
