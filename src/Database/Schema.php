@@ -2,11 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Database;
 
-use Bolt\Extension\Bolt\ClientLogin\Client;
-use League\OAuth2\Client\Token\AccessToken;
-use Silex\Application;
-use Doctrine\DBAL\Query\QueryBuilder;
-
 /**
  * ClientLogin database schema
  *
