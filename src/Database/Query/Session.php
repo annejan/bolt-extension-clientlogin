@@ -45,4 +45,15 @@ class Session extends QueryBase
             ->where('session = :session')
         ;
     }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryRemoveExpiredSessions()
+    {
+        return $this->getQueryBuilder()
+            ->delete($this->tableName)
+            ->where('lastseen <= :maxage')
+        ;
+    }
 }
