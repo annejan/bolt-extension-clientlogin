@@ -52,6 +52,16 @@ class Database
     }
 
     /**
+     * Get the profile query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
+     */
+    public function getProfileQuery()
+    {
+        return new Query\Session($this->db, $this->profileTableName);
+    }
+
+    /**
      * Get the session query builder.
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Session
