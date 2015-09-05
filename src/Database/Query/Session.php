@@ -56,4 +56,20 @@ class Session extends QueryBase
             ->orderBy('lastseen', 'DESC')
         ;
     }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function insertSession()
+    {
+        return $this->getQueryBuilder()
+            ->insert($this->tableName)
+            ->values([
+                'userid'   => ':userid',
+                'session'  => ':session',
+                'token'    => ':token',
+                'lastseen' => ':lastseen',
+            ])
+        ;
+    }
 }
