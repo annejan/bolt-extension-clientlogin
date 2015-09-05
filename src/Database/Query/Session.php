@@ -42,7 +42,7 @@ class Session extends QueryBase
     {
         return $this->getQueryBuilder()
             ->delete($this->tableName)
-            ->where('session <= :session')
+            ->where('session = :session')
         ;
     }
 }
