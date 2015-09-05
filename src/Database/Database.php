@@ -52,6 +52,20 @@ class Database
     }
 
     /**
+     * Get a session record by session ID.
+     *
+     * @return array|false|null
+     */
+    public function getSessionBySessionId($sessionId)
+    {
+        $query = $this->getSessionQuery()
+            ->queryBySessionId()
+            ->setParameter(':session', $sessionId);
+
+        return $this->fetchArray($query);
+    }
+
+    /**
      * Get a session record by user ID.
      *
      * @return array|false|null
