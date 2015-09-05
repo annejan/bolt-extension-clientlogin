@@ -52,6 +52,16 @@ class Database
     }
 
     /**
+     * Get the session query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Session
+     */
+    public function getSessionQuery()
+    {
+        return new Query\Session($this->db, $this->sessionTableName);
+    }
+
+    /**
      * Execute a query and fetch the result as an associative array.
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder
