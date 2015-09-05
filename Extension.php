@@ -7,6 +7,7 @@ use Bolt\Events\CronEvent;
 use Bolt\Events\CronEvents;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
 
 /**
  * Login with OAuth1 or OAuth2
@@ -22,7 +23,6 @@ class Extension extends BaseExtension
 {
     /** @var string Extension name */
     const NAME = 'ClientLogin';
-
     /** @var string Extension's container */
     const CONTAINER = 'extensions.ClientLogin';
 
@@ -36,38 +36,25 @@ class Extension extends BaseExtension
 
     public function initialize()
     {
-        /*
-         * Configuration provider
-         */
+        // Configuration set up
         $this->setConfig();
 
-        /*
-         * Register ourselves as a service
-         */
+        // Service providers
         $this->app->register(new Provider\ClientLoginServiceProvider($this->config));
         $this->app['twig']->addExtension(new Twig\ClientLoginExtension($this->app));
 
-        /*
-         * Backend
-         */
+        // Check & create database tables if required
         if ($this->app['config']->getWhichEnd() === 'backend' || $this->app['config']->getWhichEnd() === 'cli') {
-            // Check & create database tables if required
-            $this->app['clientlogin.db']->dbCheck();
+            $this->app['clientlogin.db.schema']->build();
         }
 
-        /*
-         * Set up controller routes
-         */
+        // Controller routes
         $this->app->mount('/' . $this->config['basepath'], new Controller\ClientLoginController());
 
-        /*
-         * Scheduled cron listener
-         */
+        // Scheduled cron listener
         $this->app['dispatcher']->addListener(CronEvents::CRON_DAILY, [$this, 'cronDaily']);
 
-        /*
-         * Before middleware
-         */
+        // Middleware
         $this->app->before([$this, 'before']);
     }
 
