@@ -34,4 +34,15 @@ class Session extends QueryBase
             ->orderBy('lastseen', 'DESC')
         ;
     }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryRemoveSession()
+    {
+        return $this->getQueryBuilder()
+            ->delete($this->getTableNameSessions())
+            ->where('session <= :session')
+        ;
+    }
 }
