@@ -178,7 +178,7 @@ class Database
         try {
             return $query->execute();
         } catch (\Doctrine\DBAL\DBALException $e) {
-            $this->logger->critical("ClientLogin had an database exception.", ['event' => 'exception', 'exception' => $e]);
+            $this->logger->critical("ClientLogin had a database exception.", ['event' => 'exception', 'exception' => $e]);
         }
     }
 
@@ -196,7 +196,7 @@ class Database
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC);
         } catch (\Doctrine\DBAL\DBALException $e) {
-            $this->logger->critical("ClientLogin had an database exception.", ['event' => 'exception', 'exception' => $e]);
+            $this->logger->critical("ClientLogin had a database exception.", ['event' => 'exception', 'exception' => $e]);
         }
     }
 }
