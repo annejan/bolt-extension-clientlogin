@@ -59,7 +59,7 @@ class Database
     public function getSessionBySessionId($sessionId)
     {
         $query = $this->getSessionQuery()
-            ->queryBySessionId()
+            ->queryFetchBySessionId()
             ->setParameter(':session', $sessionId);
 
         return $this->fetchArray($query);
@@ -73,35 +73,35 @@ class Database
     public function getSessionByUserId($userId)
     {
         $query = $this->getSessionQuery()
-            ->queryByUserId()
+            ->queryFetchByUserId()
             ->setParameter(':userid', $userId);
 
         return $this->fetchArray($query);
     }
 
     /**
-     * Remove a single session record.
+     * Delete a single session record.
      *
      * @param string $sessionId
      */
-    public function removeSession($sessionId)
+    public function deleteSession($sessionId)
     {
         $query = $this->getSessionQuery()
-            ->queryRemoveSession()
+            ->queryDeleteSession()
             ->setParameter(':session', $sessionId);
         $this->executeQuery($query);
     }
 
     /**
-     * Remove expired session records.
+     * Delete expired session records.
      *
      * @param string $sessionId
      */
-    public function removeSessionsExpired($sessionId)
+    public function deleteSessionsExpired($sessionId)
     {
         $maxage = $this->config->get('login_expiry');
         $query = $this->getSessionQuery()
-            ->queryRemoveExpiredSessions()
+            ->queryDeleteExpiredSessions()
             ->setParameter(':maxage', date('Y-m-d H:i:s', strtotime("-$maxage days")));
         $this->executeQuery($query);
     }

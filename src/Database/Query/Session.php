@@ -12,7 +12,29 @@ class Session extends QueryBase
     /**
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryByUserId()
+    public function queryDeleteSession()
+    {
+        return $this->getQueryBuilder()
+            ->delete($this->tableName)
+            ->where('session = :session')
+        ;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryDeleteExpiredSessions()
+    {
+        return $this->getQueryBuilder()
+            ->delete($this->tableName)
+            ->where('lastseen <= :maxage')
+        ;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryFetchByUserId()
     {
         return $this->getQueryBuilder()
             ->select('*')
@@ -25,35 +47,13 @@ class Session extends QueryBase
     /**
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryBySessionId()
+    public function queryFetchBySessionId()
     {
         return $this->getQueryBuilder()
             ->select('*')
             ->from($this->tableName)
             ->where('session = :session')
             ->orderBy('lastseen', 'DESC')
-        ;
-    }
-
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function queryRemoveSession()
-    {
-        return $this->getQueryBuilder()
-            ->delete($this->tableName)
-            ->where('session = :session')
-        ;
-    }
-
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function queryRemoveExpiredSessions()
-    {
-        return $this->getQueryBuilder()
-            ->delete($this->tableName)
-            ->where('lastseen <= :maxage')
         ;
     }
 }
