@@ -61,6 +61,10 @@ class Schema
 
                 $table->setPrimaryKey(['id']);
 
+                $table->addIndex(['provider']);
+                $table->addIndex(['identifier']);
+                $table->addIndex(['username']);
+
                 return $table;
             }
         );
@@ -74,7 +78,9 @@ class Schema
                 $table->addColumn('session',  'string', ['length' => 64]);
                 $table->addColumn('token',    'text',   ['notnull' => false, 'default' => null]);
                 $table->addColumn('lastseen', 'datetime');
+
                 $table->setPrimaryKey(['id']);
+
                 $table->addIndex(['userid']);
                 $table->addIndex(['session']);
 
