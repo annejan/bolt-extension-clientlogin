@@ -52,6 +52,20 @@ class Database
     }
 
     /**
+     * Get a session record by user ID.
+     *
+     * @return array|false|null
+     */
+    public function getSessionByUserId($userId)
+    {
+        $query = $this->getSessionQuery()
+            ->queryByUserId()
+            ->setParameter(':userid', $userId);
+
+        return $this->fetchArray($query);
+    }
+
+    /**
      * Get the profile query builder.
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
