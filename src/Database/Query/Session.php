@@ -72,4 +72,18 @@ class Session extends QueryBase
             ])
         ;
     }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function updateSession()
+    {
+        return $this->getQueryBuilder()
+            ->update($this->tableName)
+            ->set('session',  ':session')
+            ->set('token',    ':token')
+            ->set('lastseen', ':lastseen')
+            ->where('userid  = :userid')
+        ;
+    }
 }
