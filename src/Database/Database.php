@@ -79,11 +79,6 @@ class Database
         return $this->fetchArray($query);
     }
 
-    public function removeSession($sessionId)
-    {
-
-    }
-
     /**
      * Get the profile query builder.
      *
@@ -102,6 +97,22 @@ class Database
     protected function getSessionQuery()
     {
         return new Query\Session($this->db, $this->sessionTableName);
+    }
+
+    /**
+     * Execute a query.
+     *
+     * @param \Doctrine\DBAL\Query\QueryBuilder
+     *
+     * @return array|false|null
+     */
+    protected function executeQuery(QueryBuilder $query)
+    {
+        try {
+            return $query->execute();
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            $this->logger->critical("ClientLogin had an database exception.", ['event' => 'exception', 'exception' => $e]);
+        }
     }
 
     /**
