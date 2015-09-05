@@ -18,6 +18,7 @@ class Client implements \JsonSerializable
     protected $id;
     protected $provider;
     protected $uid;
+    protected $enabled = true;
     protected $nickname;
     protected $name;
     protected $firstName;
@@ -33,6 +34,16 @@ class Client implements \JsonSerializable
 
     public function __construct()
     {
+    }
+
+    /**
+     * Check if the profile is enabled.
+     *
+     * @return boolean
+     */
+    public function isEnabled()
+    {
+        return $this->enabled();
     }
 
     /**
@@ -115,6 +126,7 @@ class Client implements \JsonSerializable
         $class->provider    = $user['provider'];
         $class->password    = isset($data['password'])   ? $data['password']   : '';
         $class->uid         = isset($data['identifier']) ? $data['identifier'] : $data['uid'];
+        $class->enabled     = $data['enabled'];
         $class->nickname    = $data['nickname'];
         $class->name        = $data['name'];
         $class->firstName   = $data['firstName'];
@@ -133,23 +145,27 @@ class Client implements \JsonSerializable
     /**
      * Add an OAuth2 client data
      *
-     * @param \League\OAuth2\Client\Provider\ResourceOwnerInterface $user
+     * @param string                 $provider
+     * @param ResourceOwnerInterface $resourceOwner
      *
      * @return Client
      */
-    public function createFromResourceOwnerInterface($provider, ResourceOwnerInterface $user)
+    public static function createFromResourceOwner($provider, ResourceOwnerInterface $resourceOwner)
     {
-        $this->provider  = $provider;
-        $this->uid       = $user->getId();
-        $this->nickname  = $user->getNickname();
-        $this->name      = $user->getName();
-        $this->firstName = $user->getFirstName();
-        $this->lastName  = $user->getLastName();
-        $this->email     = $user->getEmail();
-        $this->imageUrl  = $user->getImageurl();
-        $this->urls      = $user->getUrl();
+        $classname = get_called_class();
+        $class = new $classname();
 
-        return $this;
+        $class->provider  = $provider;
+        $class->uid       = $resourceOwner->getId();
+        $class->nickname  = $resourceOwner->getNickname();
+        $class->name      = $resourceOwner->getName();
+        $class->firstName = $resourceOwner->getFirstName();
+        $class->lastName  = $resourceOwner->getLastName();
+        $class->email     = $resourceOwner->getEmail();
+        $class->imageUrl  = $resourceOwner->getImageurl();
+        $class->urls      = $resourceOwner->getUrl();
+
+        return $class;
     }
 
     public static function createPasswordAuth($username, $password)
