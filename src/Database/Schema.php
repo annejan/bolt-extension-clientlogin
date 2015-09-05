@@ -54,9 +54,11 @@ class Schema
                 $table->addColumn('provider',     'string',  ['length' => 64]);
                 $table->addColumn('identifier',   'string',  ['length' => 128]);
                 $table->addColumn('username',     'string',  ['length' => 64]);
+                $table->addColumn('enabled',      'boolean', []);
                 $table->addColumn('providerdata', 'text');
                 $table->addColumn('sessiondata',  'text');
                 $table->addColumn('lastupdate',   'datetime');
+
                 $table->setPrimaryKey(['id']);
 
                 return $table;
