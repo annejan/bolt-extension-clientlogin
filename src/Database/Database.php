@@ -76,12 +76,16 @@ class Database
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder
      *
-     * @return array|false
+     * @return array|false|null
      */
     private function fetchArray(QueryBuilder $query)
     {
-        return $query
-            ->execute()
-            ->fetch(\PDO::FETCH_ASSOC);
+        try {
+            return $query
+                ->execute()
+                ->fetch(\PDO::FETCH_ASSOC);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            $this->logger->critical("ClientLogin had an database exception.", ['event' => 'exception', 'exception' => $e]);
+        }
     }
 }
