@@ -127,6 +127,26 @@ class Database
     }
 
     /**
+     * Update a session record.
+     *
+     * @param string $userId
+     * @param string $sessionId
+     * @param object $token
+     */
+    public function updateSession($userId, $sessionId, $token)
+    {
+        $query = $this->getSessionQuery()
+            ->updateSession()
+            ->setParameters([
+                ':userid'     => $userId,
+                ':session'    => $sessionId,
+                ':token'      => json_encode($token),
+                ':lastupdate' => date('Y-m-d H:i:s', time()),
+            ]);
+        $this->executeQuery($query);
+    }
+
+    /**
      * Get the profile query builder.
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
