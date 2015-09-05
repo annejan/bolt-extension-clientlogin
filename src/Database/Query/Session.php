@@ -21,4 +21,17 @@ class Session extends QueryBase
             ->orderBy('lastseen', 'DESC')
         ;
     }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryBySessionId()
+    {
+        return $this->getQueryBuilder()
+            ->select('*')
+            ->from($this->getTableNameSessions())
+            ->where('session = :session')
+            ->orderBy('lastseen', 'DESC')
+        ;
+    }
 }
