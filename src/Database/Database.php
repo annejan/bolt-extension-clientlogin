@@ -79,12 +79,17 @@ class Database
         return $this->fetchArray($query);
     }
 
+    public function removeSession($sessionId)
+    {
+
+    }
+
     /**
      * Get the profile query builder.
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
      */
-    public function getProfileQuery()
+    protected function getProfileQuery()
     {
         return new Query\Session($this->db, $this->profileTableName);
     }
@@ -94,7 +99,7 @@ class Database
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Session
      */
-    public function getSessionQuery()
+    protected function getSessionQuery()
     {
         return new Query\Session($this->db, $this->sessionTableName);
     }
@@ -106,7 +111,7 @@ class Database
      *
      * @return array|false|null
      */
-    private function fetchArray(QueryBuilder $query)
+    protected function fetchArray(QueryBuilder $query)
     {
         try {
             return $query
