@@ -93,6 +93,20 @@ class Database
     }
 
     /**
+     * Remove expired session records.
+     *
+     * @param string $sessionId
+     */
+    public function removeSessionsExpired($sessionId)
+    {
+        $maxage = $this->config->get('login_expiry');
+        $query = $this->getSessionQuery()
+            ->queryRemoveExpiredSessions()
+            ->setParameter(':maxage', date('Y-m-d H:i:s', strtotime("-$maxage days")));
+        $this->executeQuery($query);
+    }
+
+    /**
      * Get the profile query builder.
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
