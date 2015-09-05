@@ -10,7 +10,7 @@ use Monolog\Handler\StreamHandler;
 use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
 
 /**
- * Login with OAuth1 or OAuth2
+ * Frontend client login with OAuth2 or passwords.
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  *
@@ -78,8 +78,7 @@ class Extension extends BaseExtension
     public function cronDaily(CronEvent $event)
     {
         $event->output->writeln("<comment>ClientLogin: Clearing old sessions</comment>");
-        $record = new Database($this->app);
-        $record->doRemoveExpiredSessions();
+        $this->app['clientlogin.db']->doRemoveExpiredSessions();
     }
 
     /**

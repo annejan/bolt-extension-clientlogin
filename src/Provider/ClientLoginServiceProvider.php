@@ -36,7 +36,9 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
         $app['clientlogin.db'] = $app->share(
             function ($app) use ($userTable, $sessionTable) {
                 $records = new Database(
-                    $app,
+                    $app['db'],
+                    $app['clientlogin.config'],
+                    $app['logger.system'],
                     $userTable,
                     $sessionTable
                 );
