@@ -16,7 +16,7 @@ class Session extends QueryBase
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->getTableNameSessions())
+            ->from($this->tableName)
             ->where('userid = :userid')
             ->orderBy('lastseen', 'DESC')
         ;
@@ -29,7 +29,7 @@ class Session extends QueryBase
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->getTableNameSessions())
+            ->from($this->tableName)
             ->where('session = :session')
             ->orderBy('lastseen', 'DESC')
         ;
@@ -41,7 +41,7 @@ class Session extends QueryBase
     public function queryRemoveSession()
     {
         return $this->getQueryBuilder()
-            ->delete($this->getTableNameSessions())
+            ->delete($this->tableName)
             ->where('session <= :session')
         ;
     }
