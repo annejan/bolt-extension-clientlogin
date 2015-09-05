@@ -9,4 +9,16 @@ namespace Bolt\Extension\Bolt\ClientLogin\Database\Query;
  */
 class Session extends QueryBase
 {
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryByUserId()
+    {
+        return $this->getQueryBuilder()
+            ->select('*')
+            ->from($this->getTableNameSessions())
+            ->where('userid = :userid')
+            ->orderBy('lastseen', 'DESC')
+        ;
+    }
 }
