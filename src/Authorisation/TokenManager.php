@@ -5,11 +5,11 @@ namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
+use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
 use RandomLib\Generator;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
-use League\OAuth2\Client\Token\AccessToken;
 
 /**
  * Token management class.
@@ -29,7 +29,11 @@ class TokenManager
     protected $log;
 
     /**
-     * @param Application $app
+     * Constructor.
+     *
+     * @param SessionInterface $session
+     * @param Generator $random
+     * @param LoggerInterface $log
      */
     public function __construct(SessionInterface $session, Generator $random, LoggerInterface $log)
     {
@@ -43,7 +47,7 @@ class TokenManager
      *
      * @param string $tokenName
      *
-     * @return string|null
+     * @return array|string|null
      */
     public function getToken($tokenName)
     {
