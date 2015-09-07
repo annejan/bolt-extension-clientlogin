@@ -2,8 +2,9 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Database;
 
-use Bolt\Extension\Bolt\ClientLogin\Client;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Token;
 use Bolt\Extension\Bolt\ClientLogin\Config;
+use Bolt\Extension\Bolt\ClientLogin\Profile;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use League\OAuth2\Client\Token\AccessToken;
@@ -66,7 +67,7 @@ class Records
             ->setParameter(':provider', $provider)
             ->setParameter(':identifier', $identifier);
 
-        return $this->fetchArray($query);
+        return Profile::createFromDbRecord($this->fetchArray($query));
     }
 
     /**
@@ -133,15 +134,15 @@ class Records
     /**
      * Insert a user profile.
      *
-     * @param string $provider
-     * @param string $identifier
-     * @param string $username
-     * @param string $providerData
-     * @param string $sessionData
+     * @param string  $provider
+     * @param string  $identifier
+     * @param string  $username
+     * @param Profile $providerData
+     * @param Token   ssionData
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function insertProfile($provider, $identifier, $username, $providerData, $sessionData)
+    public function insertProfile($provider, $identifier, $username, Profile $providerData, Token $sessionData)
     {
         $query = $this->getProfileQuery()
             ->insertProfile()
@@ -149,8 +150,8 @@ class Records
                 'provider'     => $provider,
                 'identifier'   => $identifier,
                 'username'     => $username,
-                'providerdata' => $providerData,
-                'sessiondata'  => $sessionData,
+                'providerdata' => json_encode($providerData),
+                'sessiondata'  => json_encode($sessionData),
                 'lastupdate'   => date('Y-m-d H:i:s', time()),
             ]);
 
@@ -183,15 +184,15 @@ class Records
     /**
      * Insert a user profile.
      *
-     * @param string $provider
-     * @param string $identifier
-     * @param string $username
-     * @param string $providerData
-     * @param string $sessionData
+     * @param string  $provider
+     * @param string  $identifier
+     * @param string  $username
+     * @param Profile $providerData
+     * @param Token   $sessionData
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function updateProfile($provider, $identifier, $username, $providerData, $sessionData)
+    public function updateProfile($provider, $identifier, $username, Profile $providerData, Token $sessionData)
     {
         $query = $this->getProfileQuery()
             ->updateSession()
@@ -199,8 +200,8 @@ class Records
                 'provider'     => $provider,
                 'identifier'   => $identifier,
                 'username'     => $username,
-                'providerdata' => $providerData,
-                'sessiondata'  => $sessionData,
+                'providerdata' => json_encode($providerData),
+                'sessiondata'  => json_encode($sessionData),
                 'lastupdate'   => date('Y-m-d H:i:s', time()),
             ]);
 
@@ -212,11 +213,11 @@ class Records
      *
      * @param string $userId
      * @param string $sessionId
-     * @param object $token
+     * @param Token  $token
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function updateSession($userId, $sessionId, $token)
+    public function updateSession($userId, $sessionId, Token $token)
     {
         $query = $this->getSessionQuery()
             ->updateSession()
@@ -228,6 +229,20 @@ class Records
             ]);
 
         return $this->executeQuery($query);
+    }
+
+    /**
+     * Get a table name.
+     *
+     * @return string|null
+     */
+    public function getTableName($type)
+    {
+        if ($type === 'profile') {
+            return $this->profileTableName;
+        } elseif ($type === 'session') {
+            return $this->sessionTableName;
+        }
     }
 
     /**

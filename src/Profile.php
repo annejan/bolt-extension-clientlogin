@@ -6,11 +6,11 @@ use Hautelook\Phpass\PasswordHash;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 
 /**
- * Client details class
+ * Client profile data class
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Client implements \JsonSerializable
+class Profile implements \JsonSerializable
 {
     protected $id;
     protected $provider;
