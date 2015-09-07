@@ -60,7 +60,7 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
         );
 
         $app['clientlogin.config'] = $app->share(
-            function ($app) {
+            function ($this) {
                 return new Config($this->config);
             }
         );
