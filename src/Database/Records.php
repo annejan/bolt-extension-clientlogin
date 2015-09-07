@@ -121,6 +121,33 @@ class Records
     }
 
     /**
+     * Insert a user profile.
+     *
+     * @param string $provider
+     * @param string $identifier
+     * @param string $username
+     * @param string $providerdata
+     * @param string $sessiondata
+     *
+     * @return array|false|null
+     */
+    public function insertProfile($provider, $identifier, $username, $providerdata, $sessiondata)
+    {
+        $query = $this->getProfileQuery()
+            ->insertProfile()
+            ->setParameters([
+                'provider'     => $provider,
+                'identifier'   => $identifier,
+                'username'     => $username,
+                'providerdata' => $providerdata,
+                'sessiondata'  => $sessiondata,
+                'lastseen'     => date('Y-m-d H:i:s', time()),
+            ]);
+
+        return $this->executeQuery($query);
+    }
+
+    /**
      * Insert a session record.
      *
      * @param string $userId
