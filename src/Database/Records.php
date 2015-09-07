@@ -132,12 +132,12 @@ class Records
      * @param string $provider
      * @param string $identifier
      * @param string $username
-     * @param string $providerdata
-     * @param string $sessiondata
+     * @param string $providerData
+     * @param string $sessionData
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function insertProfile($provider, $identifier, $username, $providerdata, $sessiondata)
+    public function insertProfile($provider, $identifier, $username, $providerData, $sessionData)
     {
         $query = $this->getProfileQuery()
             ->insertProfile()
@@ -145,8 +145,8 @@ class Records
                 'provider'     => $provider,
                 'identifier'   => $identifier,
                 'username'     => $username,
-                'providerdata' => $providerdata,
-                'sessiondata'  => $sessiondata,
+                'providerdata' => $providerData,
+                'sessiondata'  => $sessionData,
                 'lastseen'     => date('Y-m-d H:i:s', time()),
             ]);
 
