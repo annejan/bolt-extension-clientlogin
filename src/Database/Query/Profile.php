@@ -17,8 +17,9 @@ class Profile extends QueryBase
         return $this->getQueryBuilder()
             ->select('*')
             ->from($this->tableName)
-            ->where('userid = :userid')
-            ->orderBy('lastseen', 'DESC')
+            ->where('provider = :provider')
+            ->andWhere('identifier = :identifier')
+            ->orderBy('lastupdate', 'DESC')
         ;
     }
 
