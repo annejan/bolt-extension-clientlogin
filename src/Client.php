@@ -12,9 +12,6 @@ use League\OAuth2\Client\Provider\ResourceOwnerInterface;
  */
 class Client implements \JsonSerializable
 {
-    /** @var mixed  */
-    public $client = false;
-
     protected $id;
     protected $provider;
     protected $uid;
@@ -168,6 +165,12 @@ class Client implements \JsonSerializable
         return $class;
     }
 
+    /**
+     * Create an instance from password data.
+     *
+     * @param string $userName
+     * @param string $password
+     */
     public static function createPasswordAuth($username, $password)
     {
         $classname = get_called_class();
