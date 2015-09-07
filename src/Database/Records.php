@@ -97,19 +97,24 @@ class Records
      * Delete a single session record.
      *
      * @param string $sessionId
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
     public function deleteSession($sessionId)
     {
         $query = $this->getSessionQuery()
             ->queryDeleteSession()
             ->setParameter(':session', $sessionId);
-        $this->executeQuery($query);
+
+        return $this->executeQuery($query);
     }
 
     /**
      * Delete expired session records.
      *
      * @param string $sessionId
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
     public function deleteSessionsExpired($sessionId)
     {
@@ -117,7 +122,8 @@ class Records
         $query = $this->getSessionQuery()
             ->queryDeleteExpiredSessions()
             ->setParameter(':maxage', date('Y-m-d H:i:s', strtotime("-$maxage days")));
-        $this->executeQuery($query);
+
+        return $this->executeQuery($query);
     }
 
     /**
@@ -129,7 +135,7 @@ class Records
      * @param string $providerdata
      * @param string $sessiondata
      *
-     * @return array|false|null
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
     public function insertProfile($provider, $identifier, $username, $providerdata, $sessiondata)
     {
@@ -153,6 +159,8 @@ class Records
      * @param string $userId
      * @param string $sessionId
      * @param object $token
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
     public function insertSession($userId, $sessionId, $token)
     {
@@ -164,7 +172,8 @@ class Records
                 ':token'      => json_encode($token),
                 ':lastupdate' => date('Y-m-d H:i:s', time()),
             ]);
-        $this->executeQuery($query);
+
+        return $this->executeQuery($query);
     }
 
     /**
@@ -173,6 +182,8 @@ class Records
      * @param string $userId
      * @param string $sessionId
      * @param object $token
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
     public function updateSession($userId, $sessionId, $token)
     {
@@ -184,7 +195,8 @@ class Records
                 ':token'      => json_encode($token),
                 ':lastupdate' => date('Y-m-d H:i:s', time()),
             ]);
-        $this->executeQuery($query);
+
+        return $this->executeQuery($query);
     }
 
     /**
@@ -212,7 +224,7 @@ class Records
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder
      *
-     * @return array|false|null
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
     protected function executeQuery(QueryBuilder $query)
     {
