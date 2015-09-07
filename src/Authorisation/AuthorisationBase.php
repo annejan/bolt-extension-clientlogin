@@ -10,6 +10,7 @@ use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Bolt\Extension\Bolt\ClientLogin\Database\Records;
 
 /**
  * Authorisation control class.
@@ -19,7 +20,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 abstract class AuthorisationBase
 {
     /** @var \Bolt\Application */
-    private $app;
+    protected $app;
+
     /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     private $config;
     /** @var \Symfony\Component\HttpFoundation\Response */
@@ -44,23 +46,9 @@ abstract class AuthorisationBase
      *
      * @return TokenManager
      */
-    public function getTokenManager()
+    protected function getTokenManager()
     {
         return $this->tm;
-    }
-
-    /**
-     * Get the final response object that will be returned to the request.
-     *
-     * @return Response
-     */
-    public function getResponse()
-    {
-        if ($this->response instanceof Response) {
-            return $this->response;
-        }
-
-        throw new \UnexpectedValueException('Invalid reponse object set for ClientLogin session.');
     }
 
     /**
@@ -86,14 +74,9 @@ abstract class AuthorisationBase
         return $token;
     }
 
-    /**
-     * Set a reponse object.
-     *
-     * @param Response
-     */
-    protected function setResponse(Response $response)
+    protected function updateLogin()
     {
-        $this->response = $response;
+        //
     }
 
     /**
@@ -107,6 +90,16 @@ abstract class AuthorisationBase
     }
 
     /**
+     * Get the Records DI.
+     *
+     * @return Records
+     */
+    protected function getRecords()
+    {
+        return $this->app['clientlogin.records'];
+    }
+
+    /**
      * Construct the authorisation URL with query parameters.
      *
      * @param string $providerName
@@ -116,7 +109,7 @@ abstract class AuthorisationBase
     protected function getCallbackUrl($providerName)
     {
         $key = $this->config->get('response_noun');
-        $url = $this->app['resources']->getUrl('rooturl') . $this->getConfig->get('basepath') . "/endpoint?$key=$providerName";
+        $url = $this->app['resources']->getUrl('rooturl') . $this->getConfig()->get('basepath') . "/endpoint?$key=$providerName";
         $this->setDebugMessage("Setting callback URL: $url");
 
         return $url;
@@ -140,7 +133,7 @@ abstract class AuthorisationBase
      *
      * @throws \InvalidArgumentException
      */
-    protected function setFeedback($state, $message)
+    public function setFeedback($state, $message)
     {
         if (empty($state) || !in_array($state, ['error', 'message', 'debug'])) {
             throw new \InvalidArgumentException("Feedback state can only be 'error', 'message', or 'debug'.");
