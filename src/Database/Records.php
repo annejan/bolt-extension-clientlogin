@@ -177,6 +177,33 @@ class Records
     }
 
     /**
+     * Insert a user profile.
+     *
+     * @param string $provider
+     * @param string $identifier
+     * @param string $username
+     * @param string $providerData
+     * @param string $sessionData
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
+     */
+    public function updateProfile($provider, $identifier, $username, $providerData, $sessionData)
+    {
+        $query = $this->getProfileQuery()
+            ->updateSession()
+            ->setParameters([
+                'provider'     => $provider,
+                'identifier'   => $identifier,
+                'username'     => $username,
+                'providerdata' => $providerData,
+                'sessiondata'  => $sessionData,
+                'lastseen'     => date('Y-m-d H:i:s', time()),
+            ]);
+
+        return $this->executeQuery($query);
+    }
+
+    /**
      * Update a session record.
      *
      * @param string $userId
