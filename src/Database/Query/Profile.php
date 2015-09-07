@@ -39,4 +39,19 @@ class Profile extends QueryBase
             ])
         ;
     }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function updateProfile()
+    {
+        return $this->getQueryBuilder()
+            ->update($this->tableName)
+            ->set('providerdata', ':providerdata')
+            ->set('sessiondata', ':sessiondata')
+            ->set('lastseen', ':lastseen')
+            ->where('provider  = :provider')
+            ->andWhere('identifier  = :identifier')
+        ;
+    }
 }
