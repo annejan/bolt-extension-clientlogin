@@ -52,6 +52,20 @@ class Database
     }
 
     /**
+     * Get a profile record by user ID.
+     *
+     * @return array|false|null
+     */
+    public function getProfileByUserId($userId)
+    {
+        $query = $this->getProfileQuery()
+            ->queryFetchByUserId()
+            ->setParameter(':userid', $userId);
+
+        return $this->fetchArray($query);
+    }
+
+    /**
      * Get a session record by session ID.
      *
      * @return array|false|null
@@ -153,7 +167,7 @@ class Database
      */
     protected function getProfileQuery()
     {
-        return new Query\Session($this->db, $this->profileTableName);
+        return new Query\Profile($this->db, $this->profileTableName);
     }
 
     /**
