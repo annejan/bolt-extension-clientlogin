@@ -21,4 +21,22 @@ class Profile extends QueryBase
             ->orderBy('lastseen', 'DESC')
         ;
     }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function insertProfile()
+    {
+        return $this->getQueryBuilder()
+            ->insert($this->tableName)
+            ->values([
+                'provider'     => ':provider',
+                'identifier'   => ':identifier',
+                'username'     => ':username',
+                'providerdata' => ':providerdata',
+                'sessiondata'  => ':sessiondata',
+                'lastseen'     => ':lastseen',
+            ])
+        ;
+    }
 }
