@@ -15,7 +15,7 @@ use Silex\Application;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Database
+class Records
 {
     /** @var \Doctrine\DBAL\Connection */
     protected $db;
