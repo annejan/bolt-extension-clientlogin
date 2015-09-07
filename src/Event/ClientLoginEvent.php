@@ -7,20 +7,19 @@ use Symfony\Component\EventDispatcher\Event;
 
 class ClientLoginEvent extends Event
 {
-    /** @var array The user record */
+    /** @var array User record */
     private $user;
-
-    /** @var string The user profile table name */
-    private $tablename;
+    /** @var string User profile table name */
+    private $tableName;
 
     /**
      * @param Client $user
-     * @param string $tablename
+     * @param string $tableName
      */
-    public function __construct(Client $user, $tablename)
+    public function __construct(Client $user, $tableName)
     {
         $this->user      = $user;
-        $this->tablename = $tablename;
+        $this->tableName = $tableName;
     }
 
     /**
@@ -36,6 +35,6 @@ class ClientLoginEvent extends Event
      */
     public function getTableNameProfiles()
     {
-        return $this->tablename;
+        return $this->tableName;
     }
 }
