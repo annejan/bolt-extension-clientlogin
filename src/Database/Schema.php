@@ -2,6 +2,8 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Database;
 
+use Doctrine\DBAL\Schema\Schema as DbalSchema;
+
 /**
  * ClientLogin database schema
  *
@@ -41,15 +43,17 @@ class Schema
      */
     public function build()
     {
+        $me = $this;
+
         // User/client provider table
         $this->schemaManager->registerExtensionTable(
-            function ($schema) use ($this) {
-                $table = $schema->createTable($this->profileTableName);
+            function (DbalSchema $schema) use ($me) {
+                $table = $schema->createTable($me->profileTableName);
                 $table->addColumn('id',           'integer', ['autoincrement' => true]);
                 $table->addColumn('provider',     'string',  ['length' => 64]);
                 $table->addColumn('identifier',   'string',  ['length' => 128]);
                 $table->addColumn('username',     'string',  ['length' => 64]);
-                $table->addColumn('enabled',      'boolean', []);
+                $table->addColumn('enabled',      'boolean', ['default' => true]);
                 $table->addColumn('providerdata', 'text');
                 $table->addColumn('sessiondata',  'text');
                 $table->addColumn('lastupdate',   'datetime');
@@ -66,8 +70,8 @@ class Schema
 
         // User/client session table
         $this->schemaManager->registerExtensionTable(
-            function ($schema) use ($this) {
-                $table = $schema->createTable($this->sessionTableName);
+            function (DbalSchema $schema) use ($me) {
+                $table = $schema->createTable($me->sessionTableName);
                 $table->addColumn('id',       'integer', ['autoincrement' => true]);
                 $table->addColumn('userid',   'integer');
                 $table->addColumn('session',  'string', ['length' => 64]);
