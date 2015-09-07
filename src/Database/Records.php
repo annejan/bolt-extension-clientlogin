@@ -54,13 +54,17 @@ class Records
     /**
      * Get a profile record by user ID.
      *
+     * @param string $provider
+     * @param string $identifier
+     *
      * @return array|false|null
      */
-    public function getProfileByUserId($userId)
+    public function getProfileByUserId($provider, $identifier)
     {
         $query = $this->getProfileQuery()
             ->queryFetchByUserId()
-            ->setParameter(':userid', $userId);
+            ->setParameter(':provider', $provider)
+            ->setParameter(':identifier', $identifier);
 
         return $this->fetchArray($query);
     }
