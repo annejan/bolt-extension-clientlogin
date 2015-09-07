@@ -147,7 +147,7 @@ class Records
                 'username'     => $username,
                 'providerdata' => $providerData,
                 'sessiondata'  => $sessionData,
-                'lastseen'     => date('Y-m-d H:i:s', time()),
+                'lastupdate'   => date('Y-m-d H:i:s', time()),
             ]);
 
         return $this->executeQuery($query);
@@ -167,10 +167,10 @@ class Records
         $query = $this->getSessionQuery()
             ->insertSession()
             ->setParameters([
-                ':userid'     => $userId,
-                ':session'    => $sessionId,
-                ':token'      => json_encode($token),
-                ':lastupdate' => date('Y-m-d H:i:s', time()),
+                ':userid'   => $userId,
+                ':session'  => $sessionId,
+                ':token'    => json_encode($token),
+                ':lastseen' => date('Y-m-d H:i:s', time()),
             ]);
 
         return $this->executeQuery($query);
@@ -197,7 +197,7 @@ class Records
                 'username'     => $username,
                 'providerdata' => $providerData,
                 'sessiondata'  => $sessionData,
-                'lastseen'     => date('Y-m-d H:i:s', time()),
+                'lastupdate'   => date('Y-m-d H:i:s', time()),
             ]);
 
         return $this->executeQuery($query);
@@ -217,10 +217,10 @@ class Records
         $query = $this->getSessionQuery()
             ->updateSession()
             ->setParameters([
-                ':userid'     => $userId,
-                ':session'    => $sessionId,
-                ':token'      => json_encode($token),
-                ':lastupdate' => date('Y-m-d H:i:s', time()),
+                ':userid'   => $userId,
+                ':session'  => $sessionId,
+                ':token'    => json_encode($token),
+                ':lastseen' => date('Y-m-d H:i:s', time()),
             ]);
 
         return $this->executeQuery($query);

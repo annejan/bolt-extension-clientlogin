@@ -35,7 +35,7 @@ class Profile extends QueryBase
                 'username'     => ':username',
                 'providerdata' => ':providerdata',
                 'sessiondata'  => ':sessiondata',
-                'lastseen'     => ':lastseen',
+                'lastupdate'   => ':lastupdate',
             ])
         ;
     }
@@ -49,7 +49,7 @@ class Profile extends QueryBase
             ->update($this->tableName)
             ->set('providerdata', ':providerdata')
             ->set('sessiondata', ':sessiondata')
-            ->set('lastseen', ':lastseen')
+            ->set('lastupdate', ':lastupdate')
             ->where('provider  = :provider')
             ->andWhere('identifier  = :identifier')
         ;
