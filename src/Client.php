@@ -170,9 +170,6 @@ class Client implements \JsonSerializable
 
     public static function createPasswordAuth($username, $password)
     {
-        $hasher = new PasswordHash(12, true);
-        $password = $hasher->HashPassword($password);
-
         $classname = get_called_class();
         $class = new $classname();
 
