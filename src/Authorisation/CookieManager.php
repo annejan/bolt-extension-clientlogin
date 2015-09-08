@@ -40,8 +40,7 @@ class CookieManager
      */
     public function create($userId, Token $token)
     {
-        $value = $this->random->generateString(32);
-        $cookie = new Cookie('bolt_clientlogin', $value, $token->getExpires(), '/', null, false, false);
+        $cookie = new Cookie('bolt_clientlogin', $token->getSessionId(), $token->getExpires(), '/', null, false, false);
         $this->commit($userId, $cookie, $token);
 
         return $cookie;
@@ -58,7 +57,7 @@ class CookieManager
      */
     public function update($userId, Cookie $cookie, Token $token)
     {
-        $cookie = new Cookie('bolt_clientlogin', $cookie->getValue(), $token->getExpires(), '/', null, false, false);
+        $cookie = new Cookie('bolt_clientlogin', $token->getSessionId(), $token->getExpires(), '/', null, false, false);
         $this->commit($userId, $cookie, $token);
 
         return $cookie;
