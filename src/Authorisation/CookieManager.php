@@ -33,15 +33,16 @@ class CookieManager
     /**
      * Create an authentication cookie.
      *
-     * @param Token $token
+     * @param integer $userId
+     * @param Token   $token
      *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function create(Token $token)
+    public function create($userId, Token $token)
     {
         $value = $this->random->generateString(32);
         $cookie = new Cookie('bolt_clientlogin', $value, $token->getExpires(), '/', null, false, false);
-        $this->commit($cookie, $token);
+        $this->commit($userId, $cookie, $token);
 
         return $cookie;
     }
@@ -49,15 +50,16 @@ class CookieManager
     /**
      * Update an authentication cookie.
      *
-     * @param Cookie $cookie
-     * @param Token $token
+     * @param integer $userId
+     * @param Cookie  $cookie
+     * @param Token   $token
      *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function update(Cookie $cookie, Token $token)
+    public function update($userId, Cookie $cookie, Token $token)
     {
         $cookie = new Cookie('bolt_clientlogin', $cookie->getValue(), $token->getExpires(), '/', null, false, false);
-        $this->commit($cookie, $token);
+        $this->commit($userId, $cookie, $token);
 
         return $cookie;
     }
@@ -66,16 +68,16 @@ class CookieManager
      * Insert/update a session record for an authentication cookie.
      *
      * @param Cookie $cookie
-     * @param Token $token
+     * @param Token  $token
      *
      * @return integer|null
      */
-    protected function commit(Cookie $cookie, Token $token)
+    protected function commit($userId, Cookie $cookie, Token $token)
     {
-        if ($session = $this->records->getSessionBySessionId((string) $cookie)) {
-            return $this->records->updateSession($session['userid'], $cookie->getValue(), $token);
+        if ($this->records->getSessionBySessionId((string) $cookie)) {
+            return $this->records->updateSession($userId, $cookie->getValue(), $token);
         } else {
-            return $this->records->insertSession($session['userid'], $cookie->getValue(), $token);
+            return $this->records->insertSession($userId, $cookie->getValue(), $token);
         }
     }
 }
