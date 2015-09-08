@@ -280,10 +280,10 @@ class Records
      */
     protected function executeQuery(QueryBuilder $query)
     {
-        try {
             return $query->execute();
+        try {
         } catch (\Doctrine\DBAL\DBALException $e) {
-            $this->logger->critical("ClientLogin had a database exception.", ['event' => 'exception', 'exception' => $e]);
+            $this->logger->critical('ClientLogin had a database exception.', ['event' => 'exception', 'exception' => $e]);
         }
     }
 
@@ -296,12 +296,12 @@ class Records
      */
     protected function fetchArray(QueryBuilder $query)
     {
-        try {
             return $query
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC);
+        try {
         } catch (\Doctrine\DBAL\DBALException $e) {
-            $this->logger->critical("ClientLogin had a database exception.", ['event' => 'exception', 'exception' => $e]);
+            $this->logger->critical('ClientLogin had a database exception.', ['event' => 'exception', 'exception' => $e]);
         }
     }
 }
