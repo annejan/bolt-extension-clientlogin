@@ -27,14 +27,16 @@ class Token implements \JsonSerializable
      *
      * @param string  $provider
      * @param string  $resourceOwnerId
+     * @param string  $sessionId
      * @param string  $accessToken
      * @param integer $expires
      * @param string  $refreshToken
      */
-    public function __construct($provider, $resourceOwnerId, $accessToken, $expires, $refreshToken)
+    public function __construct($provider, $resourceOwnerId, $sessionId, $accessToken, $expires, $refreshToken)
     {
         $this->provider = $provider;
         $this->resourceOwnerId = $resourceOwnerId;
+        $this->sessionId = $sessionId;
         $this->accessToken = $accessToken;
         $this->expires = $expires;
         $this->refreshToken = $refreshToken;
@@ -65,6 +67,26 @@ class Token implements \JsonSerializable
     public function hasExpired()
     {
         return $this->expires < time();
+    }
+
+    /**
+     * Update session ID.
+     *
+     * @param string
+     */
+    public function setSessionId($sessionId)
+    {
+        $this->sessionId = sessionId;
+    }
+
+    /**
+     * Returns session ID.
+     *
+     * @return string
+     */
+    public function getSessionId()
+    {
+        return $this->sessionId;
     }
 
     /**
@@ -127,6 +149,7 @@ class Token implements \JsonSerializable
         return [
             'provider'        => $this->provider,
             'resourceOwnerId' => $this->resourceOwnerId,
+            'sessionId'       => $this->sessionId,
             'accessToken'     => $this->accessToken,
             'expires'         => $this->expires,
             'refreshToken'    => $this->refreshToken,
