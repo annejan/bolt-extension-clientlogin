@@ -31,12 +31,12 @@ class Profile extends QueryBase
         return $this->getQueryBuilder()
             ->insert($this->tableName)
             ->values([
-                'provider'     => ':provider',
-                'identifier'   => ':identifier',
-                'username'     => ':username',
-                'providerdata' => ':providerdata',
-                'sessiondata'  => ':sessiondata',
-                'lastupdate'   => ':lastupdate',
+                'provider'      => ':provider',
+                'identifier'    => ':identifier',
+                'username'      => ':username',
+                'providerdata'  => ':providerdata',
+                'providertoken' => ':providertoken',
+                'lastupdate'    => ':lastupdate',
             ])
         ;
     }
@@ -49,7 +49,7 @@ class Profile extends QueryBase
         return $this->getQueryBuilder()
             ->update($this->tableName)
             ->set('providerdata', ':providerdata')
-            ->set('sessiondata', ':sessiondata')
+            ->set('providertoken', ':providertoken')
             ->set('lastupdate', ':lastupdate')
             ->where('provider  = :provider')
             ->andWhere('identifier  = :identifier')
