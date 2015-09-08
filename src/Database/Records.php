@@ -58,7 +58,7 @@ class Records
      * @param string $provider
      * @param string $identifier
      *
-     * @return array|false|null
+     * @return Profile|false
      */
     public function getProfileByUserId($provider, $identifier)
     {
