@@ -55,15 +55,31 @@ class RecordManager
     /**
      * Get a profile record by user ID.
      *
+     * @param string $id
+     *
+     * @return Profile|false
+     */
+    public function getProfileById($id)
+    {
+        $query = $this->getProfileQuery()
+            ->queryFetchById()
+            ->setParameter(':id', $id);
+
+        return Profile::createFromDbRecord($this->fetchArray($query));
+    }
+
+    /**
+     * Get a profile record by provider ID.
+     *
      * @param string $provider
      * @param string $identifier
      *
      * @return Profile|false
      */
-    public function getProfileByUserId($provider, $identifier)
+    public function getProfileByProviderId($provider, $identifier)
     {
         $query = $this->getProfileQuery()
-            ->queryFetchByUserId()
+            ->queryFetchByProviderId()
             ->setParameter(':provider', $provider)
             ->setParameter(':identifier', $identifier);
 

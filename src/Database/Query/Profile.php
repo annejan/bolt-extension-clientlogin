@@ -12,7 +12,20 @@ class Profile extends QueryBase
     /**
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryFetchByUserId()
+    public function queryFetchById()
+    {
+        return $this->getQueryBuilder()
+        ->select('*')
+        ->from($this->tableName)
+        ->where('id = :id')
+        ->orderBy('lastupdate', 'DESC')
+        ;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryFetchByProviderId()
     {
         return $this->getQueryBuilder()
             ->select('*')
