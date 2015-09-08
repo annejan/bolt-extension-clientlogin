@@ -3,7 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Provider;
 
 use Bolt\Extension\Bolt\ClientLogin\Config;
-use Bolt\Extension\Bolt\ClientLogin\Database\Records;
+use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Session;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
@@ -35,7 +35,7 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
 
         $app['clientlogin.records'] = $app->share(
             function ($app) use ($userTable, $sessionTable) {
-                $records = new Records(
+                $records = new RecordManager(
                     $app['db'],
                     $app['clientlogin.config'],
                     $app['logger.system'],

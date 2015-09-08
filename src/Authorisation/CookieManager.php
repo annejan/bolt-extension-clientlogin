@@ -2,7 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
-use Bolt\Extension\Bolt\ClientLogin\Database\Records;
+use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use RandomLib\Generator;
 use Symfony\Component\HttpFoundation\Cookie;
 
@@ -13,16 +13,18 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class CookieManager
 {
+    /** @var RecordManager */
+    protected $records;
     /** @var \RandomLib\Generator */
     protected $random;
 
     /**
      * Constructor.
      *
-     * @param Records   $records
-     * @param Generator $random
+     * @param RecordManager $records
+     * @param Generator     $random
      */
-    public function __construct(Records $records, Generator $random)
+    public function __construct(RecordManager $records, Generator $random)
     {
         $this->records = $records;
         $this->random = $random;
