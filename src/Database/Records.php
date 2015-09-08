@@ -234,6 +234,10 @@ class Records
     /**
      * Get a table name.
      *
+     * @param string $table
+     *
+     * @throws InvalidArgumentException
+     *
      * @return string|null
      */
     public function getTableName($type)
@@ -243,6 +247,8 @@ class Records
         } elseif ($type === 'session') {
             return $this->sessionTableName;
         }
+
+        throw new \InvalidArgumentException('Tinvalid table requested.');
     }
 
     /**
