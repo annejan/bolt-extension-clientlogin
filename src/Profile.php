@@ -34,13 +34,91 @@ class Profile implements \JsonSerializable
     }
 
     /**
-     * Check if the profile is enabled.
-     *
+     * @return string
+     */
+    public function getProvider()
+    {
+        return $this->provider;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUid()
+    {
+        return $this->uid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNickname()
+    {
+        return $this->nickname;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImageUrl()
+    {
+        return $this->imageUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->urls;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
      * @return boolean
      */
     public function isEnabled()
     {
-        return $this->enabled();
+        return $this->enabled;
     }
 
     /**
