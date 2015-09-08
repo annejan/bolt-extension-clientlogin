@@ -77,11 +77,11 @@ class TokenManager
         // Retrive the saved token to make sure that the Session is working properly
         $token = $this->getToken(self::TOKEN_ACCESS);
 
-        if (empty($token)) {
-            throw new \RuntimeException('[ClientLogin] Unable to create a Symfony session token!');
+        if ($token instanceof Token) {
+            return $token;
         }
 
-        return $token;
+        throw new \RuntimeException('[ClientLogin] Unable to create a Symfony session token!');
     }
 
     /**
