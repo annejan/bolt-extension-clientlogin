@@ -147,12 +147,12 @@ class Records
         $query = $this->getProfileQuery()
             ->insertProfile()
             ->setParameters([
-                'provider'     => $provider,
-                'identifier'   => $identifier,
-                'username'     => $username,
-                'providerdata' => json_encode($providerData),
-                'sessiondata'  => json_encode($sessionData),
-                'lastupdate'   => date('Y-m-d H:i:s', time()),
+                'provider'      => $provider,
+                'identifier'    => $identifier,
+                'username'      => $username,
+                'providerdata'  => json_encode($providerData),
+                'providertoken' => json_encode($sessionData),
+                'lastupdate'    => date('Y-m-d H:i:s', time()),
             ]);
 
         return $this->executeQuery($query);
@@ -197,12 +197,12 @@ class Records
         $query = $this->getProfileQuery()
             ->updateSession()
             ->setParameters([
-                'provider'     => $provider,
-                'identifier'   => $identifier,
-                'username'     => $username,
-                'providerdata' => json_encode($providerData),
-                'sessiondata'  => json_encode($sessionData),
-                'lastupdate'   => date('Y-m-d H:i:s', time()),
+                'provider'      => $provider,
+                'identifier'    => $identifier,
+                'username'      => $username,
+                'providerdata'  => json_encode($providerData),
+                'providertoken' => json_encode($sessionData),
+                'lastupdate'    => date('Y-m-d H:i:s', time()),
             ]);
 
         return $this->executeQuery($query);

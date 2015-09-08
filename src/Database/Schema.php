@@ -49,14 +49,14 @@ class Schema
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($me) {
                 $table = $schema->createTable($me->profileTableName);
-                $table->addColumn('id',           'integer', ['autoincrement' => true]);
-                $table->addColumn('provider',     'string',  ['length' => 64]);
-                $table->addColumn('identifier',   'string',  ['length' => 128]);
-                $table->addColumn('username',     'string',  ['length' => 64]);
-                $table->addColumn('enabled',      'boolean', ['default' => true]);
-                $table->addColumn('providerdata', 'text');
-                $table->addColumn('sessiondata',  'text');
-                $table->addColumn('lastupdate',   'datetime');
+                $table->addColumn('id',            'integer', ['autoincrement' => true]);
+                $table->addColumn('provider',      'string',  ['length' => 64]);
+                $table->addColumn('identifier',    'string',  ['length' => 128]);
+                $table->addColumn('username',      'string',  ['length' => 64]);
+                $table->addColumn('enabled',       'boolean', ['default' => true]);
+                $table->addColumn('providerdata',  'text');
+                $table->addColumn('providertoken', 'text');
+                $table->addColumn('lastupdate',    'datetime');
 
                 $table->setPrimaryKey(['id']);
 
