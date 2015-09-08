@@ -61,6 +61,25 @@ class TokenManager
     }
 
     /**
+     * Generate a fresh authentication token.
+     *
+     * @param string  $provider
+     * @param string  $resourceOwnerId
+     * @param string  $sessionId
+     * @param string  $accessToken
+     * @param integer $expires
+     * @param string  $refreshToken
+     *
+     * @return Token
+     */
+    public function generateAuthToken($provider, $resourceOwnerId, $sessionId = null, $accessToken = null, $expires = null, $refreshToken = null)
+    {
+        $sessionId = $sessionId ?: $this->random->generateString(32);
+
+        return new Token($provider, $resourceOwnerId, $sessionId, $accessToken, $expires, $refreshToken);
+    }
+
+    /**
      * Save an authentication token to the session.
      *
      * @param Token $tokenName
