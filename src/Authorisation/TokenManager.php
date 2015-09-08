@@ -47,7 +47,7 @@ class TokenManager
      *
      * @param string $tokenName
      *
-     * @return array|string|null
+     * @return Token|string|null
      */
     public function getToken($tokenName)
     {
@@ -61,42 +61,6 @@ class TokenManager
     }
 
     /**
-     * Save an password authentication token to the session.
-     *
-     * @param array $tokenValue
-     *
-     * @return array
-     */
-    public function setAuthPasswordToken(array $tokenValue)
-    {
-        $this->log->debug('Setting seesion password token.');
-        $tokenData = [
-            'type' => Types::AUTH_PASSWORD,
-            'data' => $tokenValue,
-        ];
-
-        return $this->setAuthToken($tokenData);
-    }
-
-    /**
-     * Save an OAuth authentication token to the session.
-     *
-     * @param AccessToken $tokenValue
-     *
-     * @return array
-     */
-    public function setAuthOAuthToken(AccessToken $tokenValue)
-    {
-        $this->log->debug('Setting seesion OAuth token.');
-        $tokenData = [
-            'type' => Types::AUTH_OAUTH2,
-            'data' => $tokenValue,
-        ];
-
-        return $this->setAuthToken($tokenData);
-    }
-
-    /**
      * Save an authentication token to the session.
      *
      * @param string $tokenName
@@ -105,7 +69,7 @@ class TokenManager
      *
      * @return array
      */
-    protected function setAuthToken($tokenData)
+    public function setAuthToken($tokenData)
     {
         $this->session->set(self::TOKEN_ACCESS, $tokenData);
 
