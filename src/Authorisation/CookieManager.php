@@ -56,7 +56,7 @@ class CookieManager
      */
     public function update(Cookie $cookie, Token $token)
     {
-        $cookie = new Cookie('bolt_clientlogin', (string) $cookie, $token->getExpires(), '/', null, false, false);
+        $cookie = new Cookie('bolt_clientlogin', $cookie->getValue(), $token->getExpires(), '/', null, false, false);
         $this->commit($cookie, $token);
 
         return $cookie;
@@ -73,9 +73,9 @@ class CookieManager
     protected function commit(Cookie $cookie, Token $token)
     {
         if ($session = $this->records->getSessionBySessionId((string) $cookie)) {
-            return $this->records->updateSession($session['userid'], (string) $cookie, $token);
+            return $this->records->updateSession($session['userid'], $cookie->getValue(), $token);
         } else {
-            return $this->records->insertSession($session['userid'], (string) $cookie, $token);
+            return $this->records->insertSession($session['userid'], $cookie->getValue(), $token);
         }
     }
 }
