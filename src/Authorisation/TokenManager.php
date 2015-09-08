@@ -72,6 +72,7 @@ class TokenManager
     public function setAuthToken($tokenData)
     {
         $this->session->set(self::TOKEN_ACCESS, $tokenData);
+        $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_ACCESS, $tokenData));
 
         // Retrive the saved token to make sure that the Session is working properly
         $token = $this->getToken(self::TOKEN_ACCESS);
