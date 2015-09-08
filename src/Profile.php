@@ -110,7 +110,7 @@ class Profile implements \JsonSerializable
      */
     public static function createFromDbRecord($user)
     {
-        if ($user === false) {
+        if (empty($user)) {
             return false;
         }
 
