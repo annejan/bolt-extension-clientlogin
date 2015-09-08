@@ -107,6 +107,8 @@ class Profile implements \JsonSerializable
      * Just… don't… ask… :-/
      *
      * @param array|boolean $user
+     *
+     * @return Profile
      */
     public static function createFromDbRecord($user)
     {
@@ -145,7 +147,7 @@ class Profile implements \JsonSerializable
      * @param string                 $provider
      * @param ResourceOwnerInterface $resourceOwner
      *
-     * @return Client
+     * @return Profile
      */
     public static function createFromResourceOwner($provider, ResourceOwnerInterface $resourceOwner)
     {
@@ -170,6 +172,8 @@ class Profile implements \JsonSerializable
      *
      * @param string $userName
      * @param string $password
+     *
+     * @return Profile
      */
     public static function createPasswordAuth($username, $password)
     {
@@ -192,14 +196,5 @@ class Profile implements \JsonSerializable
         $class->locale      = '';
 
         return $class;
-    }
-
-    /**
-     * Add a password based user data
-     *
-     * @param \stdClass $client
-     */
-    public function addPasswordClient(\stdClass $client)
-    {
     }
 }
