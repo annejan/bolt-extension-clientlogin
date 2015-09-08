@@ -68,6 +68,16 @@ class Token implements \JsonSerializable
     }
 
     /**
+     * Returns the provider of this instance.
+     *
+     * @return string
+     */
+    public function getProvider()
+    {
+        return $this->provider;
+    }
+
+    /**
      * Returns the access token string of this instance.
      *
      * @return string
