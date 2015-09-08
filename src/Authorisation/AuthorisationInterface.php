@@ -2,6 +2,9 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
+use Bolt\Extension\Bolt\ClientLogin\Exception\DisabledProviderException;
+use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
+use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -19,6 +22,9 @@ interface AuthorisationInterface
      * @param Request          $request
      * @param SessionInterface $session
      * @param string           $returnpage
+     *
+     * @throws DisabledProviderException
+     * @throws InvalidAuthorisationRequestException
      *
      * @return Response
      */
