@@ -24,9 +24,7 @@ class RecordManager
     protected $config;
 
     /** @var string */
-    private $profileTableName;
-    /** @var string */
-    private $sessionTableName;
+    private $tableName;
 
     /**
      * Constructor.
@@ -34,22 +32,19 @@ class RecordManager
      * @param Connection      $db
      * @param Config          $config
      * @param LoggerInterface $logger
-     * @param string          $profileTableName
-     * @param string          $sessionTableName
+     * @param string          $tableName
      */
     public function __construct(
         Connection $db,
         Config $config,
         LoggerInterface $logger,
-        $profileTableName,
-        $sessionTableName
+        $tableName
     )
     {
         $this->db = $db;
         $this->config = $config;
         $this->logger = $logger;
-        $this->profileTableName = $profileTableName;
-        $this->sessionTableName = $sessionTableName;
+        $this->tableName;
     }
 
     /**

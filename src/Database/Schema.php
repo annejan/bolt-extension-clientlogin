@@ -14,9 +14,7 @@ class Schema
     /** @var \Bolt\Storage\Database\Schema\Manager */
     private $schemaManager;
     /** @var string */
-    private $profileTableName;
-    /** @var string */
-    private $sessionTableName;
+    private $tableName;
 
     /**
      * Constructor
@@ -28,60 +26,39 @@ class Schema
      * \Bolt\Database\IntegrityChecker
      *
      */
-    public function __construct($schemaManager, $profileTableName, $sessionTableName)
+    public function __construct($schemaManager, $tableName)
     {
         $this->schemaManager = $schemaManager;
-        $this->profileTableName = $profileTableName;
-        $this->sessionTableName = $sessionTableName;
+        $this->tableName = $tableName;
     }
 
     /**
-     * Create/update database tables
-     *
-     * @param string $profileTableName
-     * @param string $sessionTableName
+     * Create/update database table.
      */
     public function build()
     {
-        $me = $this;
+        $tableName = $this->tableName;
 
         // User/client provider table
         $this->schemaManager->registerExtensionTable(
-            function (DbalSchema $schema) use ($me) {
-                $table = $schema->createTable($me->profileTableName);
-                $table->addColumn('id',            'integer', ['autoincrement' => true]);
-                $table->addColumn('provider',      'string',  ['length' => 64]);
-                $table->addColumn('identifier',    'string',  ['length' => 128]);
-                $table->addColumn('username',      'string',  ['length' => 64]);
-                $table->addColumn('enabled',       'boolean', ['default' => true]);
-                $table->addColumn('providerdata',  'text');
-                $table->addColumn('providertoken', 'text');
-                $table->addColumn('lastupdate',    'datetime');
+            function (DbalSchema $schema) use ($tableName) {
+                $table = $schema->createTable($tableName);
+                $table->addColumn('id',                'integer',  ['autoincrement' => true]);
+                $table->addColumn('provider',          'string',   ['length' => 64]);
+                $table->addColumn('resource_owner_id', 'string',   ['length' => 128]);
+                $table->addColumn('access_token',      'string',   ['length' => 128]);
+                $table->addColumn('refresh_token',     'string',   ['notnull' => false, 'default' => null, 'length' => 128, ]);
+                $table->addColumn('expiry',            'datetime', ['notnull' => false, 'default' => null]);
+                $table->addColumn('lastupdate',        'datetime', ['notnull' => false, 'default' => null]);
+                $table->addColumn('providerdata',      'text',     ['notnull' => false, 'default' => null]);
+                $table->addColumn('enabled',           'boolean',  ['default' => true]);
 
                 $table->setPrimaryKey(['id']);
 
                 $table->addIndex(['provider']);
-                $table->addIndex(['identifier']);
-                $table->addIndex(['username']);
-
-                return $table;
-            }
-        );
-
-        // User/client session table
-        $this->schemaManager->registerExtensionTable(
-            function (DbalSchema $schema) use ($me) {
-                $table = $schema->createTable($me->sessionTableName);
-                $table->addColumn('id',       'integer', ['autoincrement' => true]);
-                $table->addColumn('userid',   'integer');
-                $table->addColumn('session',  'string', ['length' => 64]);
-                $table->addColumn('token',    'text',   ['notnull' => false, 'default' => null]);
-                $table->addColumn('lastseen', 'datetime');
-
-                $table->setPrimaryKey(['id']);
-
-                $table->addIndex(['userid']);
-                $table->addIndex(['session']);
+                $table->addIndex(['resource_owner_id']);
+                $table->addIndex(['access_token']);
+                $table->addIndex(['refresh_token']);
 
                 return $table;
             }

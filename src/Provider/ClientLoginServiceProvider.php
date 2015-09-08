@@ -22,8 +22,7 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $tablePrefix = rtrim($app['config']->get('general/database/prefix', 'bolt_'), '_') . '_';
-        $userTable = $tablePrefix . 'client_profiles';
-        $sessionTable = $tablePrefix . 'client_sessions';
+        $app['clientlogin.db.table'] = $tablePrefix . 'clientlogin';
 
         $app['clientlogin.session'] = $app->share(
             function ($app) {
@@ -34,13 +33,12 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
         );
 
         $app['clientlogin.records'] = $app->share(
-            function ($app) use ($userTable, $sessionTable) {
+            function ($app) {
                 $records = new RecordManager(
                     $app['db'],
                     $app['clientlogin.config'],
                     $app['logger.system'],
-                    $userTable,
-                    $sessionTable
+                    $app['clientlogin.db.table']
                 );
 
                 return $records;
@@ -48,11 +46,10 @@ class ClientLoginServiceProvider implements ServiceProviderInterface
         );
 
         $app['clientlogin.db.schema'] = $app->share(
-            function ($app) use ($userTable, $sessionTable) {
+            function ($app) {
                 $schema = new Schema(
                     $app['integritychecker'],
-                    $userTable,
-                    $sessionTable
+                    $app['clientlogin.db.table']
                 );
 
                 return $schema;
