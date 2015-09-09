@@ -2,8 +2,6 @@
 
 class GithubResourceOwner implements ResourceOwnerInterface
 {
-    use ClientLoginTrait;
-
     /**
      * Domain
      *
@@ -76,18 +74,6 @@ class GithubResourceOwner implements ResourceOwnerInterface
     public function getUrl()
     {
         return trim($this->domain.'/'.$this->getNickname()) ?: null;
-    }
-
-    /**
-     * Get resource avatar URL
-     *
-     * @return string|null
-     */
-    public function getImageurl()
-    {
-        if (!empty($this->response['avatar_url'])) {
-            return $this->response['avatar_url'];
-        }
     }
 
     /**

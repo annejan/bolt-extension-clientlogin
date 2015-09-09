@@ -2,7 +2,7 @@
 
 namespace League\OAuth2\Client\Provider;
 
-class GoogleResourceOwner implements ResourceOwnerInterface
+class GoogleUser implements ResourceOwnerInterface
 {
     use ClientLoginTrait;
 
@@ -71,7 +71,7 @@ class GoogleResourceOwner implements ResourceOwnerInterface
      *
      * @return string|null
      */
-    public function getImageurl()
+    public function getAvatar()
     {
         if (!empty($this->response['image']['url'])) {
             return $this->response['image']['url'];
