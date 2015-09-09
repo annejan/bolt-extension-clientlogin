@@ -3,6 +3,8 @@
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
 
 use League\OAuth2\Client\Provider\Instagram as LeagueInstagram;
+use League\OAuth2\Client\Provider\InstagramResourceOwner;
+use League\OAuth2\Client\Token\AccessToken;
 
 /**
  * Instagram provider extension.
@@ -11,4 +13,11 @@ use League\OAuth2\Client\Provider\Instagram as LeagueInstagram;
  */
 class Instagram extends LeagueInstagram
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function createResourceOwner(array $response, AccessToken $token)
+    {
+        return new InstagramResourceOwner($response);
+    }
 }

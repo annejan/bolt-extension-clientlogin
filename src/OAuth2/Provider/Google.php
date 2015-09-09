@@ -3,6 +3,8 @@
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
 
 use League\OAuth2\Client\Provider\Google as LeagueGoogle;
+use League\OAuth2\Client\Provider\GoogleUser;
+use League\OAuth2\Client\Token\AccessToken;
 
 /**
  * Google provider extension.
@@ -33,5 +35,13 @@ class Google extends LeagueGoogle
     public function setHostedDomain($hostedDomain)
     {
         $this->hostedDomain = $hostedDomain;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createResourceOwner(array $response, AccessToken $token)
+    {
+        return new GoogleResourceOwner($response);
     }
 }
