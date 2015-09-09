@@ -24,7 +24,6 @@ class Schema
      * Note that $schemaManager will be either:
      * \Bolt\Storage\Database\Schema\Manager
      * \Bolt\Database\IntegrityChecker
-     *
      */
     public function __construct($schemaManager, $tableName)
     {
