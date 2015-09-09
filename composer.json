@@ -24,10 +24,7 @@
 	"prefer-stable" : true,
 	"autoload" : {
 		"files" : [
-			"init.php",
-			"lib/GuzzleHttp/Guzzle/functions_include.php",
-			"lib/GuzzleHttp/Promise/functions_include.php",
-			"lib/GuzzleHttp/Psr7/functions_include.php"
+			"init.php"
 		],
 		"psr-4" : {
 			"Bolt\\Extension\\Bolt\\ClientLogin\\" : [
@@ -35,13 +32,7 @@
 				"src/"
 			],
 			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
-			"League\\OAuth2\\Client\\" : "lib/League/OAuth2/",
-			"GuzzleHttp\\" : [
-				"lib/GuzzleHttp",
-				"lib/GuzzleHttp/Guzzle",
-				"lib/GuzzleHttp/Promise",
-				"lib/GuzzleHttp/Psr7"
-			]
+			"League\\OAuth2\\Client\\" : "lib/League/OAuth2/"
 		}
 	},
 	"autoload-dev" : {
