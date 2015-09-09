@@ -12,4 +12,16 @@ use League\OAuth2\Client\Provider\GoogleUser as LeagueGoogleResourceOwner;
 class GoogleResourceOwner extends LeagueGoogleResourceOwner
 {
     use ClientLoginTrait;
+
+    /**
+     * Get avatar image URL.
+     *
+     * @return string|null
+     */
+    public function getImageurl()
+    {
+        if (!empty($this->response['image']['url'])) {
+            return $this->response['image']['url'];
+        }
+    }
 }

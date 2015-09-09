@@ -12,4 +12,16 @@ use League\OAuth2\Client\Provider\GithubResourceOwner as LeagueGitHubResourceOwn
 class GitHubResourceOwner extends LeagueGitHubResourceOwner
 {
     use ClientLoginTrait;
+
+    /**
+     * Get resource avatar URL
+     *
+     * @return string|null
+     */
+    public function getImageurl()
+    {
+        if (!empty($this->response['avatar_url'])) {
+            return $this->response['avatar_url'];
+        }
+    }
 }
