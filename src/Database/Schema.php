@@ -48,9 +48,9 @@ class Schema
                 $table->addColumn('resource_owner_id', 'string',   ['length' => 128]);
                 $table->addColumn('access_token',      'string',   ['length' => 128]);
                 $table->addColumn('refresh_token',     'string',   ['notnull' => false, 'default' => null, 'length' => 128, ]);
-                $table->addColumn('expiry',            'datetime', ['notnull' => false, 'default' => null]);
+                $table->addColumn('expires',           'integer',  ['notnull' => false, 'default' => null]);
                 $table->addColumn('lastupdate',        'datetime', ['notnull' => false, 'default' => null]);
-                $table->addColumn('providerdata',      'text',     ['notnull' => false, 'default' => null]);
+                $table->addColumn('resource_owner',    'text',     ['notnull' => false, 'default' => null]);
                 $table->addColumn('enabled',           'boolean',  ['default' => true]);
 
                 $table->setPrimaryKey(['id']);
