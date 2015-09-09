@@ -2,7 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Exception;
 
-class ProviderException extends \Exception
+class InvalidProviderException extends \Exception
 {
     const INVALID_PROVIDER = 'Invalid provider.';
 }
