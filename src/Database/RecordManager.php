@@ -65,10 +65,26 @@ class RecordManager
     }
 
     /**
+     * Get a profile record by access token ID.
+     *
+     * @param string $tokenId
+     *
+     * @return array|false
+     */
+    public function getProfileByAccessToken($tokenId)
+    {
+        $query = $this->getQueriesRead()
+            ->queryFetchByAccessToken()
+            ->setParameter(':access_token', $tokenId);
+
+        return $this->fetchArray($query);
+    }
+
+    /**
      * Get a profile record by provider and resource owner ID.
      *
-     * @param string $id
-     * @param string $id
+     * @param string $provider
+     * @param string $resourceOwnerId
      *
      * @return array|false
      */

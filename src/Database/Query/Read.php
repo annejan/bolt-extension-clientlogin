@@ -25,6 +25,19 @@ class Read extends QueryBase
     /**
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
+    public function queryFetchByAccessToken()
+    {
+        return $this->getQueryBuilder()
+            ->select('*')
+            ->from($this->tableName)
+            ->where('access_token = :access_token')
+            ->orderBy('lastupdate', 'DESC')
+        ;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
     public function queryFetchByResource()
     {
         return $this->getQueryBuilder()
