@@ -19,8 +19,6 @@ namespace League\OAuth2\Client\Provider;
  */
 class GenericResourceOwner implements ResourceOwnerInterface
 {
-    use ClientLoginTrait;
-
     /**
      * @var array
      */

@@ -6,8 +6,6 @@
  */
 class LinkedInResourceOwner extends GenericResourceOwner
 {
-    use ClientLoginTrait;
-
     /**
      * Raw response
      *
