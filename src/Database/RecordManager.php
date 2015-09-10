@@ -7,10 +7,9 @@ use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
-use Silex\Application;
-use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 
 /**
  * Authenticated user record maintenance
@@ -40,8 +39,7 @@ class RecordManager
         Config $config,
         LoggerInterface $logger,
         $tableName
-    )
-    {
+    ) {
         $this->db = $db;
         $this->config = $config;
         $this->logger = $logger;
@@ -152,8 +150,8 @@ class RecordManager
     /**
      * Update a user access token.
      *
-     * @param string                 $provider
-     * @param AccessToken            $accessToken
+     * @param string      $provider
+     * @param AccessToken $accessToken
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
@@ -262,7 +260,7 @@ class RecordManager
      */
     protected function executeQuery(QueryBuilder $query)
     {
-            return $query->execute();
+        return $query->execute();
         try {
         } catch (\Doctrine\DBAL\DBALException $e) {
             $this->logger->critical('ClientLogin had a database exception.', ['event' => 'exception', 'exception' => $e]);
@@ -278,7 +276,7 @@ class RecordManager
      */
     protected function fetchArray(QueryBuilder $query)
     {
-            return $query
+        return $query
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC);
         try {
