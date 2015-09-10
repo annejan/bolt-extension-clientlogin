@@ -11,8 +11,6 @@ use League\OAuth2\Client\Provider\GoogleUser as LeagueGoogleResourceOwner;
  */
 class GoogleResourceOwner extends LeagueGoogleResourceOwner
 {
-    use ClientLoginTrait;
-
     /**
      * Get avatar image URL.
      *

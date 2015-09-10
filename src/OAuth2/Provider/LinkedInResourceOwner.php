@@ -11,5 +11,4 @@ use League\OAuth2\Client\Provider\LinkedInResourceOwner as LeagueLinkedInResourc
  */
 class LinkedInResourceOwner extends LeagueLinkedInResourceOwner
 {
-    use ClientLoginTrait;
 }

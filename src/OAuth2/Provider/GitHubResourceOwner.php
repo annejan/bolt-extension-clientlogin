@@ -11,8 +11,6 @@ use League\OAuth2\Client\Provider\GithubResourceOwner as LeagueGitHubResourceOwn
  */
 class GitHubResourceOwner extends LeagueGitHubResourceOwner
 {
-    use ClientLoginTrait;
-
     /**
      * Get resource avatar URL
      *

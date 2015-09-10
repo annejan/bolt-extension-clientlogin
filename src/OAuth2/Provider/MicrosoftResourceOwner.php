@@ -11,5 +11,4 @@ use Stevenmaguire\OAuth2\Client\Provider\MicrosoftResourceOwner as LeagueMicroso
  */
 class MicrosoftResourceOwner extends LeagueMicrosoftResourceOwner
 {
-    use ClientLoginTrait;
 }

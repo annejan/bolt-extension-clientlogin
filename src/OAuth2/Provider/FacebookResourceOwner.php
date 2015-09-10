@@ -11,5 +11,4 @@ use League\OAuth2\Client\Provider\FacebookUser as LeagueFacebookResourceOwner;
  */
 class FacebookResourceOwner extends LeagueFacebookResourceOwner
 {
-    use ClientLoginTrait;
 }

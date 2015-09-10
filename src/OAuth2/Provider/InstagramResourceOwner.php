@@ -11,5 +11,4 @@ use League\OAuth2\Client\Provider\InstagramResourceOwner as LeagueInstagramResou
  */
 class InstagramResourceOwner extends LeagueInstagramResourceOwner
 {
-    use ClientLoginTrait;
 }
