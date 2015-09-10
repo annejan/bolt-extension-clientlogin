@@ -9,7 +9,7 @@ use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
 
-class ClientLoginServiceProvider implements ServiceProviderInterface
+class ServiceProvider implements ServiceProviderInterface
 {
     /** @var array */
     private $config;

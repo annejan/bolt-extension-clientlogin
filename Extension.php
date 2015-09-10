@@ -40,7 +40,7 @@ class Extension extends BaseExtension
         $this->setConfig();
 
         // Service providers
-        $this->app->register(new Provider\ClientLoginServiceProvider($this->config));
+        $this->app->register(new Provider\ServiceProvider($this->config));
         $this->app['twig']->addExtension(new Twig\ClientLoginExtension($this->app));
 
         // Check & create database tables if required
