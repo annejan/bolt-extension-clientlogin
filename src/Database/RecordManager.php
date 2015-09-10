@@ -174,14 +174,14 @@ class RecordManager
     }
 
     /**
-     * Delete profile record..
+     * Delete profile record.
      *
      * @param string $provider
      * @param string $resourceOwnerId
      *
      * @return array|false
      */
-    public function getProfileByResource($provider, $resourceOwnerId)
+    public function deleteProfileByResource($provider, $resourceOwnerId)
     {
         $query = $this->getQueriesRemove()
             ->queryDelete()
