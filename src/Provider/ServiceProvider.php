@@ -24,14 +24,6 @@ class ServiceProvider implements ServiceProviderInterface
         $tablePrefix = rtrim($app['config']->get('general/database/prefix', 'bolt_'), '_') . '_';
         $app['clientlogin.db.table'] = $tablePrefix . 'clientlogin';
 
-        $app['clientlogin.session'] = $app->share(
-            function ($app) {
-                $session = new Session($app);
-
-                return $session;
-            }
-        );
-
         $app['clientlogin.records'] = $app->share(
             function ($app) {
                 $records = new RecordManager(
