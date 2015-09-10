@@ -45,7 +45,7 @@ class RecordManager
         $this->db = $db;
         $this->config = $config;
         $this->logger = $logger;
-        $this->tableName;
+        $this->tableName = $tableName;
     }
 
     /**
