@@ -36,7 +36,6 @@ class Write extends QueryBase
         return $this->getQueryBuilder()
             ->update($this->tableName)
             ->set('access_token',   ':access_token')
-            ->set('refresh_token',  ':refresh_token')
             ->set('expires',        ':expires')
             ->set('lastupdate',     ':lastupdate')
             ->set('resource_owner', ':resource_owner')
@@ -55,8 +54,23 @@ class Write extends QueryBase
             ->set('access_token',   ':access_token')
             ->set('expires',        ':expires')
             ->set('lastupdate',     ':lastupdate')
-            ->where('provider  = :provider')
-            ->andWhere('resource_owner_id  = :resource_owner_id')
+            ->where('provider = :provider')
+            ->andWhere('resource_owner_id = :resource_owner_id')
+        ;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryUpdateRefreshToken()
+    {
+        return $this->getQueryBuilder()
+            ->update($this->tableName)
+            ->set('refresh_token',  ':refresh_token')
+            ->set('expires',        ':expires')
+            ->set('lastupdate',     ':lastupdate')
+            ->where('provider = :provider')
+            ->andWhere('resource_owner_id = :resource_owner_id')
         ;
     }
 

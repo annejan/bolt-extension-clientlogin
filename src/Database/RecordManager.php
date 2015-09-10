@@ -113,7 +113,7 @@ class RecordManager
             ->queryInsert()
             ->setParameters([
                 'provider'          => $provider,
-                'resource_owner_id' => $accessToken->getResourceOwnerId(),
+                'resource_owner_id' => $resourceOwner->getId(),
                 'access_token'      => (string) $accessToken,
                 'refresh_token'     => $accessToken->getRefreshToken(),
                 'expires'           => $accessToken->getExpires(),
@@ -139,9 +139,8 @@ class RecordManager
             ->queryUpdate()
             ->setParameters([
                 'provider'          => $provider,
-                'resource_owner_id' => $accessToken->getResourceOwnerId(),
+                'resource_owner_id' => $resourceOwner->getId(),
                 'access_token'      => (string) $accessToken,
-                'refresh_token'     => $accessToken->getRefreshToken(),
                 'expires'           => $accessToken->getExpires(),
                 'lastupdate'        => date('Y-m-d H:i:s', time()),
                 'resource_owner'    => json_encode($resourceOwner->toArray()),
@@ -166,6 +165,29 @@ class RecordManager
                 'provider'          => $provider,
                 'resource_owner_id' => $accessToken->getResourceOwnerId(),
                 'access_token'      => (string) $accessToken,
+                'expires'           => $accessToken->getExpires(),
+                'lastupdate'        => date('Y-m-d H:i:s', time()),
+            ]);
+
+        return $this->executeQuery($query);
+    }
+
+    /**
+     * Update a user access token.
+     *
+     * @param string      $provider
+     * @param AccessToken $accessToken
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
+     */
+    public function updateRefreshToken($provider, AccessToken $accessToken)
+    {
+        $query = $this->getQueriesWrite()
+            ->queryUpdateAccessToken()
+            ->setParameters([
+                'provider'          => $provider,
+                'resource_owner_id' => $accessToken->getResourceOwnerId(),
+                'refresh_token'     => $accessToken->getRefreshToken(),
                 'expires'           => $accessToken->getExpires(),
                 'lastupdate'        => date('Y-m-d H:i:s', time()),
             ]);
