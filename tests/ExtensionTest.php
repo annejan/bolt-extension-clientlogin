@@ -43,17 +43,4 @@ class ExtensionTest extends BoltUnitTest
         $this->assertArrayHasKey('debug_mode',    $this->extension->config);
         $this->assertArrayHasKey('response_noun', $this->extension->config);
     }
-
-    public function testCronDaily()
-    {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
-        $command = new CronRunner($this->app);
-        $tester = new CommandTester($command);
-        $tester->execute([]);
-        $result = $tester->getDisplay();
-        $this->assertRegExp('/ClientLogin: Clearing old sessions/', $result);
-    }
 }
