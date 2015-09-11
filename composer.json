@@ -36,10 +36,10 @@
 		}
 	},
 	"autoload-dev" : {
-        "psr-4" : {
-            "Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
-            "Bolt\\Tests\\" : "vendor/bolt/bolt/tests/phpunit/unit/"
-        }
+		"psr-4" : {
+			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
+			"Bolt\\Tests\\" : "vendor/bolt/bolt/tests/phpunit/unit/"
+		}
 	},
 	"extra" : {
 		"branch-alias" : {
