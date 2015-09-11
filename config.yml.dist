@@ -58,4 +58,3 @@ login_expiry: 14
 # Note: This file wil get huge, quickly!
 debug:
   enabled: false
-
