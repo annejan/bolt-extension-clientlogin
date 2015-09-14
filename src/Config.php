@@ -97,6 +97,16 @@ class Config
     }
 
     /**
+     * Check if we're running debug mode.
+     *
+     * @return boolean
+     */
+    public function isDebug()
+    {
+        return (boolean) $this->config['debug']['enabled'];
+    }
+
+    /**
      * Default config options
      *
      * @return array
