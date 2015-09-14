@@ -23,7 +23,6 @@ class ProfileWrite extends QueryBase
                 'provider'          => ':provider',
                 'resource_owner_id' => ':resource_owner_id',
                 'refresh_token'     => ':refresh_token',
-                'expires'           => ':expires',
                 'lastupdate'        => ':lastupdate',
                 'resource_owner'    => ':resource_owner',
             ])
@@ -31,7 +30,6 @@ class ProfileWrite extends QueryBase
                 'provider'          => $provider,
                 'resource_owner_id' => $resourceOwnerId,
                 'refresh_token'     => $accessToken->getRefreshToken(),
-                'expires'           => $accessToken->getExpires(),
                 'lastupdate'        => date('Y-m-d H:i:s', time()),
                 'resource_owner'    => json_encode($resourceOwner->toArray()),
             ])
@@ -54,30 +52,8 @@ class ProfileWrite extends QueryBase
             ->setParameters([
                 'provider'          => $provider,
                 'resource_owner_id' => $resourceOwnerId,
-                'expires'           => $accessToken->getExpires(),
                 'lastupdate'        => date('Y-m-d H:i:s', time()),
                 'resource_owner'    => json_encode($resourceOwner->toArray()),
-            ])
-        ;
-    }
-
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function queryUpdateExpires($provider, $resourceOwnerId, AccessToken $accessToken)
-    {
-        return $this->getQueryBuilder()
-            ->update($this->tableName)
-            ->set('expires',        ':expires')
-            ->set('lastupdate',     ':lastupdate')
-            ->where('provider  = :provider')
-            ->andWhere('resource_owner_id  = :resource_owner_id')
-            ->queryUpdate()
-            ->setParameters([
-                'provider'          => $provider,
-                'resource_owner_id' => $resourceOwnerId,
-                'expires'           => $accessToken->getExpires(),
-                'lastupdate'        => date('Y-m-d H:i:s', time()),
             ])
         ;
     }
