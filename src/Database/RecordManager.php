@@ -107,18 +107,9 @@ class RecordManager
      */
     public function insertProfile($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
-        $query = $this->getProfileQueriesWrite()
-            ->queryInsert()
-            ->setParameters([
-                'provider'          => $provider,
-                'resource_owner_id' => $resourceOwner->getId(),
-//                 'access_token'      => (string) $accessToken,
-                'refresh_token'     => $accessToken->getRefreshToken(),
-                'expires'           => $accessToken->getExpires(),
-                'lastupdate'        => date('Y-m-d H:i:s', time()),
-                'resource_owner'    => json_encode($resourceOwner->toArray()),
-            ]);
-
+        $query = $this->getProfileQueriesWrite()->queryInsert()
+        ;
+// TODO
         return $this->executeQuery($query);
     }
 
@@ -222,9 +213,9 @@ class RecordManager
     }
 
     /**
-     * Get the read query builder.
+     * Get the profile read query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileRead
      */
     protected function getProfileQueriesRead()
     {
@@ -232,9 +223,9 @@ class RecordManager
     }
 
     /**
-     * Get the remove query builder.
+     * Get the profile remove query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileRemove
      */
     protected function getProfileQueriesRemove()
     {
@@ -242,13 +233,43 @@ class RecordManager
     }
 
     /**
-     * Get the write query builder.
+     * Get the profile write query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileWrite
      */
     protected function getProfileQueriesWrite()
     {
         return new Query\ProfileWrite($this->db, $this->tableName);
+    }
+
+    /**
+     * Get the session read query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\SessionRead
+     */
+    protected function getSessionQueriesRead()
+    {
+        return new Query\SessionRead($this->db, $this->tableName . '_sessions');
+    }
+
+    /**
+     * Get the session remove query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\SessionRemove
+     */
+    protected function getSessionQueriesRemove()
+    {
+        return new Query\SessionRemove($this->db, $this->tableName . '_sessions');
+    }
+
+    /**
+     * Get the session write query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\SessionWrite
+     */
+    protected function getSessionQueriesWrite()
+    {
+        return new Query\SessionWrite($this->db, $this->tableName . '_sessions');
     }
 
     /**
