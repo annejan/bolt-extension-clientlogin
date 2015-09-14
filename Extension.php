@@ -50,21 +50,6 @@ class Extension extends BaseExtension
 
         // Scheduled cron listener
         $this->app['dispatcher']->addListener(CronEvents::CRON_DAILY, [$this, 'cronDaily']);
-
-        // Middleware
-        $this->app->before([$this, 'before']);
-    }
-
-    /**
-     * Before middleware
-     */
-    public function before()
-    {
-        // Debug logger
-        if ($this->config['debug_mode']) {
-            $debuglog = $this->app['resources']->getPath('cache') . '/authenticate.log';
-            $this->app['logger.system']->pushHandler(new StreamHandler($debuglog, Logger::DEBUG));
-        }
     }
 
     /**
