@@ -36,9 +36,6 @@ class Extension extends BaseExtension
 
     public function initialize()
     {
-        // Configuration set up
-        $this->setConfig();
-
         // Service providers
         $this->app->register(new Provider\ServiceProvider($this->config));
         $this->app['twig']->addExtension(new Twig\ClientLoginExtension($this->app));
@@ -79,42 +76,5 @@ class Extension extends BaseExtension
     {
         $event->output->writeln("<comment>ClientLogin: Clearing old sessions</comment>");
         $this->app['clientlogin.db']->doRemoveExpiredSessions();
-    }
-
-    /**
-     * Set up config and defaults
-     *
-     * This has evolved from HybridAuth configuration and we need to cope as such
-     */
-    private function setConfig()
-    {
-        // Handle old provider config
-        $providersConfig = [];
-        foreach ($this->config['providers'] as $provider => $values) {
-            // This needs to match the provider class name for OAuth
-            $name = ucwords(strtolower($provider));
-
-            // On/off switch
-            $providersConfig[$name]['enabled'] = $values['enabled'];
-
-            // Keys
-            $providersConfig[$name]['clientId']     = $values['clientId']     ? : $values['keys']['id'];
-            $providersConfig[$name]['clientSecret'] = $values['clientSecret'] ? : $values['keys']['secret'];
-
-            // Scopes
-            if (isset($values['scopes'])) {
-                $providersConfig[$name]['scopes'] = $values['scopes'];
-            } elseif (isset($values['scope']) && !isset($values['scopes'])) {
-                $providersConfig[$name]['scopes'] = explode(' ', $values['scope']);
-            }
-        }
-
-        // Handle old debug parameter
-        if (isset($this->config['debug_mode'])) {
-            $this->config['debug']['enabled'] = (boolean) $this->config['debug_mode'];
-        }
-
-        // Write it all back
-        $this->config['providers'] = $providersConfig;
     }
 }

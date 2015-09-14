@@ -21,6 +21,7 @@ class Config
     public function __construct(array $config)
     {
         $this->config = Arr::mergeRecursiveDistinct($this->getDefaultConfig(), $config);
+        $this->setupProviderConfig();
     }
 
     /**
@@ -132,5 +133,42 @@ class Config
             ],
             'response_noun' => 'authenticate'
         ];
+    }
+
+    /**
+     * Set up config and defaults
+     *
+     * This has evolved from HybridAuth configuration and we need to cope as such
+     */
+    protected function setupProviderConfig()
+    {
+        // Handle old provider config
+        $providersConfig = [];
+        foreach ($this->config['providers'] as $provider => $values) {
+            // This needs to match the provider class name for OAuth
+            $name = ucwords(strtolower($provider));
+
+            // On/off switch
+            $providersConfig[$name]['enabled'] = $values['enabled'];
+
+            // Keys
+            $providersConfig[$name]['clientId']     = $values['clientId']     ? : $values['keys']['id'];
+            $providersConfig[$name]['clientSecret'] = $values['clientSecret'] ? : $values['keys']['secret'];
+
+            // Scopes
+            if (isset($values['scopes'])) {
+                $providersConfig[$name]['scopes'] = $values['scopes'];
+            } elseif (isset($values['scope']) && !isset($values['scopes'])) {
+                $providersConfig[$name]['scopes'] = explode(' ', $values['scope']);
+            }
+        }
+
+        // Handle old debug parameter
+        if (isset($this->config['debug_mode'])) {
+            $this->config['debug']['enabled'] = (boolean) $this->config['debug_mode'];
+        }
+
+        // Write it all back
+        $this->config['providers'] = $providersConfig;
     }
 }
