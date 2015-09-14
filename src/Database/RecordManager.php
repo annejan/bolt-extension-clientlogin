@@ -82,12 +82,9 @@ class RecordManager
      *
      * @return array|false
      */
-    public function getProfileByResource($provider, $resourceOwnerId)
+    public function getProfileByResourceOwnerId($provider, $resourceOwnerId)
     {
-        $query = $this->getProfileQueriesRead()
-            ->queryFetchByResource()
-            ->setParameter(':provider', $provider)
-            ->setParameter(':resource_owner_id', $resourceOwnerId);
+        $query = $this->getProfileQueriesRead()->queryFetchByResourceOwnerId($provider, $resourceOwnerId);
 
         return $this->fetchArray($query);
     }
@@ -180,10 +177,7 @@ class RecordManager
      */
     public function deleteProfileByResource($provider, $resourceOwnerId)
     {
-        $query = $this->getProfileQueriesDelete()
-            ->queryDelete()
-            ->setParameter(':provider', $provider)
-            ->setParameter(':resource_owner_id', $resourceOwnerId);
+        $query = $this->getProfileQueriesDelete()->queryDelete(provider, $resourceOwnerId);
 
         return $this->executeQuery($query);
     }
