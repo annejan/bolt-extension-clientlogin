@@ -68,6 +68,7 @@ class Schema
                 $table->addColumn('provider',          'string',   ['length' => 64]);
                 $table->addColumn('resource_owner_id', 'string',   ['length' => 128]);
                 $table->addColumn('access_token',      'string',   ['length' => 128]);
+                $table->addColumn('access_token_data', 'text',     ['notnull' => false, 'default' => null]);
                 $table->addColumn('expires',           'integer',  ['notnull' => false, 'default' => null]);
 
                 $table->setPrimaryKey(['id']);
