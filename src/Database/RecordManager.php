@@ -55,9 +55,7 @@ class RecordManager
      */
     public function getProfileById($id)
     {
-        $query = $this->getProfileQueriesRead()
-            ->queryFetchById()
-            ->setParameter(':id', $id);
+        $query = $this->getProfileQueriesRead()->queryFetchById($id);
 
         return $this->fetchArray($query);
     }
@@ -69,11 +67,9 @@ class RecordManager
      *
      * @return array|false
      */
-    public function getProfileByAccessToken($tokenId)
+    public function getProfileByResourceOwnerId($provider, $resourceOwnerId)
     {
-        $query = $this->getProfileQueriesRead()
-            ->queryFetchByAccessToken()
-            ->setParameter(':access_token', $tokenId);
+        $query = $this->getProfileQueriesRead()->queryFetchByResourceOwnerId($provider, $resourceOwnerId);
 
         return $this->fetchArray($query);
     }
@@ -107,9 +103,8 @@ class RecordManager
      */
     public function insertProfile($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
-        $query = $this->getProfileQueriesWrite()->queryInsert()
-        ;
-// TODO
+        $query = $this->getProfileQueriesWrite()->queryInsert($provider, $resourceOwner->getId(), $accessToken, $resourceOwner);
+
         return $this->executeQuery($query);
     }
 
@@ -124,16 +119,7 @@ class RecordManager
      */
     public function updateProfile($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
-        $query = $this->getProfileQueriesWrite()
-            ->queryUpdate()
-            ->setParameters([
-                'provider'          => $provider,
-                'resource_owner_id' => $resourceOwner->getId(),
-                'access_token'      => (string) $accessToken,
-                'expires'           => $accessToken->getExpires(),
-                'lastupdate'        => date('Y-m-d H:i:s', time()),
-                'resource_owner'    => json_encode($resourceOwner->toArray()),
-            ]);
+        $query = $this->getProfileQueriesWrite()->queryUpdate($provider, $resourceOwner->getId(), $accessToken, $resourceOwner);
 
         return $this->executeQuery($query);
     }
@@ -194,7 +180,7 @@ class RecordManager
      */
     public function deleteProfileByResource($provider, $resourceOwnerId)
     {
-        $query = $this->getProfileQueriesRemove()
+        $query = $this->getProfileQueriesDelete()
             ->queryDelete()
             ->setParameter(':provider', $provider)
             ->setParameter(':resource_owner_id', $resourceOwnerId);
@@ -225,11 +211,11 @@ class RecordManager
     /**
      * Get the profile remove query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileRemove
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileDelete
      */
-    protected function getProfileQueriesRemove()
+    protected function getProfileQueriesDelete()
     {
-        return new Query\ProfileRemove($this->db, $this->tableName);
+        return new Query\ProfileDelete($this->db, $this->tableName);
     }
 
     /**
@@ -255,11 +241,11 @@ class RecordManager
     /**
      * Get the session remove query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\SessionRemove
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\SessionDelete
      */
-    protected function getSessionQueriesRemove()
+    protected function getSessionQueriesDelete()
     {
-        return new Query\SessionRemove($this->db, $this->tableName . '_sessions');
+        return new Query\SessionDelete($this->db, $this->tableName . '_sessions');
     }
 
     /**
