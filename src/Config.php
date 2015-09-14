@@ -106,8 +106,8 @@ class Config
         $options = [
             'enabled' => false,
             'keys' => [
-                'id' => null,
-                'secret' => null
+                'clientId'     => null,
+                'clientSecret' => null
             ],
             'scopes' => []
         ];
@@ -153,8 +153,8 @@ class Config
             $providersConfig[$name]['enabled'] = $values['enabled'];
 
             // Keys
-            $providersConfig[$name]['clientId']     = $values['keys']['clientId']     ? : $values['keys']['id'];
-            $providersConfig[$name]['clientSecret'] = $values['keys']['clientSecret'] ? : $values['keys']['secret'];
+            $providersConfig[$name]['clientId']     = isset($values['keys']['id']) ? $values['keys']['id'] : $values['keys']['clientId'];
+            $providersConfig[$name]['clientSecret'] = isset($values['keys']['secret']) ? $values['keys']['secret'] : $values['keys']['clientSecret'];
 
             // Scopes
             if (isset($values['scopes'])) {
