@@ -2,6 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Bolt\Helpers\Arr;
 /**
  * Configuration provider.
  *
@@ -19,7 +20,7 @@ class Config
      */
     public function __construct(array $config)
     {
-        $this->config = $config;
+        $this->config = Arr::mergeRecursiveDistinct($this->getDefaultConfig(), $config);
     }
 
     /**
@@ -91,5 +92,45 @@ class Config
     public function getTemplate($key)
     {
         return isset($this->config['template'][$key]) ? $this->config['template'][$key] : null;
+    }
+
+    /**
+     * Default config options
+     *
+     * @return array
+     */
+    protected function getDefaultConfig()
+    {
+        $options = [
+            'enabled' => false,
+            'keys' => [
+                'id' => null,
+                'secret' => null
+            ],
+            'scopes' => []
+        ];
+
+        return [
+            'providers' => [
+                'Password' => $options,
+                'Google'   => $options,
+                'Facebook' => $options,
+                'Twitter'  => $options,
+                'GitHub'   => $options,
+            ],
+            'basepath' => 'authenticate',
+            'template' => [
+                'profile'         => '_profile.twig',
+                'button'          => '_button.twig',
+                'password'        => '_password.twig',
+                'password_parent' => 'password.twig'
+            ],
+            'zocial'        => false,
+            'login_expiry'  => 14,
+            'debug'         => [
+                'enabled' => false,
+            ],
+            'response_noun' => 'authenticate'
+        ];
     }
 }

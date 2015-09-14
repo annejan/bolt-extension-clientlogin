@@ -117,45 +117,4 @@ class Extension extends BaseExtension
         // Write it all back
         $this->config['providers'] = $providersConfig;
     }
-
-    /**
-     * Default config options
-     *
-     * @return array
-     */
-    protected function getDefaultConfig()
-    {
-        return [
-            'providers' => [
-                'Password' => [
-                    'enabled' => false
-                ],
-                'Google' => [
-                    'enabled' => false
-                ],
-                'Facebook' => [
-                    'enabled' => false
-                ],
-                'Twitter' => [
-                    'enabled' => false
-                ],
-                'GitHub' => [
-                    'enabled' => false
-                ]
-            ],
-            'basepath' => 'authenticate',
-            'template' => [
-                'profile'         => '_profile.twig',
-                'button'          => '_button.twig',
-                'password'        => '_password.twig',
-                'password_parent' => 'password.twig'
-            ],
-            'zocial'        => false,
-            'login_expiry'  => 14,
-            'debug'         => [
-                'enabled' => false,
-            ],
-            'response_noun' => 'hauth.done'
-        ];
-    }
 }
