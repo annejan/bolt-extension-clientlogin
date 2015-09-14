@@ -20,7 +20,8 @@ class Config
      */
     public function __construct(array $config)
     {
-        $this->config = Arr::mergeRecursiveDistinct($this->getDefaultConfig(), $config);
+        $default = $this->getDefaultConfig();
+        $this->config = Arr::mergeRecursiveDistinct($default, $config);
         $this->setupProviderConfig();
     }
 
@@ -126,9 +127,9 @@ class Config
                 'password'        => '_password.twig',
                 'password_parent' => 'password.twig'
             ],
-            'zocial'        => false,
-            'login_expiry'  => 14,
-            'debug'         => [
+            'zocial'       => false,
+            'login_expiry' => 14,
+            'debug'        => [
                 'enabled' => false,
             ],
             'response_noun' => 'authenticate'
@@ -152,8 +153,8 @@ class Config
             $providersConfig[$name]['enabled'] = $values['enabled'];
 
             // Keys
-            $providersConfig[$name]['clientId']     = $values['clientId']     ? : $values['keys']['id'];
-            $providersConfig[$name]['clientSecret'] = $values['clientSecret'] ? : $values['keys']['secret'];
+            $providersConfig[$name]['clientId']     = $values['keys']['clientId']     ? : $values['keys']['id'];
+            $providersConfig[$name]['clientSecret'] = $values['keys']['clientSecret'] ? : $values['keys']['secret'];
 
             // Scopes
             if (isset($values['scopes'])) {
