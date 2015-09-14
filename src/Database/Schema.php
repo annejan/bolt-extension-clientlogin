@@ -42,12 +42,10 @@ class Schema
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($tableName) {
                 $table = $schema->createTable($tableName);
-                $table->addColumn('id',                'integer',  ['autoincrement' => true]);
+                $table->addColumn('id',                'guid',     []);
                 $table->addColumn('provider',          'string',   ['length' => 64]);
                 $table->addColumn('resource_owner_id', 'string',   ['length' => 128]);
-                $table->addColumn('access_token',      'string',   ['length' => 128]);
                 $table->addColumn('refresh_token',     'string',   ['notnull' => false, 'default' => null, 'length' => 128, ]);
-                $table->addColumn('expires',           'integer',  ['notnull' => false, 'default' => null]);
                 $table->addColumn('lastupdate',        'datetime', ['notnull' => false, 'default' => null]);
                 $table->addColumn('resource_owner',    'text',     ['notnull' => false, 'default' => null]);
                 $table->addColumn('enabled',           'boolean',  ['default' => true]);
@@ -56,8 +54,27 @@ class Schema
 
                 $table->addIndex(['provider']);
                 $table->addIndex(['resource_owner_id']);
-                $table->addIndex(['access_token']);
                 $table->addIndex(['refresh_token']);
+
+                return $table;
+            }
+        );
+
+        // User/client provider table
+        $this->schemaManager->registerExtensionTable(
+            function (DbalSchema $schema) use ($tableName) {
+                $table = $schema->createTable($tableName . '_tokens');
+                $table->addColumn('id',                'integer',  ['autoincrement' => true]);
+                $table->addColumn('provider',          'string',   ['length' => 64]);
+                $table->addColumn('resource_owner_id', 'string',   ['length' => 128]);
+                $table->addColumn('access_token',      'string',   ['length' => 128]);
+                $table->addColumn('expires',           'integer',  ['notnull' => false, 'default' => null]);
+
+                $table->setPrimaryKey(['id']);
+
+                $table->addIndex(['provider']);
+                $table->addIndex(['resource_owner_id']);
+                $table->addIndex(['access_token']);
 
                 return $table;
             }
