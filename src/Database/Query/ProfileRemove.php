@@ -7,7 +7,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Database\Query;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Remove extends QueryBase
+class ProfileRemove extends QueryBase
 {
     /**
      * @return \Doctrine\DBAL\Query\QueryBuilder

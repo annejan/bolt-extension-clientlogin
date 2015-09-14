@@ -55,7 +55,7 @@ class RecordManager
      */
     public function getProfileById($id)
     {
-        $query = $this->getQueriesRead()
+        $query = $this->getProfileQueriesRead()
             ->queryFetchById()
             ->setParameter(':id', $id);
 
@@ -71,7 +71,7 @@ class RecordManager
      */
     public function getProfileByAccessToken($tokenId)
     {
-        $query = $this->getQueriesRead()
+        $query = $this->getProfileQueriesRead()
             ->queryFetchByAccessToken()
             ->setParameter(':access_token', $tokenId);
 
@@ -88,7 +88,7 @@ class RecordManager
      */
     public function getProfileByResource($provider, $resourceOwnerId)
     {
-        $query = $this->getQueriesRead()
+        $query = $this->getProfileQueriesRead()
             ->queryFetchByResource()
             ->setParameter(':provider', $provider)
             ->setParameter(':resource_owner_id', $resourceOwnerId);
@@ -107,12 +107,12 @@ class RecordManager
      */
     public function insertProfile($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
-        $query = $this->getQueriesWrite()
+        $query = $this->getProfileQueriesWrite()
             ->queryInsert()
             ->setParameters([
                 'provider'          => $provider,
                 'resource_owner_id' => $resourceOwner->getId(),
-                'access_token'      => (string) $accessToken,
+//                 'access_token'      => (string) $accessToken,
                 'refresh_token'     => $accessToken->getRefreshToken(),
                 'expires'           => $accessToken->getExpires(),
                 'lastupdate'        => date('Y-m-d H:i:s', time()),
@@ -133,7 +133,7 @@ class RecordManager
      */
     public function updateProfile($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
-        $query = $this->getQueriesWrite()
+        $query = $this->getProfileQueriesWrite()
             ->queryUpdate()
             ->setParameters([
                 'provider'          => $provider,
@@ -157,7 +157,7 @@ class RecordManager
      */
     public function updateAccessToken($provider, AccessToken $accessToken)
     {
-        $query = $this->getQueriesWrite()
+        $query = $this->getProfileQueriesWrite()
             ->queryUpdateAccessToken()
             ->setParameters([
                 'provider'          => $provider,
@@ -180,7 +180,7 @@ class RecordManager
      */
     public function updateRefreshToken($provider, AccessToken $accessToken)
     {
-        $query = $this->getQueriesWrite()
+        $query = $this->getProfileQueriesWrite()
             ->queryUpdateAccessToken()
             ->setParameters([
                 'provider'          => $provider,
@@ -203,7 +203,7 @@ class RecordManager
      */
     public function deleteProfileByResource($provider, $resourceOwnerId)
     {
-        $query = $this->getQueriesRemove()
+        $query = $this->getProfileQueriesRemove()
             ->queryDelete()
             ->setParameter(':provider', $provider)
             ->setParameter(':resource_owner_id', $resourceOwnerId);
@@ -226,9 +226,9 @@ class RecordManager
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
      */
-    protected function getQueriesRead()
+    protected function getProfileQueriesRead()
     {
-        return new Query\Read($this->db, $this->tableName);
+        return new Query\ProfileRead($this->db, $this->tableName);
     }
 
     /**
@@ -236,9 +236,9 @@ class RecordManager
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
      */
-    protected function getQueriesRemove()
+    protected function getProfileQueriesRemove()
     {
-        return new Query\Remove($this->db, $this->tableName);
+        return new Query\ProfileRemove($this->db, $this->tableName);
     }
 
     /**
@@ -246,9 +246,9 @@ class RecordManager
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\Profile
      */
-    protected function getQueriesWrite()
+    protected function getProfileQueriesWrite()
     {
-        return new Query\Write($this->db, $this->tableName);
+        return new Query\ProfileWrite($this->db, $this->tableName);
     }
 
     /**

@@ -7,7 +7,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Database\Query;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Read extends QueryBase
+class ProfileRead extends QueryBase
 {
     /**
      * @return \Doctrine\DBAL\Query\QueryBuilder
