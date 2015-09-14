@@ -15,7 +15,7 @@ class ProfileWrite extends QueryBase
     /**
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryInsert($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    public function queryInsert($provider, $resourceOwnerId, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         return $this->getQueryBuilder()
             ->insert($this->tableName)
@@ -29,7 +29,7 @@ class ProfileWrite extends QueryBase
             ])
             ->setParameters([
                 'provider'          => $provider,
-                'resource_owner_id' => $resourceOwner->getId(),
+                'resource_owner_id' => $resourceOwnerId,
                 'refresh_token'     => $accessToken->getRefreshToken(),
                 'expires'           => $accessToken->getExpires(),
                 'lastupdate'        => date('Y-m-d H:i:s', time()),
@@ -41,7 +41,7 @@ class ProfileWrite extends QueryBase
     /**
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryUpdate($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    public function queryUpdate($provider, $resourceOwnerId, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         return $this->getQueryBuilder()
             ->update($this->tableName)
@@ -53,8 +53,50 @@ class ProfileWrite extends QueryBase
             ->queryUpdate()
             ->setParameters([
                 'provider'          => $provider,
-                'resource_owner_id' => $resourceOwner->getId(),
+                'resource_owner_id' => $resourceOwnerId,
                 'expires'           => $accessToken->getExpires(),
+                'lastupdate'        => date('Y-m-d H:i:s', time()),
+                'resource_owner'    => json_encode($resourceOwner->toArray()),
+            ])
+        ;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryUpdateExpires($provider, $resourceOwnerId, AccessToken $accessToken)
+    {
+        return $this->getQueryBuilder()
+            ->update($this->tableName)
+            ->set('expires',        ':expires')
+            ->set('lastupdate',     ':lastupdate')
+            ->where('provider  = :provider')
+            ->andWhere('resource_owner_id  = :resource_owner_id')
+            ->queryUpdate()
+            ->setParameters([
+                'provider'          => $provider,
+                'resource_owner_id' => $resourceOwnerId,
+                'expires'           => $accessToken->getExpires(),
+                'lastupdate'        => date('Y-m-d H:i:s', time()),
+            ])
+        ;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function queryUpdateResourceOwner($provider, $resourceOwnerId, ResourceOwnerInterface $resourceOwner)
+    {
+        return $this->getQueryBuilder()
+            ->update($this->tableName)
+            ->set('lastupdate',     ':lastupdate')
+            ->set('resource_owner', ':resource_owner')
+            ->where('provider  = :provider')
+            ->andWhere('resource_owner_id  = :resource_owner_id')
+            ->queryUpdate()
+            ->setParameters([
+                'provider'          => $provider,
+                'resource_owner_id' => $resourceOwnerId,
                 'lastupdate'        => date('Y-m-d H:i:s', time()),
                 'resource_owner'    => json_encode($resourceOwner->toArray()),
             ])
@@ -66,7 +108,7 @@ class ProfileWrite extends QueryBase
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function querySetEnable($enable)
+    public function querySetEnable($provider, $resourceOwnerId, $enable)
     {
         return $this->getQueryBuilder()
             ->update($this->tableName)
