@@ -23,7 +23,6 @@ class SessionRead extends QueryBase
             ->from($this->tableNameTokens, 's')
             ->innerJoin('s', $this->tableName, 'p', 's.guid = p.guid')
             ->where('p.guid  = :guid')
-            ->orderBy('expires', 'DESC')
             ->setParameter(':guid', $guid)
         ;
     }
@@ -42,7 +41,6 @@ class SessionRead extends QueryBase
             ->from($this->tableNameTokens, 's')
             ->innerJoin('s', $this->tableName, 'p', 's.guid = p.guid')
             ->where('s.token  = :token')
-            ->orderBy('expires', 'DESC')
             ->setParameter(':token', $cookie)
         ;
     }

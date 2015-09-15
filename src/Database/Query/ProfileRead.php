@@ -41,7 +41,6 @@ class ProfileRead extends QueryBase
             ->from($this->tableName)
             ->where('provider = :provider')
             ->andWhere('resource_owner_id = :resource_owner_id')
-            ->orderBy('lastupdate', 'DESC')
             ->setParameter(':provider', $provider)
             ->setParameter(':resource_owner_id', $resourceOwnerId)
         ;
