@@ -12,6 +12,8 @@ class SessionRead extends QueryBase
     /**
      * Query to fetch a session based on access token.
      *
+     * @param string $cookie
+     *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     public function queryFetchByAccessToken($cookie)
