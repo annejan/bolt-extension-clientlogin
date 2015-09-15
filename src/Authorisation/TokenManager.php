@@ -52,9 +52,9 @@ class TokenManager
     public function getToken($tokenName)
     {
         if ($token = $this->session->get($tokenName)) {
-            $this->log->debug("Retrieved '$tokenName' token. Value: '$token'.");
+            $this->log->debug("Retrieved '$tokenName' token. Value: '$token'.", ['event' => 'extensions']);
         } else {
-            $this->log->debug("Token '$tokenName' does not exist.");
+            $this->log->debug("Token '$tokenName' does not exist.", ['event' => 'extensions']);
         }
 
         return $token;
@@ -91,7 +91,7 @@ class TokenManager
     public function setAuthToken(Token $tokenData)
     {
         $this->session->set(self::TOKEN_ACCESS, $tokenData);
-        $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_ACCESS, (string) $tokenData));
+        $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_ACCESS, (string) $tokenData), ['event' => 'extensions']);
 
         // Retrive the saved token to make sure that the Session is working properly
         $token = $this->getToken(self::TOKEN_ACCESS);
@@ -106,15 +106,14 @@ class TokenManager
     /**
      * Save a state token to the session.
      *
+     * @param $string
+     *
      * @return string
      */
-    public function setStateToken()
+    public function setStateToken($state)
     {
-        // Create a unique token
-        $token = $this->random->generateString(32);
-
-        $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_STATE, $token));
-        $this->session->set(self::TOKEN_STATE, $token);
+        $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_STATE, $state), ['event' => 'extensions']);
+        $this->session->set(self::TOKEN_STATE, $state);
 
         // Retrive the saved token to make sure that the Session is working properly
         $token = $this->getToken(self::TOKEN_STATE);
@@ -139,7 +138,7 @@ class TokenManager
     {
         $state = $request->get('state');
         if ($state === null) {
-            $this->log->error('Authorisation request was missing state token.');
+            $this->log->error('Authorisation request was missing state token.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Invalid authorisation request!');
         }
 
@@ -150,7 +149,7 @@ class TokenManager
         $this->removeToken(self::TOKEN_STATE);
 
         if (empty($stateToken) || $stateToken !== $state) {
-            $this->log->error("Mismatch of state token '$state' against saved '$stateToken'");
+            $this->log->error("Mismatch of state token '$state' against saved '$stateToken'", ['event' => 'extensions']);
 
             return false;
         }
@@ -165,7 +164,7 @@ class TokenManager
      */
     public function removeToken($tokenName)
     {
-        $this->log->debug("Clearing '$tokenName' token.");
+        $this->log->debug("Clearing '$tokenName' token.", ['event' => 'extensions']);
         $this->session->remove($tokenName);
     }
 }
