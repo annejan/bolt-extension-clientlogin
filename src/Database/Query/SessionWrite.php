@@ -20,20 +20,20 @@ class SessionWrite extends QueryBase
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryInsert($provider, $resourceOwnerId, AccessToken $accessToken)
+    public function queryInsert($guid, AccessToken $accessToken)
     {
         return $this->getQueryBuilder()
             ->insert($this->tableName)
             ->values([
-                'provider'          => ':provider',
-                'resource_owner_id' => ':resource_owner_id',
+                'guid'              => ':guid',
                 'access_token'      => ':access_token',
                 'access_token_data' => ':access_token_data',
                 'expires'           => ':expires',
             ])
             ->setParameters([
-                'provider'          => $provider,
-                'resource_owner_id' => $resourceOwnerId,
+                'uid'               => $guid,
+                'access_token'      => (string) $accessToken,
+                'access_token_data' => json_encode($accessToken),
                 'expires'           => $accessToken->getExpires(),
             ])
         ;
@@ -42,25 +42,23 @@ class SessionWrite extends QueryBase
     /**
      * Update a session record.
      *
-     * @param string      $provider
+     * @param string      $guid
      * @param string      $resourceOwnerId
      * @param AccessToken $accessToken
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryUpdate($provider, $resourceOwnerId, AccessToken $accessToken)
+    public function queryUpdate($id, $resourceOwnerId, AccessToken $accessToken)
     {
         return $this->getQueryBuilder()
             ->update($this->tableName)
             ->set('access_token', ':access_token')
             ->set('access_token_data', ':access_token_data')
             ->set('expires', ':expires')
-            ->where('provider  = :provider')
-            ->andWhere('resource_owner_id  = :resource_owner_id')
+            ->where('id  = :id')
             ->queryUpdate()
             ->setParameters([
-                'provider'          => $provider,
-                'resource_owner_id' => $resourceOwnerId,
+                'id'                => $id,
                 'access_token'      => (string) $accessToken,
                 'access_token_data' => json_encode($accessToken),
                 'expires'           => $accessToken->getExpires(),
