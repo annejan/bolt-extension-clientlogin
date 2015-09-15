@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin;
+namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Psr\Log\LoggerInterface;
@@ -52,7 +52,7 @@ class Session
             return false;
         }
 
-        $profile = $this->getRecordManager()->getProfileByAccessToken($cookie);
+        $profile = $this->getRecordManager()->queryFetchByAccessToken($cookie);
         if (!$profile) {
             // We shouldn't have a cookie that doesn't have a profile
             $this->setDebugMessage(sprintf('Cookie "%s" found in isLoggedIn() check, but no matching profile!', $cookie));
