@@ -198,39 +198,6 @@ class Remote extends HandlerBase implements HandlerInterface
     }
 
     /**
-     *
-     * @param string $providerName
-     *
-     * @throws Exception\InvalidProviderException
-     *
-     * @return AbstractProvider
-     */
-    protected function getProvider()
-    {
-        if ($this->provider !== null) {
-            return $this->provider;
-        }
-
-        if ($this->providerName === null) {
-            throw new \RuntimeException('The function getProvider() called before setProviderName()');
-        }
-
-        $this->setDebugMessage("Creating provider $this->providerName");
-
-        /** @var \League\OAuth2\Client\Provider\AbstractProvider $providerClass */
-        $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $this->providerName;
-
-        if (!class_exists($providerClass)) {
-            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
-        }
-
-        $options = $this->getProviderOptions($this->providerName);
-        $collaborators = ['httpClient' => new \GuzzleHttp\Client()];
-
-        return $this->provider = new $providerClass($options, $collaborators);
-    }
-
-    /**
      * Get a corrected provider name form a request
      *
      * @param Request $request
