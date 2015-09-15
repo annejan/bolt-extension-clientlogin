@@ -10,9 +10,10 @@ use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
+use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
-use League\OAuth2\Client\Token\AccessToken;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Authorisation control class.
@@ -36,8 +37,12 @@ abstract class HandlerBase
     /**
      * @param Application $app
      */
-    public function __construct(Application $app)
+    public function __construct(Application $app, RequestStack $requestStack)
     {
+        if (!$request = $requestStack->getCurrentRequest()) {
+            throw new Exception\ConfigurationException(sprintf('%s can not be instated outside of the request cycle.'));
+        }
+
         $this->app    = $app;
         $this->config = $app['clientlogin.config'];
         $this->tm     = new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
