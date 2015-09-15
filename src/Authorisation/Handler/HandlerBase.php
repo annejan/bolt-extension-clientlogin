@@ -1,23 +1,25 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
+namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Application;
-use Bolt\Extension\Bolt\ClientLogin\Client;
 use Bolt\Extension\Bolt\ClientLogin\Config;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\CookieManager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
+use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
-use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
-use Symfony\Component\HttpFoundation\Response;
+use Bolt\Extension\Bolt\ClientLogin\Exception;
+use Bolt\Extension\Bolt\ClientLogin\Profile;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Bolt\Extension\Bolt\ClientLogin\Database\Records;
+use League\OAuth2\Client\Token\AccessToken;
 
 /**
  * Authorisation control class.
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-abstract class AuthorisationBase
+abstract class HandlerBase
 {
     /** @var \Bolt\Application */
     protected $app;
@@ -41,39 +43,6 @@ abstract class AuthorisationBase
         $this->tm     = new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
     }
 
-    /**
-     * Get the token manager instance.
-     *
-     * @return TokenManager
-     */
-    protected function getTokenManager()
-    {
-        return $this->tm;
-    }
-
-    /**
-     * Check if a visitor is logged in by session token.
-     *
-     * If session token doesn't exist we assume the user is not logged in.
-     *
-     * If session token has expired we also return a false.
-     *
-     * @param Request $request
-     *
-     * @return boolean|array
-     */
-    protected function isLoggedIn(Request $request)
-    {
-        $token = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
-        if ($token === null) {
-            $this->setDebugMessage('No token for ' .  TokenManager::TOKEN_ACCESS);
-
-            return false;
-        }
-
-        return $token;
-    }
-
     protected function updateLogin()
     {
         //
@@ -90,13 +59,33 @@ abstract class AuthorisationBase
     }
 
     /**
-     * Get the Records DI.
+     * Get the token manager instance.
      *
-     * @return Records
+     * @return CookieManager
      */
-    protected function getRecords()
+    protected function getCookieManager()
+    {
+        return new CookieManager($this->getRecordManager(), $this->app['randomgenerator'], $this->app['resources']);
+    }
+
+    /**
+     * Get the RecordManager DI.
+     *
+     * @return RecordManager
+     */
+    protected function getRecordManager()
     {
         return $this->app['clientlogin.records'];
+    }
+
+    /**
+     * Get the token manager instance.
+     *
+     * @return TokenManager
+     */
+    protected function getTokenManager()
+    {
+        return $this->tm;
     }
 
     /**
@@ -148,21 +137,20 @@ abstract class AuthorisationBase
      */
     protected function setDebugMessage($message)
     {
-        $this->app['logger.system']->debug($message);
+        $this->app['logger.system']->debug($message, ['event' => 'extensions']);
         $this->setFeedback('debug', $message);
     }
 
     /**
      * Dispatch event to any listeners.
      *
-     * @param string $type Either 'clientlogin.Login' or 'clientlogin.Logout'
-     * @param Client $user
+     * @param string  $type    Either 'clientlogin.Login' or 'clientlogin.Logout'
+     * @param Profile $profile
      */
-    protected function dispatchEvent($type, Client $user)
+    protected function dispatchEvent($type, Profile $profile)
     {
         if ($this->app['dispatcher']->hasListeners($type)) {
-            $tablename = $this->app['clientlogin.db']->getTableNameProfiles();
-            $event     = new ClientLoginEvent($user, $tablename);
+            $event = new ClientLoginEvent($profile, $this->app['clientlogin.records']->getTableName('profile'));
 
             try {
                 $this->app['dispatcher']->dispatch($type, $event);
