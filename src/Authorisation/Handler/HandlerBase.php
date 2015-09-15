@@ -46,7 +46,7 @@ abstract class HandlerBase
     public function __construct(Application $app, RequestStack $requestStack)
     {
         if (!$this->request = $requestStack->getCurrentRequest()) {
-            throw new Exception\ConfigurationException(sprintf('%s can not be instated outside of the request cycle.'));
+            throw new Exception\ConfigurationException(sprintf('%s can not be instated outside of the request cycle.', get_class($this)));
         }
 
         $this->app    = $app;

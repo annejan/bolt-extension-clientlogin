@@ -31,8 +31,7 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     public function login(Request $request, SessionInterface $session, $returnpage)
     {
-        $provider = $this->getConfig()->getProvider($this->providerName);
-
+        $provider = $this->getConfig()->getProvider($this->getProviderName());
         if ($provider['enabled'] !== true) {
             throw new Exception\DisabledProviderException();
         }
@@ -58,13 +57,13 @@ class Remote extends HandlerBase implements HandlerInterface
         $accessToken = $this->getAccessToken($request);
         $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
-        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->providerName, $resourceOwner->getId());
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
         if ($profile === false) {
-            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $this->providerName, $resourceOwner->getId()));
-            $write = $this->getRecordManager()->writeProfile('insert', $this->providerName, $accessToken, $resourceOwner);
+            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
+            $write = $this->getRecordManager()->writeProfile('insert', $this->getProviderName(), $accessToken, $resourceOwner);
         } else {
-            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $this->providerName, $resourceOwner->getId()));
-            $write = $this->getRecordManager()->writeProfile($profile['guid'], $this->providerName, $accessToken, $resourceOwner);
+            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
+            $write = $this->getRecordManager()->writeProfile($profile['guid'], $this->getProviderName(), $accessToken, $resourceOwner);
         }
 
         if (!$write) {
@@ -72,8 +71,8 @@ class Remote extends HandlerBase implements HandlerInterface
         }
 
         // Update the session record
-        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->providerName, $resourceOwner->getId());
-        $this->getRecordManager()->writeSession($profile['guid'], $this->providerName, $accessToken);
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
+        $this->getRecordManager()->writeSession($profile['guid'], $this->getProviderName(), $accessToken);
 
         $response = new RedirectResponse($returnpage);
         $response->headers->setCookie($this->getCookieManager()->create($resourceOwner->getId(), $accessToken));
@@ -113,7 +112,7 @@ class Remote extends HandlerBase implements HandlerInterface
             $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
             // Save the new token data
-            $this->getRecordManager()->updateProfile($this->providerName, $accessToken, $resourceOwner);
+            $this->getRecordManager()->updateProfile($this->getProviderName(), $accessToken, $resourceOwner);
         }
     }
 */
@@ -129,11 +128,11 @@ class Remote extends HandlerBase implements HandlerInterface
     {
         $provider = $this->getProvider();
 
-        if ($this->providerName === 'Google' && $approvalPrompt == 'force') {
+        if ($this->getProviderName() === 'Google' && $approvalPrompt == 'force') {
             $provider->setAccessType('offline');
         }
 
-        $options = array_merge($this->getProviderOptions($this->providerName), ['approval_prompt' => $approvalPrompt]);
+        $options = array_merge($this->getProviderOptions($this->getProviderName()), ['approval_prompt' => $approvalPrompt]);
         $authorizationUrl = $provider->getAuthorizationUrl($options);
 
         // Get the state generated and store it to the session.
