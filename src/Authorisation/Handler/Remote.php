@@ -21,10 +21,6 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class Remote extends HandlerBase implements HandlerInterface
 {
-    /** @var AbstractProvider */
-    protected $provider;
-    /** @var string */
-    protected $providerName;
     /** @var AccessToken */
     protected $accessToken;
     /** @var ResourceOwnerInterface */
@@ -35,7 +31,6 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     public function login(Request $request, SessionInterface $session, $returnpage)
     {
-        $this->setProviderName($request);
         $provider = $this->getConfig()->getProvider($this->providerName);
 
         if ($provider['enabled'] !== true) {
@@ -60,8 +55,6 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     public function process(Request $request, SessionInterface $session, $returnpage)
     {
-        $this->setProviderName($request);
-
         $accessToken = $this->getAccessToken($request);
         $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
@@ -134,7 +127,7 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     protected function getAuthorisationRedirectResponse($approvalPrompt = 'auto')
     {
-        $provider = $this->getProvider($this->providerName);
+        $provider = $this->getProvider();
 
         if ($this->providerName === 'Google' && $approvalPrompt == 'force') {
             $provider->setAccessType('offline');
@@ -195,31 +188,6 @@ class Remote extends HandlerBase implements HandlerInterface
         }
 
         return $accessToken;
-    }
-
-    /**
-     * Get a corrected provider name form a request
-     *
-     * @param Request $request
-     *
-     * @throws Exception\InvalidProviderException
-     *
-     * @return string
-     */
-    protected function setProviderName(Request $request)
-    {
-        $provider = $request->query->get('provider');
-
-        // Handle BC for old library
-        if (empty($provider)) {
-            $provider = $request->query->get('hauth_done');
-        }
-
-        if (empty($provider)) {
-            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
-        }
-
-        return $this->providerName = ucwords(strtolower($provider));
     }
 
     /**

@@ -24,6 +24,12 @@ abstract class HandlerBase
 {
     /** @var \Bolt\Application */
     protected $app;
+    /** @var AbstractProvider */
+    protected $provider;
+    /** @var string */
+    protected $providerName;
+    /** @var \Symfony\Component\HttpFoundation\Request */
+    protected $request;
 
     /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     private $config;
@@ -39,7 +45,7 @@ abstract class HandlerBase
      */
     public function __construct(Application $app, RequestStack $requestStack)
     {
-        if (!$request = $requestStack->getCurrentRequest()) {
+        if (!$this->request = $requestStack->getCurrentRequest()) {
             throw new Exception\ConfigurationException(sprintf('%s can not be instated outside of the request cycle.'));
         }
 
@@ -110,6 +116,7 @@ abstract class HandlerBase
     }
 
     /**
+     * Get a provider class object for the request.
      *
      * @param string $providerName
      *
@@ -123,23 +130,47 @@ abstract class HandlerBase
             return $this->provider;
         }
 
-        if ($this->providerName === null) {
-            throw new \RuntimeException('The function getProvider() called before setProviderName()');
-        }
 
-        $this->setDebugMessage("Creating provider $this->providerName");
+        $this->setDebugMessage("Creating provider $this->getProviderName()");
 
         /** @var \League\OAuth2\Client\Provider\AbstractProvider $providerClass */
-        $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $this->providerName;
+        $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $this->getProviderName();
 
         if (!class_exists($providerClass)) {
             throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
         }
 
-        $options = $this->getProviderOptions($this->providerName);
+        $options = $this->getProviderOptions($this->getProviderName());
         $collaborators = ['httpClient' => new \GuzzleHttp\Client()];
 
         return $this->provider = new $providerClass($options, $collaborators);
+    }
+
+    /**
+     * Get a corrected provider name form a request
+     *
+     * @throws Exception\InvalidProviderException
+     *
+     * @return string
+     */
+    protected function getProviderName()
+    {
+        if ($this->providerName !== null) {
+            return $this->providerName;
+        }
+
+        $provider = $this->request->query->get('provider');
+
+        // Handle BC for old library
+        if (empty($provider)) {
+            $provider = $this->request->query->get('hauth_done');
+        }
+
+        if (empty($provider)) {
+            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
+        }
+
+        return $this->providerName = ucwords(strtolower($provider));
     }
 
     /**
