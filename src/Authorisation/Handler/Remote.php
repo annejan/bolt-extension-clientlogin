@@ -1,13 +1,9 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
+namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Extension\Bolt\ClientLogin\Database;
-use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
-use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidProviderException;
-use Bolt\Extension\Bolt\ClientLogin\Exception\DisabledProviderException;
-use Bolt\Extension\Bolt\ClientLogin\Exception\ConfigurationException;
-use Bolt\Extension\Bolt\ClientLogin\Exception\AccessDeniedException;
+use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
@@ -16,14 +12,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidCookieException;
+use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * OAuth login provider.
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class OAuth extends AuthorisationBase implements AuthorisationInterface
+class Remote extends HandlerBase implements HandlerInterface
 {
     /** @var AbstractProvider */
     protected $provider;
@@ -42,10 +38,10 @@ class OAuth extends AuthorisationBase implements AuthorisationInterface
         $this->setProviderName($request);
 
         if ($this->getConfig()->getProvider($this->providerName)['enabled'] !== true) {
-            throw new DisabledProviderException();
+            throw new Exception\DisabledProviderException();
         }
 
-        if ($this->isLoggedIn($request)) {
+        if ($this->app['clientlogin.session']->isLoggedIn($request)) {
             // Get the user object for the event
 //$sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
             // Event dispatcher
@@ -54,9 +50,7 @@ class OAuth extends AuthorisationBase implements AuthorisationInterface
             // User is logged in already, from whence they came return them now.
             return new RedirectResponse($returnpage);
         } else {
-$approvalPrompt = 'force';
-
-            return $this->getAuthorisationRedirectResponse($approvalPrompt);
+            return $this->getAuthorisationRedirectResponse();
         }
     }
 
@@ -67,15 +61,30 @@ $approvalPrompt = 'force';
     {
         $this->setProviderName($request);
 
-        $resourceOwner = $this->getOauthResourceOwner($request);
-// dump($providerToken);
-// dump($providerToken->getToken());
-// dump($providerToken->getRefreshToken());
-// dump($providerToken->getExpires());
+        $accessToken = $this->getAccessToken($request);
+        $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
-dump('finally…');
-dump($this->getRefreshToken($providerToken));
-die();
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->providerName, $resourceOwner->getId());
+        if ($profile === false) {
+            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $this->providerName, $resourceOwner->getId()));
+            $write = $this->getRecordManager()->writeProfile('insert', $this->providerName, $accessToken, $resourceOwner);
+        } else {
+            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $this->providerName, $resourceOwner->getId()));
+            $write = $this->getRecordManager()->writeProfile($profile['guid'], $this->providerName, $accessToken, $resourceOwner);
+        }
+
+        if (!$write) {
+            throw new \Exception('why no rite?');
+        }
+
+        // Update the session record
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->providerName, $resourceOwner->getId());
+        $this->getRecordManager()->writeSession($profile['guid'], $this->providerName, $accessToken);
+
+        $response = new RedirectResponse($returnpage);
+        $response->headers->setCookie($this->getCookieManager()->create($resourceOwner->getId(), $accessToken));
+
+        return $response;
     }
 
     /**
@@ -85,38 +94,16 @@ die();
     {
     }
 
-    public function isLoggedIn(Request $request)
-    {
-        // No cookies is not logged in, we will reprocess
-        if (!$cookie = $request->cookies->get('bolt_clientlogin_session')) {
-            return false;
-        }
-
-        $profile = $this->getRecordManager()->getProfileByAccessToken($cookie);
-        if (!$profile) {
-            // We shouldn't have a cookie that doesn't have a profile
-            $this->setDebugMessage(sprintf('Cookie "%s" found in isLoggedIn() check, but no matching profile!', $cookie));
-            throw new InvalidCookieException('No matching profile found.');
-        } elseif (!$profile['enabled']) {
-            $this->setDebugMessage(sprintf('Cookie "%s" found in isLoggedIn() check, but profile disabled for "%s" "%s".', $cookie, $profile['provider'], $profile['esource_owner_id']));
-            return false;
-        } elseif ($profile['expires'] >= time()) {
-            $this->setDebugMessage(sprintf('Cookie "%s" found in isLoggedIn() check, but profile has expired.', $cookie));
-            return false;
-        }
-
-        return true;
-    }
-
+/*
     protected function getOauthResourceOwner(Request $request)
     {
-        if ($cookie = $request->cookies->get('bolt_clientlogin_session')) {
+        if ($cookie = $request->cookies->get('clientlogin_access_token')) {
             $profile = $this->getRecordManager()->getProfileByAccessToken($cookie);
 
             if (!$profile) {
-                throw new AccessDeniedException('No matching profile found.');
+                throw new Exception\AccessDeniedException('No matching profile found.');
             } elseif (!$profile['enabled']) {
-                throw new AccessDeniedException('Profile disabled.');
+                throw new Exception\AccessDeniedException('Profile disabled.');
             }
 
             // Compile the options from the database record.
@@ -135,6 +122,7 @@ die();
             $this->getRecordManager()->updateProfile($this->providerName, $accessToken, $resourceOwner);
         }
     }
+*/
 
     /**
      * Create a redirect response to fetch an authorisation code.
@@ -167,7 +155,7 @@ die();
      * @param Request $request
      *
      * @throws IdentityProviderException
-     * @throws InvalidAuthorisationRequestException
+     * @throws Exception\InvalidAuthorisationRequestException
      *
      * @return AccessToken
      */
@@ -178,12 +166,15 @@ die();
         if ($code === null) {
             $this->setDebugMessage('Attempt to get an OAuth2 acess token with an empty code in the request.');
 
-            throw new InvalidAuthorisationRequestException('No provider access code.');
+            throw new Exception\InvalidAuthorisationRequestException('No provider access code.');
         }
         $options = ['code' => $code];
 
         // Try to get an access token using the authorization code grant.
-        return $this->getProvider()->getAccessToken('authorization_code', $options);
+        $accessToken = $this->getProvider()->getAccessToken('authorization_code', $options);
+        $this->app['logger.system']->debug('[ClientLogin] OAuth token received', $accessToken->jsonSerialize());
+
+        return $accessToken;
     }
 
     /**
@@ -209,7 +200,7 @@ die();
      *
      * @param string $providerName
      *
-     * @throws InvalidProviderException
+     * @throws Exception\InvalidProviderException
      *
      * @return AbstractProvider
      */
@@ -229,7 +220,7 @@ die();
         $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $this->providerName;
 
         if (!class_exists($providerClass)) {
-            throw new InvalidProviderException(InvalidProviderException::INVALID_PROVIDER);
+            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
         }
 
         $options = $this->getProviderOptions($this->providerName);
@@ -243,6 +234,8 @@ die();
      *
      * @param Request $request
      *
+     * @throws Exception\InvalidProviderException
+     *
      * @return string
      */
     protected function setProviderName(Request $request)
@@ -255,7 +248,7 @@ die();
         }
 
         if (empty($provider)) {
-            throw new InvalidProviderException(InvalidProviderException::INVALID_PROVIDER);
+            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
         }
 
         return $this->providerName = ucwords(strtolower($provider));
@@ -266,6 +259,8 @@ die();
      *
      * @param string $providerName
      *
+     * @throws Exception\ConfigurationException
+     *
      * @return array
      */
     protected function getProviderOptions($providerName)
@@ -273,13 +268,13 @@ die();
         $providerConfig = $this->getConfig()->getProvider($providerName);
 
         if (empty($providerConfig['clientId'])) {
-            throw new ConfigurationException('Provider client ID required: ' . $providerName);
+            throw new Exception\ConfigurationException('Provider client ID required: ' . $providerName);
         }
         if (empty($providerConfig['clientSecret'])) {
-            throw new ConfigurationException('Provider secret key required: ' . $providerName);
+            throw new Exception\ConfigurationException('Provider secret key required: ' . $providerName);
         }
         if (empty($providerConfig['scopes'])) {
-            throw new ConfigurationException('Provider scope(s) required: ' . $providerName);
+            throw new Exception\ConfigurationException('Provider scope(s) required: ' . $providerName);
         }
 
         return[
