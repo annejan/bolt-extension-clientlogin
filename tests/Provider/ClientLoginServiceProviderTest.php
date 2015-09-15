@@ -23,6 +23,7 @@ class ClientLoginServiceProviderTest extends BoltUnitTest
         $app->register($provider);
         $extension = new Extension($app);
         $app['extensions']->register($extension);
+        $provider->boot($app);
 
         $this->assertNotEmpty($app['clientlogin.session']);
         $this->assertNotEmpty($app['clientlogin.handler.local']);
