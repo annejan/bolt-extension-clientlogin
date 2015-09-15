@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
+namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Extension\Bolt\ClientLogin\Exception\DisabledProviderException;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-interface AuthorisationInterface
+interface HandlerInterface
 {
     /**
      * Login a client.
