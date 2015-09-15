@@ -10,11 +10,14 @@ abstract class QueryBase
     protected $db;
     /** @var string */
     protected $tableName;
+    /** @var string */
+    protected $tableNameTokens;
 
     public function __construct(Connection $db, $tableName)
     {
         $this->db = $db;
         $this->tableName = $tableName;
+        $this->tableNameTokens = $tableName . '_tokens';
     }
 
     /**

@@ -22,7 +22,7 @@ class SessionWrite extends QueryBase
     public function queryInsert($guid, AccessToken $accessToken)
     {
         return $this->getQueryBuilder()
-            ->insert($this->tableName)
+            ->insert($this->tableNameTokens)
             ->values([
                 'guid'              => ':guid',
                 'access_token'      => ':access_token',
@@ -50,7 +50,7 @@ class SessionWrite extends QueryBase
     public function queryUpdate(AccessToken $accessToken)
     {
         return $this->getQueryBuilder()
-            ->update($this->tableName)
+            ->update($this->tableNameTokens)
             ->set('access_token', ':access_token')
             ->set('access_token_data', ':access_token_data')
             ->set('expires', ':expires')

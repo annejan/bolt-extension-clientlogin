@@ -18,7 +18,7 @@ class SessionRead extends QueryBase
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->tableName)
+            ->from($this->tableNameTokens)
             ->where('token  = :token')
             ->orderBy('expires', 'DESC')
             ->setParameter(':token', $cookie)
@@ -36,7 +36,7 @@ class SessionRead extends QueryBase
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->tableName)
+            ->from($this->tableNameTokens)
             ->where('guid  = :guid')
             ->orderBy('expires', 'DESC')
             ->setParameter(':guid', $guid)

@@ -17,7 +17,7 @@ class SessionDelete extends QueryBase
     public function queryDelete($accessTokenValue)
     {
         return $this->getQueryBuilder()
-            ->delete($this->tableName)
+            ->delete($this->tableNameTokens)
             ->where('access_token  = :access_token')
             ->setParameter(':access_token', $accessTokenValue)
         ;
