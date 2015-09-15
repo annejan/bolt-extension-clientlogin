@@ -79,7 +79,6 @@ class ProfileWrite extends QueryBase
             ->set('resource_owner', ':resource_owner')
             ->where('provider  = :provider')
             ->andWhere('resource_owner_id  = :resource_owner_id')
-            ->queryUpdate()
             ->setParameters([
                 'provider'          => $provider,
                 'resource_owner_id' => $resourceOwnerId,
@@ -106,7 +105,6 @@ class ProfileWrite extends QueryBase
             ->set('resource_owner', ':resource_owner')
             ->where('provider  = :provider')
             ->andWhere('resource_owner_id  = :resource_owner_id')
-            ->queryUpdate()
             ->setParameters([
                 'provider'          => $provider,
                 'resource_owner_id' => $resourceOwnerId,

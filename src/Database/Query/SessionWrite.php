@@ -55,7 +55,6 @@ class SessionWrite extends QueryBase
             ->set('access_token_data', ':access_token_data')
             ->set('expires', ':expires')
             ->where('access_token  = :access_token')
-            ->queryUpdate()
             ->setParameters([
                 'access_token'      => (string) $accessToken,
                 'access_token_data' => json_encode($accessToken),
