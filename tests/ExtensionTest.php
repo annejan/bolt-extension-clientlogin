@@ -40,7 +40,7 @@ class ExtensionTest extends BoltUnitTest
         $this->assertArrayHasKey('template',      $this->extension->config);
         $this->assertArrayHasKey('zocial',        $this->extension->config);
         $this->assertArrayHasKey('login_expiry',  $this->extension->config);
-        $this->assertArrayHasKey('debug_mode',    $this->extension->config);
+        $this->assertArrayHasKey('debug',         $this->extension->config);
         $this->assertArrayHasKey('response_noun', $this->extension->config);
     }
 }
