@@ -2,8 +2,10 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
+use Bolt\Configuration\ResourceManager;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use RandomLib\Generator;
+use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\Cookie;
 
 /**
@@ -17,17 +19,21 @@ class CookieManager
     protected $records;
     /** @var \RandomLib\Generator */
     protected $random;
+    /** @var ResourceManager */
+    protected $resourceManager;
 
     /**
      * Constructor.
      *
-     * @param RecordManager $records
-     * @param Generator     $random
+     * @param RecordManager   $records
+     * @param Generator       $random
+     * @param ResourceManager $resourceManager
      */
-    public function __construct(RecordManager $records, Generator $random)
+    public function __construct(RecordManager $records, Generator $random, ResourceManager $resourceManager)
     {
         $this->records = $records;
         $this->random = $random;
+        $this->resourceManager = $resourceManager;
     }
 
     /**
@@ -38,45 +44,13 @@ class CookieManager
      *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function create($userId, Token $token)
+    public function create($userId, AccessToken $accessToken)
     {
-        $cookie = new Cookie('bolt_clientlogin', $token->getSessionId(), $token->getExpires(), '/', null, false, false);
-        $this->commit($userId, $cookie, $token);
-
-        return $cookie;
-    }
-
-    /**
-     * Update an authentication cookie.
-     *
-     * @param integer $userId
-     * @param Cookie  $cookie
-     * @param Token   $token
-     *
-     * @return \Symfony\Component\HttpFoundation\Cookie
-     */
-    public function update($userId, Cookie $cookie, Token $token)
-    {
-        $cookie = new Cookie('bolt_clientlogin', $token->getSessionId(), $token->getExpires(), '/', null, false, false);
-        $this->commit($userId, $cookie, $token);
-
-        return $cookie;
-    }
-
-    /**
-     * Insert/update a session record for an authentication cookie.
-     *
-     * @param Cookie $cookie
-     * @param Token  $token
-     *
-     * @return integer|null
-     */
-    protected function commit($userId, Cookie $cookie, Token $token)
-    {
-        if ($this->records->getSessionBySessionId((string) $cookie)) {
-            return $this->records->updateSession($userId, $cookie->getValue(), $token);
-        } else {
-            return $this->records->insertSession($userId, $cookie->getValue(), $token);
+        if (!$expire = $accessToken->getExpires()) {
+            $expire = time() + 3600;
         }
+        $path = $this->resourceManager->getUrl('root');
+
+        return new Cookie('clientlogin_access_token', $accessToken->getToken(), $expire, $path);
     }
 }
