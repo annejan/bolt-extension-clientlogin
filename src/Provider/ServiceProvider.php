@@ -3,10 +3,10 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Provider;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Session;
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
-use Bolt\Extension\Bolt\ClientLogin\Session;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
