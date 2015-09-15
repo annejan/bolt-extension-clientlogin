@@ -27,7 +27,7 @@ class ProfileWrite extends QueryBase
         return $this->getQueryBuilder()
             ->insert($this->tableName)
             ->values([
-                'id'                => ':id',
+                'guid'              => ':guid',
                 'provider'          => ':provider',
                 'resource_owner_id' => ':resource_owner_id',
                 'refresh_token'     => ':refresh_token',
@@ -35,7 +35,7 @@ class ProfileWrite extends QueryBase
                 'resource_owner'    => ':resource_owner',
             ])
             ->setParameters([
-                'id'                => $this->getGuidV4(),
+                'guid'              => $this->getGuidV4(),
                 'provider'          => $provider,
                 'resource_owner_id' => $resourceOwnerId,
                 'refresh_token'     => $accessToken->getRefreshToken(),
