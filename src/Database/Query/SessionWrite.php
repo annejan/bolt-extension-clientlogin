@@ -14,8 +14,7 @@ class SessionWrite extends QueryBase
     /**
      * Query to insert a session record.
      *
-     * @param string      $provider
-     * @param string      $resourceOwnerId
+     * @param string      $guid
      * @param AccessToken $accessToken
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
@@ -42,23 +41,22 @@ class SessionWrite extends QueryBase
     /**
      * Query to update a session record.
      *
-     * @param string      $guid
+     * @param string      $id
      * @param string      $resourceOwnerId
      * @param AccessToken $accessToken
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryUpdate($id, $resourceOwnerId, AccessToken $accessToken)
+    public function queryUpdate(AccessToken $accessToken)
     {
         return $this->getQueryBuilder()
             ->update($this->tableName)
             ->set('access_token', ':access_token')
             ->set('access_token_data', ':access_token_data')
             ->set('expires', ':expires')
-            ->where('id  = :id')
+            ->where('access_token  = :access_token')
             ->queryUpdate()
             ->setParameters([
-                'id'                => $id,
                 'access_token'      => (string) $accessToken,
                 'access_token_data' => json_encode($accessToken),
                 'expires'           => $accessToken->getExpires(),
