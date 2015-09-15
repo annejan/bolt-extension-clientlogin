@@ -16,7 +16,7 @@ class ProfileRead extends QueryBase
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryFetchById($guid)
+    public function queryFetchByGuid($guid)
     {
         return $this->getQueryBuilder()
             ->select('*')

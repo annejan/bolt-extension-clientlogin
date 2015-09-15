@@ -74,7 +74,6 @@ class ProfileWrite extends QueryBase
     {
         return $this->getQueryBuilder()
             ->update($this->tableName)
-            ->set('expires',        ':expires')
             ->set('lastupdate',     ':lastupdate')
             ->set('resource_owner', ':resource_owner')
             ->where('provider  = :provider')

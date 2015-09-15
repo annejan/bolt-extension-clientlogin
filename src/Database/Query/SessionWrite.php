@@ -30,7 +30,7 @@ class SessionWrite extends QueryBase
                 'expires'           => ':expires',
             ])
             ->setParameters([
-                'uid'               => $guid,
+                'guid'              => $guid,
                 'access_token'      => (string) $accessToken,
                 'access_token_data' => json_encode($accessToken),
                 'expires'           => $accessToken->getExpires(),
@@ -41,8 +41,6 @@ class SessionWrite extends QueryBase
     /**
      * Query to update a session record.
      *
-     * @param string      $id
-     * @param string      $resourceOwnerId
      * @param AccessToken $accessToken
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
