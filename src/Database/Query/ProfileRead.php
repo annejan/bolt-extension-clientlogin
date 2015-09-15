@@ -12,18 +12,17 @@ class ProfileRead extends QueryBase
     /**
      * Query to fetch a profile by GUID.
      *
-     * @param string $id
+     * @param string $guid
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryFetchById($id)
+    public function queryFetchById($guid)
     {
         return $this->getQueryBuilder()
             ->select('*')
             ->from($this->tableName)
-            ->where('id = :id')
-            ->orderBy('lastupdate', 'DESC')
-            ->setParameter(':id', $id)
+            ->where('guid = :guid')
+            ->setParameter(':guid', $guid)
         ;
     }
 

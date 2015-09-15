@@ -61,7 +61,7 @@ class ProfileWrite extends QueryBase
     }
 
     /**
-     * Profile update query.
+     * Query to update a user profile.
      *
      * @param string                 $provider
      * @param string                 $resourceOwnerId
@@ -90,7 +90,7 @@ class ProfileWrite extends QueryBase
     }
 
     /**
-     * Update a profile record's resource ower data.
+     * Query to update a profile record's resource ower data.
      *
      * @param string                 $provider
      * @param string                 $resourceOwnerId

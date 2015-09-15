@@ -10,7 +10,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Database\Query;
 class SessionRead extends QueryBase
 {
     /**
-     * Fetch a session based on access token.
+     * Query to fetch a session based on access token.
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
@@ -26,7 +26,7 @@ class SessionRead extends QueryBase
     }
 
     /**
-     * Fetch session records by a GUID.
+     * Query to fetch session records by a GUID.
      *
      * @param string $guid
      *

@@ -12,7 +12,7 @@ use League\OAuth2\Client\Token\AccessToken;
 class SessionWrite extends QueryBase
 {
     /**
-     * Insert a session record.
+     * Query to insert a session record.
      *
      * @param string      $provider
      * @param string      $resourceOwnerId
@@ -40,7 +40,7 @@ class SessionWrite extends QueryBase
     }
 
     /**
-     * Update a session record.
+     * Query to update a session record.
      *
      * @param string      $guid
      * @param string      $resourceOwnerId
