@@ -40,8 +40,8 @@ class SessionRead extends QueryBase
             ->select('*')
             ->from($this->tableNameTokens, 's')
             ->innerJoin('s', $this->tableName, 'p', 's.guid = p.guid')
-            ->where('s.token  = :token')
-            ->setParameter(':token', $cookie)
+            ->where('s.access_token  = :access_token')
+            ->setParameter(':access_token', $cookie)
         ;
     }
 }
