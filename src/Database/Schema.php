@@ -64,16 +64,14 @@ class Schema
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($tableName) {
                 $table = $schema->createTable($tableName . '_tokens');
-                $table->addColumn('id',                'integer',  ['autoincrement' => true]);
-                $table->addColumn('guid',              'guid',     []);
                 $table->addColumn('access_token',      'string',   ['length' => 128]);
+                $table->addColumn('guid',              'guid',     []);
                 $table->addColumn('access_token_data', 'text',     ['notnull' => false, 'default' => null]);
                 $table->addColumn('expires',           'integer',  ['notnull' => false, 'default' => null]);
 
-                $table->setPrimaryKey(['id']);
+                $table->setPrimaryKey(['access_token']);
 
                 $table->addIndex(['guid']);
-                $table->addIndex(['access_token']);
                 $table->addIndex(['expires']);
 
                 return $table;
