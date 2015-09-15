@@ -13,6 +13,13 @@ use League\OAuth2\Client\Token\AccessToken;
 class ProfileWrite extends QueryBase
 {
     /**
+     * Query to insert a profile record.
+     *
+     * @param string                 $provider
+     * @param string                 $resourceOwnerId
+     * @param AccessToken            $accessToken
+     * @param ResourceOwnerInterface $resourceOwner
+     *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     public function queryInsert($provider, $resourceOwnerId, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
@@ -20,6 +27,7 @@ class ProfileWrite extends QueryBase
         return $this->getQueryBuilder()
             ->insert($this->tableName)
             ->values([
+                'id'                => ':id',
                 'provider'          => ':provider',
                 'resource_owner_id' => ':resource_owner_id',
                 'refresh_token'     => ':refresh_token',
@@ -27,6 +35,7 @@ class ProfileWrite extends QueryBase
                 'resource_owner'    => ':resource_owner',
             ])
             ->setParameters([
+                'id'                => $this->getGuidV4(),
                 'provider'          => $provider,
                 'resource_owner_id' => $resourceOwnerId,
                 'refresh_token'     => $accessToken->getRefreshToken(),
@@ -37,6 +46,28 @@ class ProfileWrite extends QueryBase
     }
 
     /**
+     * Generate a v4 UUID.
+     *
+     * @return string
+     */
+    protected function getGuidV4()
+    {
+        $data = openssl_random_pseudo_bytes(16);
+
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    /**
+     * Profile update query.
+     *
+     * @param string                 $provider
+     * @param string                 $resourceOwnerId
+     * @param AccessToken            $accessToken
+     * @param ResourceOwnerInterface $resourceOwner
+     *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     public function queryUpdate($provider, $resourceOwnerId, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
@@ -59,6 +90,12 @@ class ProfileWrite extends QueryBase
     }
 
     /**
+     * Update a profile record's resource ower data.
+     *
+     * @param string                 $provider
+     * @param string                 $resourceOwnerId
+     * @param ResourceOwnerInterface $resourceOwner
+     *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     public function queryUpdateResourceOwner($provider, $resourceOwnerId, ResourceOwnerInterface $resourceOwner)
@@ -80,6 +117,10 @@ class ProfileWrite extends QueryBase
     }
 
     /**
+     * Query to toggle the "enabled" value for a profile record.
+     *
+     * @param string  $provider
+     * @param string  $resourceOwnerId
      * @param boolean $enable
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder

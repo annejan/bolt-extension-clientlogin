@@ -10,6 +10,8 @@ namespace Bolt\Extension\Bolt\ClientLogin\Database\Query;
 class ProfileDelete extends QueryBase
 {
     /**
+     * Query to delete a profile based on provider and ID.
+     *
      * @param string $provider
      * @param string $resourceOwnerId
      *
