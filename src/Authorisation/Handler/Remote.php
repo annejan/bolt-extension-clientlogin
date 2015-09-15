@@ -36,8 +36,9 @@ class Remote extends HandlerBase implements HandlerInterface
     public function login(Request $request, SessionInterface $session, $returnpage)
     {
         $this->setProviderName($request);
+        $provider = $this->getConfig()->getProvider($this->providerName);
 
-        if ($this->getConfig()->getProvider($this->providerName)['enabled'] !== true) {
+        if ($provider['enabled'] !== true) {
             throw new Exception\DisabledProviderException();
         }
 

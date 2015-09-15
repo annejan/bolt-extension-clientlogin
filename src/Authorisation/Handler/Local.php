@@ -29,7 +29,8 @@ class Local extends HandlerBase implements HandlerInterface
      */
     public function login(Request $request, SessionInterface $session, $returnpage)
     {
-        if ($this->getConfig()->getProvider('Password')['enabled'] !== true) {
+        $provider = $this->getConfig()->getProvider('Password');
+        if ($provider['enabled'] !== true) {
             throw new DisabledProviderException();
         }
 
