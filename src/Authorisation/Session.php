@@ -52,7 +52,7 @@ class Session
             return false;
         }
 
-        $profile = $this->getRecordManager()->queryFetchByAccessToken($cookie);
+        $profile = $this->getRecordManager()->getProfileByAccessTokenId($cookie);
         if (!$profile) {
             // We shouldn't have a cookie that doesn't have a profile
             $this->setDebugMessage(sprintf('Cookie "%s" found in isLoggedIn() check, but no matching profile!', $cookie));
