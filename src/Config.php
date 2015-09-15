@@ -34,7 +34,7 @@ class Config
      */
     public function has($key)
     {
-        isset($this->config[$key]) ? $this->config[$key] : null;
+        return isset($this->config[$key]) ? true : false;
     }
 
     /**
@@ -137,6 +137,9 @@ class Config
                 'password'        => '_password.twig',
                 'password_parent' => 'password.twig'
             ],
+            'label' => array(
+                'logout' => 'Logout'
+            ),
             'zocial'       => false,
             'login_expiry' => 14,
             'debug'        => [
