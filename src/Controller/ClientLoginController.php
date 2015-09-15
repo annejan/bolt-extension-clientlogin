@@ -2,13 +2,11 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\OAuth;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Password;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\AuthorisationInterface;
-use Bolt\Extension\Bolt\ClientLogin\Response\FailureResponse;
-use Bolt\Extension\Bolt\ClientLogin\Response\SuccessResponse;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -61,8 +59,11 @@ class ClientLoginController implements ControllerProviderInterface
 
     /**
      * Before middleware to load Guzzle 6.
+     *
+     * @param Request     $request
+     * @param Application $app
      */
-    public function before()
+    public function before(Request $request, Application $app)
     {
         $baseDir = dirname(dirname(__DIR__));
 
@@ -76,7 +77,19 @@ class ClientLoginController implements ControllerProviderInterface
             $baseDir . '/lib/GuzzleHttp/Promise',
             $baseDir . '/lib/GuzzleHttp/Psr7',
         ]);
+        $loader->setPsr4('GuzzleHttp\\Promise\\', [
+            $baseDir . '/lib/GuzzleHttp/Promise',
+        ]);
+        $loader->setPsr4('GuzzleHttp\\Psr7\\', [
+            $baseDir . '/lib/GuzzleHttp/Psr7',
+        ]);
         $loader->register(true);
+
+        // Debug logger
+        if ($this->config->isDebug()) {
+            $debuglog = $app['resources']->getPath('cache') . '/authenticate.log';
+            $app['logger.system']->pushHandler(new StreamHandler($debuglog, Logger::DEBUG));
+        }
     }
 
     /**
@@ -199,10 +212,10 @@ class ClientLoginController implements ControllerProviderInterface
         }
 
         if ($providerName === 'Password') {
-            return new Password($app);
+            return $app['clientlogin.handler.local'];
         }
 
-        return new OAuth($app);
+        return $app['clientlogin.handler.remote'];
     }
 
     /**
