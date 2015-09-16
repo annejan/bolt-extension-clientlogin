@@ -3,6 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Extension\Bolt\ClientLogin\Database;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
 use League\OAuth2\Client\Provider\AbstractProvider;
@@ -75,8 +76,9 @@ class Remote extends HandlerBase implements HandlerInterface
         $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
         $this->getRecordManager()->writeSession($profile['guid'], $this->getProviderName(), $accessToken);
 
+        $cookie = Manager\Cookie::create($resourceOwner->getId(), $accessToken);
         $response = new RedirectResponse($returnpage);
-        $response->headers->setCookie($this->getCookieManager()->create($resourceOwner->getId(), $accessToken));
+        $response->headers->setCookie($cookie);
 
         return $response;
     }

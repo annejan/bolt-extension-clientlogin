@@ -4,8 +4,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Config;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\CookieManager;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
@@ -35,7 +34,7 @@ abstract class HandlerBase
     private $config;
     /** @var \Symfony\Component\HttpFoundation\Response */
     private $response;
-    /** @var TokenManager */
+    /** @var Manager\Token */
     private $tm;
     /** @var array */
     private $feedback = [];
@@ -51,7 +50,7 @@ abstract class HandlerBase
 
         $this->app    = $app;
         $this->config = $app['clientlogin.config'];
-        $this->tm     = new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
+        $this->tm     = new Manager\Token($app['session'], $app['randomgenerator'], $app['logger.system']);
     }
 
     protected function updateLogin()
@@ -70,16 +69,6 @@ abstract class HandlerBase
     }
 
     /**
-     * Get the token manager instance.
-     *
-     * @return CookieManager
-     */
-    protected function getCookieManager()
-    {
-        return new CookieManager($this->getRecordManager(), $this->app['randomgenerator'], $this->app['resources']);
-    }
-
-    /**
      * Get the RecordManager DI.
      *
      * @return RecordManager
@@ -92,7 +81,7 @@ abstract class HandlerBase
     /**
      * Get the token manager instance.
      *
-     * @return TokenManager
+     * @return Manager\Token
      */
     protected function getTokenManager()
     {

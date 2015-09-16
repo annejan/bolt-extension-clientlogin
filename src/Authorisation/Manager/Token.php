@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
+namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 
 use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Config;
