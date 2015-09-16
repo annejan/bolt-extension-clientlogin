@@ -29,6 +29,7 @@ class ServiceProvider implements ServiceProviderInterface
             function ($app) {
                 return new Session(
                     $app['clientlogin.records'],
+                    $app['session'],
                     $app['request_stack'],
                     $app['logger.system']
                 );
