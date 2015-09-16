@@ -29,14 +29,15 @@ class Remote extends HandlerBase implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function login(Request $request, SessionInterface $session, $returnpage)
+    public function login($returnpage)
     {
         $provider = $this->getConfig()->getProvider($this->getProviderName());
+
         if ($provider['enabled'] !== true) {
             throw new Exception\DisabledProviderException();
         }
 
-        if ($this->app['clientlogin.session']->isLoggedIn($request)) {
+        if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
             // Get the user object for the event
 //$sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
             // Event dispatcher
@@ -52,9 +53,9 @@ class Remote extends HandlerBase implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function process(Request $request, SessionInterface $session, $returnpage)
+    public function process($returnpage)
     {
-        $accessToken = $this->getAccessToken($request);
+        $accessToken = $this->getAccessToken($this->request);
         $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
         $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
@@ -83,7 +84,7 @@ class Remote extends HandlerBase implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function logout(Request $request, SessionInterface $session, $returnpage)
+    public function logout($returnpage)
     {
     }
 

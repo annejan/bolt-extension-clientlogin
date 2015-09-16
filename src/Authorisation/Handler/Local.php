@@ -27,7 +27,7 @@ class Local extends HandlerBase implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function login(Request $request, SessionInterface $session, $returnpage)
+    public function login($returnpage)
     {
         $provider = $this->getConfig()->getProvider('Password');
         if ($provider['enabled'] !== true) {
@@ -54,7 +54,7 @@ class Local extends HandlerBase implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function process(Request $request, SessionInterface $session, $returnpage)
+    public function process($returnpage)
     {
         if (!$token = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS)) {
             throw new InvalidAuthorisationRequestException('No token found for password endpoint.');
@@ -73,7 +73,7 @@ class Local extends HandlerBase implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function logout(Request $request, SessionInterface $session, $returnpage)
+    public function logout($returnpage)
     {
         if ($token = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS)) {
             $this->getRecordManager()->deleteSession($sessionId);

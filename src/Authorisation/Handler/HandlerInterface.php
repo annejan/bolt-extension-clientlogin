@@ -19,36 +19,30 @@ interface HandlerInterface
     /**
      * Login a client.
      *
-     * @param Request          $request
-     * @param SessionInterface $session
-     * @param string           $returnpage
+     * @param string $returnpage
      *
      * @throws DisabledProviderException
      * @throws InvalidAuthorisationRequestException
      *
      * @return Response
      */
-    public function login(Request $request, SessionInterface $session, $returnpage);
+    public function login($returnpage);
 
     /**
      * Process a client login attempt.
      *
-     * @param Request          $request
-     * @param SessionInterface $session
-     * @param string           $returnpage
+     * @param string $returnpage
      *
      * @return Response
      */
-    public function process(Request $request, SessionInterface $session, $returnpage);
+    public function process($returnpage);
 
     /**
      * Logout a client.
      *
-     * @param Request          $request
-     * @param SessionInterface $session
-     * @param string           $returnpage
+     * @param string $returnpage
      *
      * @return Response
      */
-    public function logout(Request $request, SessionInterface $session, $returnpage);
+    public function logout($returnpage);
 }
