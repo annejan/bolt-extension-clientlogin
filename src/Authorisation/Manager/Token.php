@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class TokenManager
+class Token
 {
     /** Session key name of the access token ID */
     const TOKEN_ACCESS = 'bolt.clientlogin.token.access';
