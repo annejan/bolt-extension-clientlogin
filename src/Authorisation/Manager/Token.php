@@ -3,8 +3,9 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 
 use Bolt\Application;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\SessionToken;
 use Bolt\Extension\Bolt\ClientLogin\Config;
-use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
+use Bolt\Extension\Bolt\ClientLogin\Exception;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
 use RandomLib\Generator;
@@ -76,11 +77,10 @@ class Token
     /**
      * Save an SessionToken to the session.
      *
-     * @param Token $tokenName
+     * @param string      $guid
+     * @param AccessToken $accessToken
      *
      * @throws \RuntimeException
-     *
-     * @return array
      */
     public function setAuthToken($guid, AccessToken $accessToken)
     {
@@ -91,11 +91,9 @@ class Token
         // Retrive the saved token to make sure that the Session is working properly
         $accessToken = $this->getToken(self::TOKEN_ACCESS);
 
-        if ($accessToken instanceof Token) {
-            return $accessToken;
+        if (!$accessToken instanceof SessionToken) {
+            throw new Exception\SystemSetupException('[ClientLogin] Unable to create a Symfony session token!');
         }
-
-        throw new \RuntimeException('[ClientLogin] Unable to create a Symfony session token!');
     }
 
     /**
@@ -111,7 +109,7 @@ class Token
     {
         if (empty($state)) {
             $this->log->debug('[ClientLogin] Trying to set empty state token!', ['event' => 'extensions']);
-            throw new \RuntimeException('Trying to set empty state token!');
+            throw new Exception\SystemSetupException('Trying to set empty state token!');
         }
 
         $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_STATE, $state), ['event' => 'extensions']);
@@ -121,7 +119,7 @@ class Token
         $token = $this->getToken(self::TOKEN_STATE);
 
         if (empty($token)) {
-            throw new \RuntimeException('Unable to create a Symfony session token!');
+            throw new Exception\SystemSetupException('Unable to create a Symfony session token!');
         }
 
         return $token;
@@ -141,7 +139,7 @@ class Token
         $state = $request->get('state');
         if ($state === null) {
             $this->log->error('Authorisation request was missing state token.', ['event' => 'extensions']);
-            throw new InvalidAuthorisationRequestException('Invalid authorisation request!');
+            throw new Exception\InvalidAuthorisationRequestException('Invalid authorisation request!');
         }
 
         // Get the stored token
