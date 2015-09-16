@@ -3,8 +3,9 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Types;
 use League\OAuth2\Client\Token\AccessToken;
-use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Cookie as CookieBase;
 
 /**
  * Cookie manager class.
@@ -27,6 +28,6 @@ class Cookie
             $expire = time() + 3600;
         }
 
-        return new Cookie(Types::TOKEN_COOKIE_NAME, $accessToken->getToken(), $expire, $path);
+        return new CookieBase(Types::TOKEN_COOKIE_NAME, $accessToken->getToken(), $expire, $path);
     }
 }
