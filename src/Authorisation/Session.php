@@ -63,7 +63,7 @@ class Session
      *
      * @return boolean
      */
-    protected function checkRequest(Request $request)
+    protected function checkRequest($request)
     {
         if ($request === null) {
             $request = $this->requestStack->getCurrentRequest();
@@ -74,7 +74,7 @@ class Session
         }
 
         // If we have a cookie, let's do checks.
-        if (!$cookie = $request->cookies->get('clientlogin_access_token')) {
+        if ($cookie = $request->cookies->get('clientlogin_access_token')) {
             $this->setDebugMessage(sprintf('ClientLogin checkRequest() check found cookie: %s', $cookie));
             return true;
         }
