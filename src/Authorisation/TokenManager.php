@@ -49,7 +49,7 @@ class TokenManager
      *
      * @param string $tokenName
      *
-     * @return Token|string|null
+     * @return SessionToken|string|null
      */
     public function getToken($tokenName)
     {
@@ -63,26 +63,7 @@ class TokenManager
     }
 
     /**
-     * Generate a fresh authentication token.
-     *
-     * @param string  $provider
-     * @param string  $resourceOwnerId
-     * @param string  $sessionId
-     * @param string  $accessToken
-     * @param integer $expires
-     * @param string  $refreshToken
-     *
-     * @return Token
-     */
-    public function generateAuthToken($provider, $resourceOwnerId, $sessionId = null, $accessToken = null, $expires = null, $refreshToken = null)
-    {
-        $sessionId = $sessionId ?: $this->random->generateString(32);
-
-        return new Token($provider, $resourceOwnerId, $sessionId, $accessToken, $expires, $refreshToken);
-    }
-
-    /**
-     * Save an authentication token to the session.
+     * Save an SessionToken to the session.
      *
      * @param Token $tokenName
      *
@@ -90,16 +71,17 @@ class TokenManager
      *
      * @return array
      */
-    public function setAuthToken(Token $tokenData)
+    public function setAuthToken($guid, AccessToken $accessToken)
     {
-        $this->session->set(self::TOKEN_ACCESS, $tokenData);
-        $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_ACCESS, (string) $tokenData), ['event' => 'extensions']);
+        $sessionToken = new SessionToken($guid, $accessToken);
+        $this->session->set(self::TOKEN_ACCESS, $sessionToken);
+        $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_ACCESS, (string) $sessionToken), ['event' => 'extensions']);
 
         // Retrive the saved token to make sure that the Session is working properly
-        $token = $this->getToken(self::TOKEN_ACCESS);
+        $accessToken = $this->getToken(self::TOKEN_ACCESS);
 
-        if ($token instanceof Token) {
-            return $token;
+        if ($accessToken instanceof Token) {
+            return $accessToken;
         }
 
         throw new \RuntimeException('[ClientLogin] Unable to create a Symfony session token!');
