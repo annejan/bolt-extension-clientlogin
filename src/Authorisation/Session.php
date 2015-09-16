@@ -6,6 +6,8 @@ use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use League\OAuth2\Client\Token\AccessToken;
 
 /**
  * The login session.
@@ -16,6 +18,8 @@ class Session
 {
     /** @var RecordManager */
     private $recordManager;
+    /** @var SessionInterface */
+    private $session;
     /** @var RequestStack */
     private $requestStack;
     /** @var LoggerInterface */
@@ -26,9 +30,10 @@ class Session
      *
      * @param RecordManager $recordManager
      */
-    public function __construct(RecordManager $recordManager, RequestStack $requestStack, LoggerInterface $logger)
+    public function __construct(RecordManager $recordManager, SessionInterface $session, RequestStack $requestStack, LoggerInterface $logger)
     {
         $this->recordManager = $recordManager;
+        $this->session = $session;
         $this->requestStack = $requestStack;
         $this->logger = $logger;
     }
@@ -42,31 +47,80 @@ class Session
      */
     public function isLoggedIn(Request $request = null)
     {
+        if (!$this->checkRequest($request)) {
+            return false;
+        }
+
+        return $this->checkSession($request);
+    }
+
+    /**
+     * Check a request for a valid handling.
+     *
+     * @param Request $request
+     *
+     * @throws \RuntimeException
+     *
+     * @return boolean
+     */
+    protected function checkRequest(Request $request)
+    {
         if ($request === null) {
             $request = $this->requestStack->getCurrentRequest();
         }
 
-        // No cookies is not logged in, we will reprocess
+        if ($request === null) {
+            throw new \RuntimeException('ClientLogin session provider called outside of request cycle.');
+        }
+
+        // If we have a cookie, let's do checks.
         if (!$cookie = $request->cookies->get('clientlogin_access_token')) {
-            $this->setDebugMessage('Login check found no cookie.');
+            $this->setDebugMessage(sprintf('ClientLogin checkRequest() check found cookie: %s', $cookie));
+            return true;
+        }
+
+        $this->setDebugMessage('ClientLogin checkRequest() check found no cookie.');
+        return false;
+    }
+
+    /**
+     * Check a session for a valid and not-expired AccessToken.
+     *
+     * @param Request $request
+     *
+     * @throws \RuntimeException
+     *
+     * @return boolean
+     */
+    protected function checkSession(Request $request)
+    {
+        // Get the session
+        if (!$sessionToken = $this->session->get(TokenManager::TOKEN_ACCESS)) {
+            $this->setDebugMessage('ClientLogin checkSession() check found no session key for SessionToken.');
+
             return false;
         }
 
-        $profile = $this->getRecordManager()->getProfileByAccessTokenId($cookie);
-        if (!$profile) {
-            // We shouldn't have a cookie that doesn't have a profile
-            $this->setDebugMessage(sprintf('Cookie "%s" found in isLoggedIn() check, but no matching profile!', $cookie));
-            return false;
-        } elseif (!$profile['enabled']) {
-            $this->setDebugMessage(sprintf('Cookie "%s" found in isLoggedIn() check, but profile disabled for "%s" "%s".', $cookie, $profile['provider'], $profile['resource_owner_id']));
-            return false;
-        } elseif ($profile['expires'] <= time()) {
-            $this->setDebugMessage(sprintf('Cookie "%s" found in isLoggedIn() check, but profile has past expiry of %s (server time is %s).', $cookie, date('c', $profile['expires']), date('c', time())));
+        // Check the returned object is valid
+        if (!$sessionToken['accessToken'] instanceof AccessToken) {
+            throw new \RuntimeException('AccessToken not stored with SessionToken!');
+        }
+
+        $cookie = $request->cookies->get('clientlogin_access_token');
+        if ($cookie !== $sessionToken->getAccessTokenId()) {
+            $this->setDebugMessage('ClientLogin checkSession() cookie and session mismatch.');
+
             return false;
         }
 
-        $this->setDebugMessage(sprintf('Profile login check passed for "%s" "%s".', $cookie, $profile['provider'], $profile['resource_owner_id']));
-        return true;
+        //
+        if ($sessionToken && $sessionToken['accessToken']->getExpires() > time()) {
+            $this->setDebugMessage('ClientLogin checkSession() returns TRUE.');
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
