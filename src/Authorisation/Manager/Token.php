@@ -54,12 +54,23 @@ class Token
     public function getToken($tokenName)
     {
         if ($token = $this->session->get($tokenName)) {
-            $this->log->debug("Retrieved '$tokenName' token. Value: '$token'.", ['event' => 'extensions']);
+            $this->log->debug("Retrieved '$tokenName' token. Value: '" . (string) $token . "'.", ['event' => 'extensions']);
         } else {
             $this->log->debug("Token '$tokenName' does not exist.", ['event' => 'extensions']);
         }
 
         return $token;
+    }
+
+    /**
+     * Remove a session token.
+     *
+     * @param string $tokenName
+     */
+    public function removeToken($tokenName)
+    {
+        $this->log->debug("Clearing '$tokenName' token.", ['event' => 'extensions']);
+        $this->session->remove($tokenName);
     }
 
     /**
@@ -146,16 +157,5 @@ class Token
         }
 
         return true;
-    }
-
-    /**
-     * Remove a session token.
-     *
-     * @param string $tokenName
-     */
-    public function removeToken($tokenName)
-    {
-        $this->log->debug("Clearing '$tokenName' token.", ['event' => 'extensions']);
-        $this->session->remove($tokenName);
     }
 }
