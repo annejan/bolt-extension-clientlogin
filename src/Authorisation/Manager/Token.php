@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use RandomLib\Generator;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Psr\Log\LogLevel;
 
 /**
  * Token management class.
@@ -55,9 +56,9 @@ class Token
     public function getToken($tokenName)
     {
         if ($token = $this->session->get($tokenName)) {
-            $this->log->debug("Retrieved '$tokenName' token. Value: '" . (string) $token . "'.", ['event' => 'extensions']);
+            $this->logMessage(LogLevel::DEBUG, "Retrieved '$tokenName' token. Value: '" . (string) $token . "'.");
         } else {
-            $this->log->debug("Token '$tokenName' does not exist.", ['event' => 'extensions']);
+            $this->logMessage(LogLevel::DEBUG, "Token '$tokenName' does not exist.");
         }
 
         return $token;
@@ -70,7 +71,8 @@ class Token
      */
     public function removeToken($tokenName)
     {
-        $this->log->debug("Clearing '$tokenName' token.", ['event' => 'extensions']);
+        $this->logMessage(LogLevel::DEBUG, "Clearing '$tokenName' token.");
+
         $this->session->remove($tokenName);
     }
 
@@ -86,7 +88,7 @@ class Token
     {
         $sessionToken = new SessionToken($guid, $accessToken);
         $this->session->set(self::TOKEN_ACCESS, $sessionToken);
-        $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_ACCESS, (string) $sessionToken), ['event' => 'extensions']);
+        $this->logMessage(LogLevel::DEBUG, sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_ACCESS, (string) $sessionToken));
 
         // Retrive the saved token to make sure that the Session is working properly
         $accessToken = $this->getToken(self::TOKEN_ACCESS);
@@ -108,11 +110,11 @@ class Token
     public function setStateToken($state)
     {
         if (empty($state)) {
-            $this->log->debug('[ClientLogin] Trying to set empty state token!', ['event' => 'extensions']);
+            $this->logMessage(LogLevel::DEBUG, 'Trying to set empty state token!');
             throw new Exception\SystemSetupException('Trying to set empty state token!');
         }
 
-        $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_STATE, $state), ['event' => 'extensions']);
+        $this->logMessage(LogLevel::DEBUG, sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_STATE, $state));
         $this->session->set(self::TOKEN_STATE, $state);
 
         // Retrive the saved token to make sure that the Session is working properly
@@ -138,7 +140,7 @@ class Token
     {
         $state = $request->get('state');
         if ($state === null) {
-            $this->log->error('Authorisation request was missing state token.', ['event' => 'extensions']);
+            $this->logMessage(LogLevel::ERROR, 'Authorisation request was missing state token.');
             throw new Exception\InvalidAuthorisationRequestException('Invalid authorisation request!');
         }
 
@@ -149,11 +151,21 @@ class Token
         $this->removeToken(self::TOKEN_STATE);
 
         if (empty($stateToken) || $stateToken !== $state) {
-            $this->log->error("Mismatch of state token '$state' against saved '$stateToken'", ['event' => 'extensions']);
+            $this->logMessage(LogLevel::ERROR, "Mismatch of state token '$state' against saved '$stateToken'");
 
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Write a log message.
+     *
+     * @param string $message
+     */
+    protected function logMessage($level, $message)
+    {
+        $this->log->log($level, '[ClientLogin][Token]: ' . $message, ['event' => 'extensions']);
     }
 }

@@ -75,11 +75,11 @@ class Session
 
         // If we have a cookie, let's do checks.
         if ($cookie = $request->cookies->get('clientlogin_access_token')) {
-            $this->setDebugMessage(sprintf('ClientLogin checkRequest() check found cookie: %s', $cookie));
+            $this->setDebugMessage(sprintf('checkRequest() check found cookie: %s', $cookie));
             return true;
         }
 
-        $this->setDebugMessage('ClientLogin checkRequest() check found no cookie.');
+        $this->setDebugMessage('checkRequest() check found no cookie.');
         return false;
     }
 
@@ -96,7 +96,7 @@ class Session
     {
         // Get the session
         if (!$sessionToken = $this->session->get(TokenManager::TOKEN_ACCESS)) {
-            $this->setDebugMessage('ClientLogin checkSession() check found no session key for SessionToken.');
+            $this->setDebugMessage('checkSession() check found no session key for SessionToken.');
 
             return false;
         }
@@ -108,14 +108,14 @@ class Session
 
         $cookie = $request->cookies->get('clientlogin_access_token');
         if ($cookie !== $sessionToken->getAccessTokenId()) {
-            $this->setDebugMessage('ClientLogin checkSession() cookie and session mismatch.');
+            $this->setDebugMessage('checkSession() cookie and session mismatch.');
 
             return false;
         }
 
         //
         if ($sessionToken && $sessionToken['accessToken']->getExpires() > time()) {
-            $this->setDebugMessage('ClientLogin checkSession() returns TRUE.');
+            $this->setDebugMessage('checkSession() returns TRUE.');
 
             return true;
         }
@@ -140,6 +140,6 @@ class Session
      */
     protected function setDebugMessage($message)
     {
-        $this->logger->debug($message, ['event' => 'extensions']);
+        $this->logger->debug('[ClientLogin][Session]: ' . $message, ['event' => 'extensions']);
     }
 }

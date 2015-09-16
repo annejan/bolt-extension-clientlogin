@@ -194,7 +194,7 @@ abstract class HandlerBase
      */
     protected function setDebugMessage($message)
     {
-        $this->app['logger.system']->debug($message, ['event' => 'extensions']);
+        $this->app['logger.system']->debug('[ClientLogin][Handler]: ' . $message, ['event' => 'extensions']);
         $this->setFeedback('debug', $message);
     }
 

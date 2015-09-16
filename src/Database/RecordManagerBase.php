@@ -124,12 +124,12 @@ abstract class RecordManagerBase
      */
     protected function executeQuery(QueryBuilder $query)
     {
-        $this->logger->debug('[ClientLogin]: ' . (string) $query, ['event' => 'extensions']);
+        $this->logger->debug('[ClientLogin][Database]: ' . (string) $query, ['event' => 'extensions']);
 
-        return $query->execute();
+            return $query->execute();
         try {
         } catch (\Doctrine\DBAL\DBALException $e) {
-            $this->logger->critical('ClientLogin had a database exception.', ['event' => 'exception', 'exception' => $e]);
+            $this->logger->critical('[ClientLogin][Database]: Database exception.', ['event' => 'exception', 'exception' => $e]);
         }
     }
 
@@ -142,14 +142,14 @@ abstract class RecordManagerBase
      */
     protected function fetchArray(QueryBuilder $query)
     {
-        $this->logger->debug('[ClientLogin]: ' . (string) $query, ['event' => 'extensions']);
+        $this->logger->debug('[ClientLogin][Database]: ' . (string) $query, ['event' => 'extensions']);
 
         return $query
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC);
         try {
         } catch (\Doctrine\DBAL\DBALException $e) {
-            $this->logger->critical('ClientLogin had a database exception.', ['event' => 'exception', 'exception' => $e]);
+            $this->logger->critical('[ClientLogin][Database]: Database exception.', ['event' => 'exception', 'exception' => $e]);
         }
     }
 }
