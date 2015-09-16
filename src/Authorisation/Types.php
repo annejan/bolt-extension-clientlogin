@@ -19,4 +19,7 @@ class Types
     const AUTH_PASSWORD = 'password';
     const AUTH_OAUTH1 = 'oauth1';
     const AUTH_OAUTH2 = 'oauth2';
+
+    const TOKEN_COOKIE_NAME = 'clientlogin_access_token';
+    const TOKEN_SESSION_NAME = 'clientlogin_session_token';
 }
