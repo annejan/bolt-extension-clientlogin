@@ -21,7 +21,7 @@ class Cookie
      *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
-    public function create($path, AccessToken $accessToken)
+    public static function create($path, AccessToken $accessToken)
     {
         if (!$expire = $accessToken->getExpires()) {
             $expire = time() + 3600;
