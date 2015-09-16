@@ -130,8 +130,7 @@ abstract class HandlerBase
             return $this->provider;
         }
 
-
-        $this->setDebugMessage("Creating provider $this->getProviderName()");
+        $this->setDebugMessage('Creating provider ' .$this->getProviderName());
 
         /** @var \League\OAuth2\Client\Provider\AbstractProvider $providerClass */
         $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $this->getProviderName();
