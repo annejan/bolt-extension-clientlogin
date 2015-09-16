@@ -18,7 +18,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class TokenManager
 {
+    /** Session key name of the access token ID */
     const TOKEN_ACCESS = 'bolt.clientlogin.token.access';
+    /** Session key name of the state value used on authentication request to upstream */
     const TOKEN_STATE  = 'bolt.clientlogin.token.state';
 
     /** \Symfony\Component\HttpFoundation\Session\SessionInterface */
@@ -108,10 +110,17 @@ class TokenManager
      *
      * @param $string
      *
+     * @throws \RuntimeException
+     *
      * @return string
      */
     public function setStateToken($state)
     {
+        if (empty($state)) {
+            $this->log->debug('[ClientLogin] Trying to set empty state token!', ['event' => 'extensions']);
+            throw new \RuntimeException('Trying to set empty state token!');
+        }
+
         $this->log->debug(sprintf("Setting '%s' token. Value: '%s'", self::TOKEN_STATE, $state), ['event' => 'extensions']);
         $this->session->set(self::TOKEN_STATE, $state);
 
@@ -119,7 +128,7 @@ class TokenManager
         $token = $this->getToken(self::TOKEN_STATE);
 
         if (empty($token)) {
-            throw new \RuntimeException('[ClientLogin] Unable to create a Symfony session token!');
+            throw new \RuntimeException('Unable to create a Symfony session token!');
         }
 
         return $token;
