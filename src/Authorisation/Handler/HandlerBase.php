@@ -9,9 +9,9 @@ use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Authorisation control class.
@@ -51,7 +51,9 @@ abstract class HandlerBase
     }
 
     /**
-     * Check the
+     * Check the login.
+     *
+     * @return boolean
      */
     protected function login($returnpage)
     {
@@ -61,19 +63,20 @@ abstract class HandlerBase
             throw new Exception\DisabledProviderException();
         }
 
-        if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
-            // Get the user object for the event
-            $sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
-            // Event dispatcher
-            $this->dispatchEvent('clientlogin.Login', $sessionToken);
-            // Set user feedback messages
-            $this->app['clientlogin.feedback']->set('message', 'Login was successful.');
+        if (!$this->app['clientlogin.session']->isLoggedIn($this->request)) {
+            return false;
         }
-    }
 
-    protected function process($returnpage)
-    {
+        // Get the user object for the event
+        $sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
 
+        // Event dispatcher
+        $this->dispatchEvent('clientlogin.Login', $sessionToken);
+
+        // Set user feedback messages
+        $this->app['clientlogin.feedback']->set('message', 'Login was successful.');
+
+        return true;
     }
 
     /**
