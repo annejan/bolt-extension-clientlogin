@@ -32,12 +32,12 @@ class UserInterface
      *
      * @return Twig_Markup
      */
-    public function doDisplayAuth($redirect)
+    public function displayAuth($redirect)
     {
         if ($this->app['clientlogin.session']->isLoggedIn()) {
-            return $this->doDisplayLogout($redirect);
+            return $this->displayLogout($redirect);
         } else {
-            return $this->doDisplayLogin($redirect);
+            return $this->displayLogin($redirect);
         }
     }
 
@@ -49,7 +49,7 @@ class UserInterface
      *
      * @return \Twig_Markup
      */
-    public function doDisplayLogin($redirect, $target = '')
+    public function displayLogin($redirect, $target = '')
     {
         $html = '';
 
@@ -86,7 +86,7 @@ class UserInterface
      *
      * @return \Twig_Markup
      */
-    public function doDisplayLogout($redirect)
+    public function displayLogout($redirect)
     {
         $target = ''; // empty target
 

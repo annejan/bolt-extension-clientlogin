@@ -112,7 +112,7 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayAuth($redirect = false)
     {
-        return $this->getUserInterface()->doDisplayAuth($redirect);
+        return $this->getUserInterface()->displayAuth($redirect);
     }
 
     /**
@@ -124,7 +124,7 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayLogin($redirect = false)
     {
-        return $this->getUserInterface()->doDisplayLogin($redirect);
+        return $this->getUserInterface()->displayLogin($redirect);
     }
 
     /**
@@ -136,7 +136,7 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayLogout($redirect = false)
     {
-        return $this->getUserInterface()->doDisplayLogout($redirect);
+        return $this->getUserInterface()->displayLogout($redirect);
     }
 
     /**
