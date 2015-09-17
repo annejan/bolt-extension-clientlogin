@@ -108,34 +108,6 @@ class Remote extends HandlerBase implements HandlerInterface
     }
 
     /**
-     * Get an access token from the OAuth provider.
-     *
-     * @param Request $request
-     *
-     * @throws IdentityProviderException
-     * @throws Exception\InvalidAuthorisationRequestException
-     *
-     * @return AccessToken
-     */
-    protected function getAccessToken(Request $request)
-    {
-        $code = $request->query->get('code');
-
-        if ($code === null) {
-            $this->setDebugMessage('Attempt to get an OAuth2 acess token with an empty code in the request.');
-
-            throw new Exception\InvalidAuthorisationRequestException('No provider access code.');
-        }
-        $options = ['code' => $code];
-
-        // Try to get an access token using the authorization code grant.
-        $accessToken = $this->getProvider()->getAccessToken('authorization_code', $options);
-        $this->setDebugMessage('OAuth token received', $accessToken->jsonSerialize());
-
-        return $accessToken;
-    }
-
-    /**
      * Get a refresh token from the OAuth provider.
      *
      * @param AccessToken $accessToken
