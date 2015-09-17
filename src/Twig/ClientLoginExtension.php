@@ -4,20 +4,19 @@ namespace Bolt\Extension\Bolt\ClientLogin\Twig;
 
 use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Extension;
-use Bolt\Extension\Bolt\ClientLogin\UserInterface;
+use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 
 /**
  * Twig functions
  */
 class ClientLoginExtension extends \Twig_Extension
 {
-    /** @var UserInterface class object */
-    private $userinterface;
+    /** @var UserInterface */
+    protected $userInterface;
 
     public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->userinterface = new UserInterface($app);
     }
 
     /**
@@ -109,7 +108,7 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayAuth($redirect = false)
     {
-        return $this->userinterface->doDisplayAuth($redirect);
+        return $this->getUserInterface()->doDisplayAuth($redirect);
     }
 
     /**
@@ -121,7 +120,7 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayLogin($redirect = false)
     {
-        return $this->userinterface->doDisplayLogin($redirect);
+        return $this->getUserInterface()->doDisplayLogin($redirect);
     }
 
     /**
@@ -133,6 +132,21 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayLogout($redirect = false)
     {
-        return $this->userinterface->doDisplayLogout($redirect);
+        return $this->getUserInterface()->doDisplayLogout($redirect);
+    }
+
+    /**
+     * Return a UserInterface object and ensure our Twig global extists.
+     *
+     * @return UserInterface
+     */
+    protected function getUserInterface()
+    {
+        if ($this->userinterface === null) {
+            $this->app['twig']->addGlobal('clientlogin', null);
+            $this->userinterface = new UserInterface($this->app);
+        }
+
+        return $this->userinterface;
     }
 }
