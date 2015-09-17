@@ -22,7 +22,7 @@ class UserInterface
         $this->app = $app;
         $this->config = $app['clientlogin.config'];
 
-        $this->app['twig.loader.filesystem']->addPath(dirname(__DIR__) . '/assets');
+        $this->app['twig.loader.filesystem']->addPath(dirname(dirname(dirname(__DIR__))) . '/assets');
     }
 
     /**
