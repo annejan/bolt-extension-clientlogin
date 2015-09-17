@@ -36,11 +36,10 @@ class Remote extends HandlerBase implements HandlerInterface
         }
 
         if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
-// TODO
             // Get the user object for the event
-//$sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
+            $sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
             // Event dispatcher
-//$this->dispatchEvent('clientlogin.Login', $sessionToken);
+            $this->dispatchEvent('clientlogin.Login', $sessionToken);
 
             // User is logged in already, from whence they came return them now.
             return new RedirectResponse($returnpage);

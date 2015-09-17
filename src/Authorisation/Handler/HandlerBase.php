@@ -4,11 +4,11 @@ namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\SessionToken;
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
-use Bolt\Extension\Bolt\ClientLogin\Profile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -171,13 +171,13 @@ abstract class HandlerBase
     /**
      * Dispatch event to any listeners.
      *
-     * @param string  $type    Either 'clientlogin.Login' or 'clientlogin.Logout'
-     * @param Profile $profile
+     * @param string       $type    Either 'clientlogin.Login' or 'clientlogin.Logout'
+     * @param SessionToken $sessionToken
      */
-    protected function dispatchEvent($type, Profile $profile)
+    protected function dispatchEvent($type, SessionToken $sessionToken)
     {
         if ($this->app['dispatcher']->hasListeners($type)) {
-            $event = new ClientLoginEvent($profile, $this->app['clientlogin.records']->getTableName('profile'));
+            $event = new ClientLoginEvent($sessionToken);
 
             try {
                 $this->app['dispatcher']->dispatch($type, $event);
