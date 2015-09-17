@@ -2,6 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
@@ -39,6 +40,24 @@ class Session
     }
 
     /**
+     * Get a logged in visitor profile.
+     *
+     * @param Request $request
+     *
+     * @return Profile
+     */
+    public function getLoggedIn(Request $request = null)
+    {
+    if (!$this->checkRequest($request)) {
+            return;
+        }
+
+        if ($this->checkSession($request)) {
+            return $this->session->get(Manager\Token::TOKEN_ACCESS);
+        }
+    }
+
+    /**
      * Check if a visitor is logged in.
      *
      * @param Request $request
@@ -57,7 +76,7 @@ class Session
     /**
      * Check a request for a valid handling.
      *
-     * @param Request $request
+     * @param Request|null $request
      *
      * @throws \RuntimeException
      *
@@ -74,7 +93,7 @@ class Session
         }
 
         // If we have a cookie, let's do checks.
-        if ($cookie = $request->cookies->get('clientlogin_access_token')) {
+        if ($cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME)) {
             $this->setDebugMessage(sprintf('checkRequest() check found cookie: %s', $cookie));
             return true;
         }
@@ -86,16 +105,20 @@ class Session
     /**
      * Check a session for a valid and not-expired AccessToken.
      *
-     * @param Request $request
+     * @param Request|null $request
      *
      * @throws \RuntimeException
      *
      * @return boolean
      */
-    protected function checkSession(Request $request)
+    protected function checkSession($request)
     {
+        if ($request === null) {
+            $request = $this->requestStack->getCurrentRequest();
+        }
+
         // Get the session
-        if (!$sessionToken = $this->session->get(TokenManager::TOKEN_ACCESS)) {
+        if (!$sessionToken = $this->session->get(Manager\Token::TOKEN_ACCESS)) {
             $this->setDebugMessage('checkSession() check found no session key for SessionToken.');
 
             return false;
@@ -106,7 +129,7 @@ class Session
             throw new \RuntimeException('AccessToken not stored with SessionToken!');
         }
 
-        $cookie = $request->cookies->get('clientlogin_access_token');
+        $cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME);
         if ($cookie !== $sessionToken->getAccessTokenId()) {
             $this->setDebugMessage('checkSession() cookie and session mismatch.');
 
