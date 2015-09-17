@@ -130,6 +130,7 @@ class Session
             throw new \RuntimeException('AccessToken not stored with SessionToken!');
         }
 
+        // Check that cookie matches the one stored in session.
         $cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME);
         if ($cookie !== $sessionToken->getAccessTokenId()) {
             $this->setDebugMessage('checkSession() cookie and session mismatch.');
@@ -137,8 +138,8 @@ class Session
             return false;
         }
 
-        //
-        if ($sessionToken && $sessionToken['accessToken']->getExpires() > time()) {
+        // If the expires time is after now, they are valid.
+        if ($sessionToken && $sessionToken->getAccessToken()->getExpires() > time()) {
             $this->setDebugMessage('checkSession() returns TRUE.');
 
             return true;
