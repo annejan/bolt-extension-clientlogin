@@ -11,6 +11,7 @@ use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Authorisation control class.
@@ -49,9 +50,30 @@ abstract class HandlerBase
         $this->tm     = new Manager\Token($app['session'], $app['randomgenerator'], $app['logger.system']);
     }
 
-    protected function updateLogin()
+    /**
+     * Check the
+     */
+    protected function login($returnpage)
     {
-        //
+        $provider = $this->getConfig()->getProvider($this->getProviderName());
+
+        if ($provider['enabled'] !== true) {
+            throw new Exception\DisabledProviderException();
+        }
+
+        if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
+            // Get the user object for the event
+            $sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
+            // Event dispatcher
+            $this->dispatchEvent('clientlogin.Login', $sessionToken);
+            // Set user feedback messages
+            $this->app['clientlogin.feedback']->set('message', 'Login was successful.');
+        }
+    }
+
+    protected function process($returnpage)
+    {
+
     }
 
     /**

@@ -29,23 +29,11 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     public function login($returnpage)
     {
-        $provider = $this->getConfig()->getProvider($this->getProviderName());
-
-        if ($provider['enabled'] !== true) {
-            throw new Exception\DisabledProviderException();
-        }
-
-        if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
-            // Get the user object for the event
-            $sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
-            // Event dispatcher
-            $this->dispatchEvent('clientlogin.Login', $sessionToken);
-
+        if (parent::login($returnpage)) {
             // User is logged in already, from whence they came return them now.
             return new RedirectResponse($returnpage);
-        } else {
-            return $this->getAuthorisationRedirectResponse();
         }
+        return $this->getAuthorisationRedirectResponse();
     }
 
     /**
