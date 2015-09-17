@@ -54,6 +54,7 @@ class ConfigTest extends BoltUnitTest
 
         $this->assertSame('_profile.twig', $config->getTemplate('profile'));
         $this->assertSame('_button.twig', $config->getTemplate('button'));
+        $this->assertSame('_feedback.twig', $config->getTemplate('feedback'));
         $this->assertSame('_password.twig', $config->getTemplate('password'));
         $this->assertSame('password.twig', $config->getTemplate('password_parent'));
     }
