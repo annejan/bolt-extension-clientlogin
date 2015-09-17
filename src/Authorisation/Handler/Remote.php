@@ -52,9 +52,9 @@ class Remote extends HandlerBase implements HandlerInterface
         return parent::logout($returnpage);
     }
 
-/*
     protected function getOauthResourceOwner(Request $request)
     {
+/*
         if ($cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME)) {
             $profile = $this->getRecordManager()->getProfileByAccessToken($cookie);
 
@@ -79,8 +79,8 @@ class Remote extends HandlerBase implements HandlerInterface
             // Save the new token data
             $this->getRecordManager()->updateProfile($this->getProviderName(), $accessToken, $resourceOwner);
         }
-    }
 */
+    }
 
     /**
      * Create a redirect response to fetch an authorisation code.
