@@ -17,7 +17,7 @@ use League\OAuth2\Client\Token\AccessToken;
 /**
  * Remote authentication handler class tests
  */
-class RemoteTest extends BoltUnitTest
+class RemoteLoginTest extends BoltUnitTest
 {
     /**
      * @expectedException \Bolt\Extension\Bolt\ClientLogin\Exception\InvalidProviderException
