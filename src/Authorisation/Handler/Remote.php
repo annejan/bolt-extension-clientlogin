@@ -88,7 +88,7 @@ class Remote extends HandlerBase implements HandlerInterface
 /*
     protected function getOauthResourceOwner(Request $request)
     {
-        if ($cookie = $request->cookies->get('clientlogin_access_token')) {
+        if ($cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME)) {
             $profile = $this->getRecordManager()->getProfileByAccessToken($cookie);
 
             if (!$profile) {
