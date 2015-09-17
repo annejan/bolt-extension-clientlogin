@@ -74,8 +74,11 @@ class ServiceProvider implements ServiceProviderInterface
         );
 
         $app['clientlogin.feedback'] = $app->share(
-            function ($this) {
-                return new Feedback();
+            function ($app) {
+                $feedback = new Feedback($app['session']);
+                $app->after([$feedback, 'after']);
+
+                return $feedback;
             }
         );
 

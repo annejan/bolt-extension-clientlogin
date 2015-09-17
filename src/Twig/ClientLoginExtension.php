@@ -46,7 +46,7 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getGlobals()
     {
-        return ['clientlogin' => ['feedback' => $this->app['clientlogin.feedback']->getFeedback()]];
+        return ['clientlogin' => ['feedback' => $this->app['clientlogin.feedback']]];
     }
 
     /**

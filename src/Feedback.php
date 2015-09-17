@@ -2,6 +2,8 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 /**
  * Feedback message class.
  *
@@ -12,8 +14,23 @@ class Feedback
     /** @var array */
     protected $feedback = [];
 
-    public function __construct()
+    public function __construct(SessionInterface $session)
     {
+        $this->session = $session;
+
+        if ($this->session->isStarted() && $stored = $this->session->get('clientlogin_feedback')) {
+            $this->feedback = $stored;
+        }
+    }
+
+    /**
+     * Post-request middleware callback, added in service provider.
+     */
+    public function after()
+    {
+        if ($this->session->isStarted()) {
+            $this->session->set('clientlogin_feedback', $this->feedback);
+        }
     }
 
     /**
