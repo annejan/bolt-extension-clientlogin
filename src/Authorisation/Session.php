@@ -99,6 +99,7 @@ class Session
         }
 
         $this->setDebugMessage('checkRequest() check found no cookie.');
+
         return false;
     }
 
@@ -125,7 +126,7 @@ class Session
         }
 
         // Check the returned object is valid
-        if (!$sessionToken['accessToken'] instanceof AccessToken) {
+        if (!$sessionToken instanceof SessionToken) {
             throw new \RuntimeException('AccessToken not stored with SessionToken!');
         }
 
