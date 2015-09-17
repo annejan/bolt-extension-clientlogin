@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin;
+namespace Bolt\Extension\Bolt\ClientLogin\Twig\Helper;
 
 use Bolt\Application;
 use Bolt\Helpers\String;
