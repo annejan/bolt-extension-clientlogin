@@ -32,6 +32,7 @@ template:
     login: _login.twig
     password: _password.twig
     password_parent: password.twig
+    feedback: _feedback.twig
     button: _button.twig
 
 label:

@@ -133,8 +133,9 @@ class Config
             ],
             'basepath' => 'authenticate',
             'template' => [
-                'profile'         => '_profile.twig',
                 'button'          => '_button.twig',
+                'feedback'        => '_feedback.twig',
+                'profile'         => '_profile.twig',
                 'password'        => '_password.twig',
                 'password_parent' => 'password.twig'
             ],

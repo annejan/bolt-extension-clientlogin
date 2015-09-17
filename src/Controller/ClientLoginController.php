@@ -180,7 +180,6 @@ class ClientLoginController implements ControllerProviderInterface
 //             $app['clientlogin.feedback']->setFeedback('message', 'A server error occurred, we are very sorry and someone has been notified!');
 //             $response = new RedirectResponse($this->getRedirectUrl($app));
 //         }
-//         $app['twig']->addGlobal('clientlogin', $app['clientlogin.feedback']->getFeedback());
 
         return $response;
     }
