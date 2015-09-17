@@ -20,9 +20,7 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Return the name of the extension
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -30,9 +28,7 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * The functions we add to Twig
-     *
-     * @return array Function names and their local callbacks
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -43,6 +39,14 @@ class ClientLoginExtension extends \Twig_Extension
             'displaylogin'  => new \Twig_Function_Method($this, 'getDisplayLogin'),
             'displaylogout' => new \Twig_Function_Method($this, 'getDisplayLogout')
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGlobals()
+    {
+        return ['clientlogin' => ['feedback' => $this->app['clientlogin.feedback']->getFeedback()]];
     }
 
     /**
@@ -143,7 +147,6 @@ class ClientLoginExtension extends \Twig_Extension
     protected function getUserInterface()
     {
         if ($this->userInterface === null) {
-            $this->app['twig']->addGlobal('clientlogin', null);
             $this->userInterface = new UserInterface($this->app);
         }
 
