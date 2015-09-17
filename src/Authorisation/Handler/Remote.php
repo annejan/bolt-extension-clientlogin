@@ -69,6 +69,7 @@ class Remote extends HandlerBase implements HandlerInterface
         // Update the session record
         $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
         $this->getRecordManager()->writeSession($profile['guid'], $this->getProviderName(), $accessToken);
+        $this->getTokenManager()->setAuthToken($profile['guid'], $accessToken);
 
         $response = new RedirectResponse($returnpage);
         $cookiePaths = $this->getConfig()->getCookiePaths();
