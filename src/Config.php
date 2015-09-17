@@ -62,6 +62,20 @@ class Config
     }
 
     /**
+     * Set a provider config value.
+     *
+     * @internal
+     *
+     * @param string $key
+     *
+     * @return array
+     */
+    public function setProviderValue($key, $value)
+    {
+        $this->config['providers'][$key] = $value;
+    }
+
+    /**
      * Get a button label.
      *
      * @param string $key
