@@ -1,4 +1,4 @@
-{% set feedback = clientlogin.feedback.getfeedback() %}
+{% set feedback = clientlogin.feedback.get() %}
 
 {% if feedback.debug|default(null) %}
 <strong><em>Debug Messages:</em></strong>

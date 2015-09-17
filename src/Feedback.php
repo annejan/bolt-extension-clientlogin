@@ -45,13 +45,26 @@ class Feedback
     }
 
     /**
-     * Get the saved feedback array.
+     * Peek at the saved feedback array.
      *
      * @return array
      */
-    public function getFeedback()
+    public function peek()
     {
         return $this->feedback;
+    }
+
+    /**
+     * Get the saved feedback array and flush.
+     *
+     * @return array
+     */
+    public function get()
+    {
+        $feedback = $this->feedback;
+        $this->feedback = [];
+
+        return $feedback;
     }
 
     /**
@@ -62,7 +75,7 @@ class Feedback
      *
      * @throws \InvalidArgumentException
      */
-    public function setFeedback($state, $message)
+    public function set($state, $message)
     {
         if (empty($state) || !in_array($state, ['error', 'message', 'debug'])) {
             throw new \InvalidArgumentException("Feedback state can only be 'error', 'message', or 'debug'.");

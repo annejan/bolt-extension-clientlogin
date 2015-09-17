@@ -157,27 +157,27 @@ class ClientLoginController implements ControllerProviderInterface
             $authorise = $this->getAuthoriseClass($app, $request);
 
             $response = $authorise->{$action}($this->getRedirectUrl($app));
-            $app['clientlogin.feedback']->setFeedback('message', 'Login was successful.');
+            $app['clientlogin.feedback']->set('message', 'Login was successful.');
 
 //         try {
 //         }
 //         catch (IdentityProviderException $e) {
 //             // Thrown by the OAuth2 library
-//             $app['clientlogin.feedback']->setFeedback('debug', $e->getMessage());
-//             $app['clientlogin.feedback']->setFeedback('message', 'An exception occurred authenticating with the provider.');
+//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
+//             $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
 //             $response = new Response('Access denied!', Response::HTTP_FORBIDDEN);
 //         }
 //         catch (InvalidAuthorisationRequestException $e) {
 //             // Thrown deliberately internally
-//             $app['clientlogin.feedback']->setFeedback('debug', $e->getMessage());
-//             $app['clientlogin.feedback']->setFeedback('message', 'An exception occurred authenticating with the provider.');
+//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
+//             $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
 //             $response = new Response('Access denied!', Response::HTTP_FORBIDDEN);
 //             $response = new RedirectResponse($this->getRedirectUrl($app));
 //         }
 //         catch (\Exception $e) {
 //             // Yeah, this can't be good…
-//             $app['clientlogin.feedback']->setFeedback('debug', $e->getMessage());
-//             $app['clientlogin.feedback']->setFeedback('message', 'A server error occurred, we are very sorry and someone has been notified!');
+//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
+//             $app['clientlogin.feedback']->set('message', 'A server error occurred, we are very sorry and someone has been notified!');
 //             $response = new RedirectResponse($this->getRedirectUrl($app));
 //         }
 
