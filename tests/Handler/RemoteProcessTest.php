@@ -17,7 +17,7 @@ use League\OAuth2\Client\Token\AccessToken;
 /**
  * Remote authentication handler class tests
  */
-class RemoteProcessTest extends BoltUnitTest
+class RemoteProcessTest extends HandlerUnitTest
 {
     public function testProcess()
     {
