@@ -27,6 +27,14 @@ providers:
             secret: "*** your secret here ***"
         scopes: [ user ]
 
+# Cookies
+#
+# The paths to set authentication cookies for.
+# - Default cookie is set to '/'
+# - Override by enabling `allowed_cookie_paths` and set an array of relative URIs
+#
+#allowed_cookie_paths: ['/profiles', '/members']
+
 # Templates
 template:
     login: _login.twig

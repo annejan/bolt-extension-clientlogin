@@ -98,6 +98,16 @@ class Config
     }
 
     /**
+     * Get the cookie paths we set for.
+     *
+     * @return array
+     */
+    public function getCookiePaths()
+    {
+        return $this->config['allowed_cookie_paths'] ? (array) $this->config['allowed_cookie_paths'] : ['/'];
+    }
+
+    /**
      * Check if we're running debug mode.
      *
      * @return boolean
@@ -131,6 +141,7 @@ class Config
                 'Twitter'  => $options,
                 'GitHub'   => $options,
             ],
+            'allowed_cookie_paths' => null,
             'basepath' => 'authenticate',
             'template' => [
                 'button'          => '_button.twig',

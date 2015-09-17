@@ -70,10 +70,12 @@ class Remote extends HandlerBase implements HandlerInterface
         $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
         $this->getRecordManager()->writeSession($profile['guid'], $this->getProviderName(), $accessToken);
 
-        $cookie = Manager\Cookie::create($resourceOwner->getId(), $accessToken);
-
         $response = new RedirectResponse($returnpage);
-        $response->headers->setCookie($cookie);
+        $cookiePaths = $this->getConfig()->getCookiePaths();
+        foreach ($cookiePaths as $cookiePath) {
+            $cookie = Manager\Cookie::create($cookiePath, $accessToken);
+            $response->headers->setCookie($cookie);
+        }
 
         return $response;
     }
