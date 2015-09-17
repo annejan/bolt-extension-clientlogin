@@ -80,6 +80,27 @@ abstract class HandlerBase
     }
 
     /**
+     * Logout a profile.
+     *
+     * @param string $returnpage
+     *
+     * @return Response
+     */
+    protected function logout($returnpage)
+    {
+        if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
+            $this->getTokenManager()->removeToken(Manager\Token::TOKEN_ACCESS);
+            $this->app['clientlogin.feedback']->set('message', 'Logout was successful.');
+        }
+
+        $cookiePaths = $this->getConfig()->getCookiePaths();
+        $response = new RedirectResponse($returnpage);
+        Manager\Cookie::clearResponseCookies($response, $cookiePaths);
+
+        return $response;
+    }
+
+    /**
      * Get the config DI.
      *
      * @return Config

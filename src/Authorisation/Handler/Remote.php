@@ -70,6 +70,7 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     public function logout($returnpage)
     {
+        return parent::logout($returnpage);
     }
 
 /*

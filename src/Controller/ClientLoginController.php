@@ -3,6 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Types;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
@@ -123,7 +124,7 @@ class ClientLoginController implements ControllerProviderInterface
     public function authenticationLogout(Application $app, Request $request)
     {
         $response = $this->getFinalResponse($app, $request, 'logout');
-        $response->headers->clearCookie(Types::TOKEN_COOKIE_NAME, $app['resources']->getUrl('root'));
+        $response->headers->clearCookie(Manager\Token::TOKEN_COOKIE_NAME, $app['resources']->getUrl('root'));
 
         return $response;
     }
@@ -157,7 +158,6 @@ class ClientLoginController implements ControllerProviderInterface
             $authorise = $this->getAuthoriseClass($app, $request);
 
             $response = $authorise->{$action}($this->getRedirectUrl($app));
-            $app['clientlogin.feedback']->set('message', 'Login was successful.');
 
 //         try {
 //         }
