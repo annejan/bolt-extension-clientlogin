@@ -2,39 +2,27 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Event;
 
-use Bolt\Extension\Bolt\ClientLogin\Profile;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\SessionToken;
 use Symfony\Component\EventDispatcher\Event;
 
 class ClientLoginEvent extends Event
 {
-    /** @var array User record */
-    private $user;
-    /** @var string User profile table name */
-    private $tableName;
+    /** @var SessionToken */
+    private $sessionToken;
 
     /**
-     * @param Profile $user
-     * @param string  $tableName
+     * @param SessionToken $sessionToken
      */
-    public function __construct(Profile $user, $tableName)
+    public function __construct(SessionToken $sessionToken)
     {
-        $this->user      = $user;
-        $this->tableName = $tableName;
+        $this->sessionToken = $sessionToken;
     }
 
     /**
-     * Return the user record
+     * Return the SessionToken
      */
-    public function getUser()
+    public function getSessionToken()
     {
-        return $this->user;
-    }
-
-    /**
-     * Return the user profile table name
-     */
-    public function getTableNameProfiles()
-    {
-        return $this->tableName;
+        return $this->sessionToken;
     }
 }
