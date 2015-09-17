@@ -104,7 +104,7 @@ class ClientLoginController implements ControllerProviderInterface
     {
         if (!$request->isSecure()) {
             // Log a warning if this route is not HTTPS
-            $msg = sprintf("ClientLogin login route '%s' is not being served over HTTPS. This is insecure and vulnerable!", $request->getPathInfo());
+            $msg = sprintf("[ClientLogin][Controller]: Login route '%s' is not being served over HTTPS. This is insecure and vulnerable!", $request->getPathInfo());
             $app['logger.system']->critical($msg, ['event' => 'extensions']);
         }
         $this->setFinalRedirectUrl($app, $request);
@@ -154,10 +154,11 @@ class ClientLoginController implements ControllerProviderInterface
      */
     private function getFinalResponse(Application $app, Request $request, $action)
     {
-        $authorise = $this->getAuthoriseClass($app, $request);
+            $authorise = $this->getAuthoriseClass($app, $request);
 
-            $response = $authorise->{$action}($request, $app['session'], $this->getRedirectUrl($app));
-            $authorise->setFeedback('message', 'Login was successful.');
+            $response = $authorise->{$action}($this->getRedirectUrl($app));
+//             $authorise->setFeedback('message', 'Login was successful.');
+
 //         try {
 //         }
 //         catch (IdentityProviderException $e) {
@@ -197,17 +198,17 @@ class ClientLoginController implements ControllerProviderInterface
     private function getAuthoriseClass(Application $app, Request $request)
     {
         if (!$providerName = $this->getProviderName($app, $request)) {
-            $app['logger.system']->debug('Request was missing a provider in the GET.', ['event' => 'extensions']);
+            $app['logger.system']->debug('[ClientLogin][Controller]: Request was missing a provider in the GET.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
         if ($app['clientlogin.config']->getProvider($providerName) === null){
-            $app['logger.system']->debug('Request provider did not match any configured providers.', ['event' => 'extensions']);
+            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider did not match any configured providers.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
         if ($app['clientlogin.config']->getProvider($providerName)['enabled'] !== true){
-            $app['logger.system']->debug('Request provider was disabled.', ['event' => 'extensions']);
+            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider was disabled.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 

@@ -9,11 +9,11 @@ use Bolt\Extension\Bolt\ClientLogin\Profile;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * OAuth login provider.
@@ -39,10 +39,11 @@ class Remote extends HandlerBase implements HandlerInterface
         }
 
         if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
+// TODO
             // Get the user object for the event
-//$sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
+//$sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
             // Event dispatcher
-//$this->dispatchEvent('clientlogin.Login', $sessionToken['data']);
+//$this->dispatchEvent('clientlogin.Login', $sessionToken);
 
             // User is logged in already, from whence they came return them now.
             return new RedirectResponse($returnpage);
@@ -62,14 +63,10 @@ class Remote extends HandlerBase implements HandlerInterface
         $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
         if ($profile === false) {
             $this->setDebugMessage(sprintf('No profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
-            $write = $this->getRecordManager()->writeProfile('insert', $this->getProviderName(), $accessToken, $resourceOwner);
+            $this->getRecordManager()->writeProfile('insert', $this->getProviderName(), $accessToken, $resourceOwner);
         } else {
             $this->setDebugMessage(sprintf('Profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
-            $write = $this->getRecordManager()->writeProfile($profile['guid'], $this->getProviderName(), $accessToken, $resourceOwner);
-        }
-
-        if (!$write) {
-            throw new \Exception('why no rite?');
+            $this->getRecordManager()->writeProfile($profile['guid'], $this->getProviderName(), $accessToken, $resourceOwner);
         }
 
         // Update the session record
@@ -77,6 +74,7 @@ class Remote extends HandlerBase implements HandlerInterface
         $this->getRecordManager()->writeSession($profile['guid'], $this->getProviderName(), $accessToken);
 
         $cookie = Manager\Cookie::create($resourceOwner->getId(), $accessToken);
+
         $response = new RedirectResponse($returnpage);
         $response->headers->setCookie($cookie);
 
@@ -168,7 +166,7 @@ class Remote extends HandlerBase implements HandlerInterface
 
         // Try to get an access token using the authorization code grant.
         $accessToken = $this->getProvider()->getAccessToken('authorization_code', $options);
-        $this->app['logger.system']->debug('[ClientLogin] OAuth token received', $accessToken->jsonSerialize());
+        $this->setDebugMessage('OAuth token received', $accessToken->jsonSerialize());
 
         return $accessToken;
     }
