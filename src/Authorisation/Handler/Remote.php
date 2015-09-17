@@ -60,10 +60,7 @@ class Remote extends HandlerBase implements HandlerInterface
 
         $response = new RedirectResponse($returnpage);
         $cookiePaths = $this->getConfig()->getCookiePaths();
-        foreach ($cookiePaths as $cookiePath) {
-            $cookie = Manager\Cookie::create($cookiePath, $accessToken);
-            $response->headers->setCookie($cookie);
-        }
+        Manager\Cookie::setResponseCookies($response, $accessToken, $cookiePaths);
 
         return $response;
     }
