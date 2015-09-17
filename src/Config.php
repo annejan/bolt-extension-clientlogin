@@ -140,6 +140,7 @@ class Config
                 'Facebook' => $options,
                 'Twitter'  => $options,
                 'GitHub'   => $options,
+                'Generic'  => $options,
             ],
             'allowed_cookie_paths' => null,
             'basepath' => 'authenticate',

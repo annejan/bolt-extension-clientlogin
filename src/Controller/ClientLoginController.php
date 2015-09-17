@@ -103,6 +103,9 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogout(Application $app, Request $request)
     {
+        if (!$this->getProviderName($app, $request)) {
+            $request->query->set('provider', 'Generic');
+        }
         $response = $this->getFinalResponse($app, $request, 'logout');
         $response->headers->clearCookie(Manager\Token::TOKEN_COOKIE_NAME, $app['resources']->getUrl('root'));
 
@@ -186,7 +189,8 @@ class ClientLoginController implements ControllerProviderInterface
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
-        if ($app['clientlogin.config']->getProvider($providerName)['enabled'] !== true) {
+        $providerConfig = $app['clientlogin.config']->getProvider($providerName);
+        if ($providerConfig['enabled'] !== true && $providerName !== 'Generic') {
             $app['logger.system']->debug('[ClientLogin][Controller]: Request provider was disabled.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
