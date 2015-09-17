@@ -101,6 +101,39 @@ abstract class HandlerBase
     }
 
     /**
+     * Proceess a profile login validation attempt.
+     *
+     * @param string $returnpage
+     *
+     * @return Response
+     */
+    protected function process($returnpage)
+    {
+        $accessToken = $this->getAccessToken($this->request);
+        $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
+
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
+        if ($profile === false) {
+            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
+            $this->getRecordManager()->writeProfile('insert', $this->getProviderName(), $accessToken, $resourceOwner);
+        } else {
+            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
+            $this->getRecordManager()->writeProfile($profile['guid'], $this->getProviderName(), $accessToken, $resourceOwner);
+        }
+
+        // Update the session record
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
+        $this->getRecordManager()->writeSession($profile['guid'], $this->getProviderName(), $accessToken);
+        $this->getTokenManager()->setAuthToken($profile['guid'], $accessToken);
+
+        $response = new RedirectResponse($returnpage);
+        $cookiePaths = $this->getConfig()->getCookiePaths();
+        Manager\Cookie::setResponseCookies($response, $accessToken, $cookiePaths);
+
+        return $response;
+    }
+
+    /**
      * Get the config DI.
      *
      * @return Config
