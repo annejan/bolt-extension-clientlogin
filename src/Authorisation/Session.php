@@ -93,7 +93,7 @@ class Session
         }
 
         // If we have a cookie, let's do checks.
-        if ($cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME)) {
+        if ($cookie = $request->cookies->get(Manager\Token::TOKEN_COOKIE_NAME)) {
             $this->setDebugMessage(sprintf('checkRequest() check found cookie: %s', $cookie));
             return true;
         }
@@ -131,7 +131,7 @@ class Session
         }
 
         // Check that cookie matches the one stored in session.
-        $cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME);
+        $cookie = $request->cookies->get(Manager\Token::TOKEN_COOKIE_NAME);
         if ($cookie !== $sessionToken->getAccessTokenId()) {
             $this->setDebugMessage('checkSession() cookie and session mismatch.');
 

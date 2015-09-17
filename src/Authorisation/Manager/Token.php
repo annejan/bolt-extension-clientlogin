@@ -22,6 +22,8 @@ class Token
     const TOKEN_ACCESS = 'bolt.clientlogin.token.access';
     /** Session key name of the state value used on authentication request to upstream */
     const TOKEN_STATE  = 'bolt.clientlogin.token.state';
+    const TOKEN_COOKIE_NAME = 'clientlogin_access_token';
+    const TOKEN_SESSION_NAME = 'clientlogin_session_token';
 
     /** \Symfony\Component\HttpFoundation\Session\SessionInterface */
     protected $session;
