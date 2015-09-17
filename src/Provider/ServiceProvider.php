@@ -7,6 +7,7 @@ use Bolt\Extension\Bolt\ClientLogin\Authorisation\Session;
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
+use Bolt\Extension\Bolt\ClientLogin\Feedback;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
@@ -69,6 +70,12 @@ class ServiceProvider implements ServiceProviderInterface
                 );
 
                 return $schema;
+            }
+        );
+
+        $app['clientlogin.feedback'] = $app->share(
+            function ($this) {
+                return new Feedback();
             }
         );
 

@@ -34,8 +34,6 @@ abstract class HandlerBase
     private $response;
     /** @var Manager\Token */
     private $tm;
-    /** @var array */
-    private $feedback = [];
 
     /**
      * @param Application $app
@@ -157,32 +155,6 @@ abstract class HandlerBase
         }
 
         return $this->providerName = ucwords(strtolower($provider));
-    }
-
-    /**
-     * Get the saved feedback array.
-     *
-     * @return array
-     */
-    public function getFeedback()
-    {
-        return $this->feedback;
-    }
-
-    /**
-     * Set a feedback error of message that will be passed to Twig as a global.
-     *
-     * @param string $state
-     * @param string $message
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setFeedback($state, $message)
-    {
-        if (empty($state) || !in_array($state, ['error', 'message', 'debug'])) {
-            throw new \InvalidArgumentException("Feedback state can only be 'error', 'message', or 'debug'.");
-        }
-        $this->feedback[$state][] = $message;
     }
 
     /**
