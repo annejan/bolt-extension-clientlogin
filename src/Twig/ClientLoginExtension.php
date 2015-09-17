@@ -142,11 +142,11 @@ class ClientLoginExtension extends \Twig_Extension
      */
     protected function getUserInterface()
     {
-        if ($this->userinterface === null) {
+        if ($this->userInterface === null) {
             $this->app['twig']->addGlobal('clientlogin', null);
-            $this->userinterface = new UserInterface($this->app);
+            $this->userInterface = new UserInterface($this->app);
         }
 
-        return $this->userinterface;
+        return $this->userInterface;
     }
 }
