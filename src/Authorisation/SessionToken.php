@@ -83,7 +83,7 @@ class SessionToken implements \JsonSerializable
     public function jsonSerialize()
     {
         $returnArray = [
-            'guid' => $this->guid,
+            'guid'        => $this->guid,
             'accessToken' => $this->accessToken,
         ];
 

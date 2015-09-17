@@ -2,7 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin;
 
-use Hautelook\Phpass\PasswordHash;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 
 /**

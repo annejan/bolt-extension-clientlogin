@@ -9,7 +9,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -202,12 +201,12 @@ class ClientLoginController implements ControllerProviderInterface
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
-        if ($app['clientlogin.config']->getProvider($providerName) === null){
+        if ($app['clientlogin.config']->getProvider($providerName) === null) {
             $app['logger.system']->debug('[ClientLogin][Controller]: Request provider did not match any configured providers.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
-        if ($app['clientlogin.config']->getProvider($providerName)['enabled'] !== true){
+        if ($app['clientlogin.config']->getProvider($providerName)['enabled'] !== true) {
             $app['logger.system']->debug('[ClientLogin][Controller]: Request provider was disabled.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }

@@ -2,7 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 
-use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Types;
 use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\Cookie as CookieBase;

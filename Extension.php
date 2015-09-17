@@ -5,8 +5,6 @@ namespace Bolt\Extension\Bolt\ClientLogin;
 use Bolt\BaseExtension;
 use Bolt\Events\CronEvent;
 use Bolt\Events\CronEvents;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
 
 /**

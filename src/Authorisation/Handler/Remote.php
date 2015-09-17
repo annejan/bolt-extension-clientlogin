@@ -2,18 +2,15 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
-use Bolt\Extension\Bolt\ClientLogin\Database;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+use Bolt\Extension\Bolt\ClientLogin\Database;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
-use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * OAuth login provider.

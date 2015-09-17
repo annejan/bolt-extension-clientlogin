@@ -2,9 +2,9 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
-use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
 use Bolt\Extension\Bolt\ClientLogin\Exception\DisabledProviderException;
-use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
+use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use Bolt\Extension\Bolt\ClientLogin\FormFields;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
 use Hautelook\Phpass\PasswordHash;
@@ -12,8 +12,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
 
 /**
  * Password login provider.
@@ -45,7 +43,6 @@ class Local extends HandlerBase implements HandlerInterface
 
             // User is logged in already, from whence they came return them now.
             return new RedirectResponse($returnpage);
-
         }
 
         return $this->render($request);

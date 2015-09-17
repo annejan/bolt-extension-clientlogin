@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
 
 use League\OAuth2\Client\Provider\Google as LeagueGoogle;
-use League\OAuth2\Client\Provider\GoogleUser;
 use League\OAuth2\Client\Token\AccessToken;
 
 /**

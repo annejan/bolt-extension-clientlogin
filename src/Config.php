@@ -3,6 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin;
 
 use Bolt\Helpers\Arr;
+
 /**
  * Configuration provider.
  *
@@ -53,7 +54,7 @@ class Config
      * Set a config element.
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function set($key, $value)
     {
@@ -115,7 +116,7 @@ class Config
     {
         $options = [
             'enabled' => false,
-            'keys' => [
+            'keys'    => [
                 'clientId'     => null,
                 'clientSecret' => null
             ],

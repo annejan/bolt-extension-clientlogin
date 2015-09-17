@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
 
 use League\OAuth2\Client\Provider\Facebook as LeagueFacebook;
-use League\OAuth2\Client\Provider\FacebookUser;
 use League\OAuth2\Client\Token\AccessToken;
 
 /**

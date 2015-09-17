@@ -4,10 +4,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Extension\Bolt\ClientLogin\Exception\DisabledProviderException;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
-use Bolt\Extension\Bolt\ClientLogin\Exception\ProviderException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Authentication provider interface.

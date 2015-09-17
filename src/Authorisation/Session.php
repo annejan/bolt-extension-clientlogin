@@ -3,11 +3,11 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
+use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use League\OAuth2\Client\Token\AccessToken;
 
 /**
  * The login session.

@@ -2,13 +2,9 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Database;
 
-use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
-use Doctrine\DBAL\Driver\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
-use Psr\Log\LoggerInterface;
 
 /**
  * Authenticated user record maintenance
