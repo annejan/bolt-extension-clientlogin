@@ -20,6 +20,7 @@ class Feedback
 
         if ($this->session->isStarted() && $stored = $this->session->get('clientlogin_feedback')) {
             $this->feedback = $stored;
+            $this->session->remove('clientlogin_feedback');
         }
     }
 
