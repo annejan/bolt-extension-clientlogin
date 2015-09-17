@@ -19,20 +19,24 @@ use League\OAuth2\Client\Token\AccessToken;
  */
 class RemoteProcessTest extends HandlerUnitTest
 {
-    public function testProcess()
+    /**
+     * @expectedException \Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException
+     * @expectedExceptionMessage No provider access code.
+     */
+    public function testProcessNoAccessCode()
     {
-//         $app = $this->getApp();
-//         $extension = new Extension($app);
-//         $app['extensions']->register($extension);
-//         $app['extensions']->initialize();
+        $app = $this->getApp();
+        $extension = new Extension($app);
+        $app['extensions']->register($extension);
+        $app['extensions']->initialize();
 
-//         $request = Request::create('/authenticate/login');
-//         $requestStack = new RequestStack();
-//         $requestStack->push($request);
-//         $app['request'] = $request;
-//         $app['request_stack'] = $requestStack;
+        $request = Request::create('/authenticate/endpoint');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $app['request'] = $request;
+        $app['request_stack'] = $requestStack;
 
-//         $base = new Remote($app, $app['request_stack']);
-//         $base->login('/gum-tree/koala');
+        $base = new Remote($app, $app['request_stack']);
+        $base->process('/gum-tree/koala');
     }
 }
