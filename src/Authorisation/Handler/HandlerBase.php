@@ -204,7 +204,7 @@ abstract class HandlerBase
         }
 
         $options = $this->getProviderOptions($this->getProviderName());
-        $collaborators = ['httpClient' => new \GuzzleHttp\Client()];
+        $collaborators = ['httpClient' => $this->app['clientlogin.guzzle']];
 
         return $this->provider = new $providerClass($options, $collaborators);
     }

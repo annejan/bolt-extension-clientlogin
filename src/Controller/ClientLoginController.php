@@ -66,26 +66,6 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function before(Request $request, Application $app)
     {
-        $baseDir = dirname(dirname(__DIR__));
-
-        require $baseDir . '/lib/GuzzleHttp/Guzzle/functions_include.php';
-        require $baseDir . '/lib/GuzzleHttp/Promise/functions_include.php';
-        require $baseDir . '/lib/GuzzleHttp/Psr7/functions_include.php';
-
-        $loader = new \Composer\Autoload\ClassLoader();
-        $loader->setPsr4('GuzzleHttp\\', [
-            $baseDir . '/lib/GuzzleHttp/Guzzle',
-            $baseDir . '/lib/GuzzleHttp/Promise',
-            $baseDir . '/lib/GuzzleHttp/Psr7',
-        ]);
-        $loader->setPsr4('GuzzleHttp\\Promise\\', [
-            $baseDir . '/lib/GuzzleHttp/Promise',
-        ]);
-        $loader->setPsr4('GuzzleHttp\\Psr7\\', [
-            $baseDir . '/lib/GuzzleHttp/Psr7',
-        ]);
-        $loader->register(true);
-
         // Debug logger
         if ($this->config->isDebug()) {
             $debuglog = $app['resources']->getPath('cache') . '/authenticate.log';
