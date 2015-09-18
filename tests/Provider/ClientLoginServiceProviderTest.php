@@ -4,12 +4,8 @@ namespace Bolt\Extension\Bolt\ClientLogin\Provider\Tests;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Session;
 use Bolt\Extension\Bolt\ClientLogin\Extension;
-use Bolt\Extension\Bolt\ClientLogin\Database;
 use Bolt\Extension\Bolt\ClientLogin\Provider\ServiceProvider;
 use Bolt\Tests\BoltUnitTest;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session as SessionHandler;
 
 /**
  * ClientLogin Service Provider tests

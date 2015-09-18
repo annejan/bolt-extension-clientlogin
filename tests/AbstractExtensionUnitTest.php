@@ -4,7 +4,6 @@ namespace Bolt\Extension\Bolt\ClientLogin\Tests;
 
 use Bolt\Extension\Bolt\ClientLogin\Extension;
 use Bolt\Tests\BoltUnitTest;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Base class for ClientLogin testing.

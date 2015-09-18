@@ -3,11 +3,8 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Controller\Tests;
 
 use Bolt\Extension\Bolt\ClientLogin\Extension;
-use Bolt\Nut\DatabaseRepair;
 use Bolt\Tests\BoltUnitTest;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * ClientLoginController tests

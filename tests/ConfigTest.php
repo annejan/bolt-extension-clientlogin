@@ -3,11 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Tests;
 
 use Bolt\Extension\Bolt\ClientLogin\Config;
-use Bolt\Extension\Bolt\ClientLogin\Extension;
-use Bolt\Nut\CronRunner;
-use Bolt\Nut\DatabaseRepair;
 use Bolt\Tests\BoltUnitTest;
-use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * Config class tests
