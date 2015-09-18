@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Remote authentication handler class tests
  */
-class RemoteProcessTest extends HandlerUnitTest
+class RemoteProcessTest extends AbstractHandlerUnitTest
 {
     /**
      * @expectedException \Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException

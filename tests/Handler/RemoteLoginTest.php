@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Remote authentication handler class tests
  */
-class RemoteLoginTest extends HandlerUnitTest
+class RemoteLoginTest extends AbstractHandlerUnitTest
 {
     /**
      * @expectedException \Bolt\Extension\Bolt\ClientLogin\Exception\InvalidProviderException

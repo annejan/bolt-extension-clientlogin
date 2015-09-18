@@ -12,7 +12,7 @@ use League\OAuth2\Client\Token\AccessToken;
 /**
  *
  */
-abstract class HandlerUnitTest extends BoltUnitTest
+abstract class AbstractHandlerUnitTest extends BoltUnitTest
 {
     protected function getClientLoginSession(Application $app, $fakeIsLogged = true)
     {

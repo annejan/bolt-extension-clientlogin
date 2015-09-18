@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Remote authentication handler class tests
  */
-class RemoteLogoutTest extends HandlerUnitTest
+class RemoteLogoutTest extends AbstractHandlerUnitTest
 {
     public function testLogout()
     {
