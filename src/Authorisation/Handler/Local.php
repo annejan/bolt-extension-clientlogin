@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
+use Bolt\Extension\Bolt\ClientLogin\FormFields;
 
 /**
  * Password login provider.
@@ -83,6 +84,10 @@ class Local extends HandlerBase implements HandlerInterface
      */
     protected function render()
     {
+        $formFields = FormFields::Password();
+        $this->app['boltforms']->makeForm(Types::FORM_NAME_PASSWORD, 'form', [], []);
+        $this->app['boltforms']->addFieldArray(Types::FORM_NAME_PASSWORD, $formFields['fields']);
+
         if ($this->request->isMethod('POST')) {
             // Validate the form data
             $form = $this->app['boltforms']
@@ -106,7 +111,9 @@ class Local extends HandlerBase implements HandlerInterface
             }
         }
 
+        // Get password prompt
         $html = $this->app['clientlogin.ui']->displayPasswordPrompt();
+
         return new Response($html, Response::HTTP_OK);
     }
 

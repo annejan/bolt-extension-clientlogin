@@ -118,11 +118,7 @@ class UserInterface
      */
     public function displayPasswordPrompt()
     {
-        $formFields = FormFields::Password();
-        $this->app['boltforms']->makeForm(Types::FORM_NAME_PASSWORD, 'form', [], []);
-        $this->app['boltforms']->addFieldArray(Types::FORM_NAME_PASSWORD, $formFields['fields']);
-
-        //
+        // Fetch th fields for the form
         $fields = $this->app['boltforms']->getForm(Types::FORM_NAME_PASSWORD)->all();
         $context = [
             'parent'  => $this->config->getTemplate('password_parent'),
