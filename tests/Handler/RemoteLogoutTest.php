@@ -9,12 +9,17 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Remote authentication handler class tests
+ *
+ * @coversDefaultClass \Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler\Remote
  */
 class RemoteLogoutTest extends AbstractHandlerUnitTest
 {
+    /**
+     * @covers ::logout
+     */
     public function testLogout()
     {
-        //         $app = $this->getApp();
+//         $app = $this->getApp();
 //         $extension = new Extension($app);
 //         $app['extensions']->register($extension);
 //         $app['extensions']->initialize();
@@ -26,6 +31,7 @@ class RemoteLogoutTest extends AbstractHandlerUnitTest
 //         $app['request_stack'] = $requestStack;
 
 //         $base = new Remote($app, $app['request_stack']);
-//         $base->login('/gum-tree/koala');
+//         $response = $base->logout('/gum-tree/koala');
+// dump($response);
     }
 }

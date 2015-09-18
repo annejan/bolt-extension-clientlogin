@@ -10,10 +10,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Remote authentication handler class tests
+ *
+ * @coversDefaultClass \Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler\Remote
  */
 class RemoteLoginTest extends AbstractHandlerUnitTest
 {
     /**
+     * @covers ::login
      * @expectedException \Bolt\Extension\Bolt\ClientLogin\Exception\InvalidProviderException
      */
     public function testLoginNoProvider()
@@ -34,6 +37,7 @@ class RemoteLoginTest extends AbstractHandlerUnitTest
     }
 
     /**
+     * @covers ::login
      * @expectedException \Bolt\Extension\Bolt\ClientLogin\Exception\DisabledProviderException
      */
     public function testLoginDisabledProvider()
@@ -55,7 +59,7 @@ class RemoteLoginTest extends AbstractHandlerUnitTest
     }
 
     /**
-     *
+     * @covers ::login
      */
     public function testLoginAuthorisationRedirect()
     {
@@ -84,7 +88,7 @@ class RemoteLoginTest extends AbstractHandlerUnitTest
     }
 
     /**
-     *
+     * @covers ::login
      */
     public function testLoginIsLoggedIn()
     {
@@ -116,6 +120,9 @@ class RemoteLoginTest extends AbstractHandlerUnitTest
         $this->assertTrue($response->isRedirect('/gum-tree/koala'));
     }
 
+    /**
+     * @covers ::login
+     */
     public function testGuzzle6Loaded()
     {
         $app = $this->getApp();

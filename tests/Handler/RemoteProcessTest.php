@@ -9,27 +9,55 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Remote authentication handler class tests
+ *
+ * @coversDefaultClass \Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler\Remote
  */
 class RemoteProcessTest extends AbstractHandlerUnitTest
 {
+
     /**
-     * @expectedException \Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException
-     * @expectedExceptionMessage No provider access code.
+     * @covers ::process
+     * @covers ::getOauthResourceOwner
+     * @covers ::getAuthorisationRedirectResponse
+     * @covers ::getRefreshToken
+     * @covers ::getProviderOptions
      */
-    public function testProcessNoAccessCode()
+    public function testProcessAll()
     {
-        $app = $this->getApp();
-        $extension = new Extension($app);
-        $app['extensions']->register($extension);
-        $app['extensions']->initialize();
+    }
 
-        $request = Request::create('/authenticate/endpoint');
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
-        $app['request'] = $request;
-        $app['request_stack'] = $requestStack;
+    /**
+     * @covers ::process
+     */
+    public function testProcessProcess()
+    {
+    }
 
-        $base = new Remote($app, $app['request_stack']);
-        $base->process('/gum-tree/koala');
+    /**
+     * @covers ::getOauthResourceOwner
+     */
+    public function testProcessGetOauthResourceOwner()
+    {
+    }
+
+    /**
+     * @covers ::getAuthorisationRedirectResponse
+     */
+    public function testProcessGetAuthorisationRedirectResponse()
+    {
+    }
+
+    /**
+     * @covers ::getRefreshToken
+     */
+    public function testProcessGetRefreshToken()
+    {
+    }
+
+    /**
+     * @covers ::getProviderOptions
+     */
+    public function testProcessGetProviderOptions()
+    {
     }
 }
