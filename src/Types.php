@@ -1,9 +1,9 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
+namespace Bolt\Extension\Bolt\ClientLogin;
 
 /**
- * Authorisation type constants.
+ * ClientLogin type constants.
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
