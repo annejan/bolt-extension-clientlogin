@@ -2,26 +2,29 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
-use Bolt\Extension\Bolt\ClientLogin\Extension;
-use Bolt\Extension\Bolt\ClientLogin\Session;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Types;
+use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Authentication controller
+ * ClientLogin authentication controller
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
 class ClientLoginController implements ControllerProviderInterface
 {
-    /** @var string */
-    const TOKENNAME = 'bolt_clientlogin_redirect';
+    const FINAL_REDIRECT_KEY = 'bolt.clientlogin.redirect';
 
-    /** @var array Extension config */
+    /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     private $config;
 
     /**
@@ -31,10 +34,11 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function connect(Application $app)
     {
-        $this->config = $app[Extension::CONTAINER]->config;
+        $this->config = $app['clientlogin.config'];
 
         /** @var $ctr \Silex\ControllerCollection */
-        $ctr = $app['controllers_factory'];
+        $ctr = $app['controllers_factory']
+            ->before([$this, 'before']);
 
         // Member login
         $ctr->match('/login', [$this, 'authenticationLogin'])
@@ -55,7 +59,22 @@ class ClientLoginController implements ControllerProviderInterface
     }
 
     /**
-     * Login controller
+     * Before middleware to load Guzzle 6.
+     *
+     * @param Request     $request
+     * @param Application $app
+     */
+    public function before(Request $request, Application $app)
+    {
+        // Debug logger
+        if ($this->config->isDebug()) {
+            $debuglog = $app['resources']->getPath('cache') . '/authenticate.log';
+            $app['logger.system']->pushHandler(new StreamHandler($debuglog, Logger::DEBUG));
+        }
+    }
+
+    /**
+     * Login route.
      *
      * @param \Silex\Application $app
      * @param Request            $request
@@ -64,29 +83,18 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogin(Application $app, Request $request)
     {
-        $returnpage = $this->setRedirectUrl($app);
-
-        $app['clientlogin.session']->doLogin($request, $returnpage);
-
-        $response = $app['clientlogin.session']->getResponse();
-
-        // If we have a good response, set a cookie
-        if (!$response->isClientError()) {
-            $expire = '+' . $this->config['login_expiry'] . ' days';
-            $value = $app['randomgenerator']->generateString(32);
-            $cookie = new Cookie('bolt_clientlogin', $value, $expire, '/', null, false, false);
-            $response->headers->setCookie($cookie);
-
-            $app['logger.system']->debug('Setting cookie: ' . $cookie);
-        } else {
-            $app['logger.system']->debug('Session returned a bad status code: ' . $response->getStatusCode());
+        if (!$request->isSecure()) {
+            // Log a warning if this route is not HTTPS
+            $msg = sprintf("[ClientLogin][Controller]: Login route '%s' is not being served over HTTPS. This is insecure and vulnerable!", $request->getPathInfo());
+            $app['logger.system']->critical($msg, ['event' => 'extensions']);
         }
+        $this->setFinalRedirectUrl($app, $request);
 
-        return $response;
+        return $this->getFinalResponse($app, $request, 'login');
     }
 
     /**
-     * Logout controller
+     * Logout route.
      *
      * @param \Silex\Application $app
      * @param Request            $request
@@ -95,25 +103,19 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogout(Application $app, Request $request)
     {
-        $returnpage = $this->getRedirectUrl($app);
-        $this->clearRedirectUrl($app);
-
-        $app['clientlogin.session']->logout($returnpage);
-
-        $response = $app['clientlogin.session']->getResponse();
-
-        if (!$response->isClientError()) {
-            $app['logger.system']->debug('Clearing cookie:');
-            $response->headers->clearCookie('bolt_clientlogin');
-        } else {
-            $app['logger.system']->debug('Session returned a bad status code: ' . $response->getStatusCode());
+        if (!$this->getProviderName($app, $request)) {
+            $request->query->set('provider', 'Generic');
         }
+        $response = $this->getFinalResponse($app, $request, 'logout');
+        $response->headers->clearCookie(Manager\Token::TOKEN_COOKIE_NAME, $app['resources']->getUrl('root'));
 
         return $response;
     }
 
     /**
-     * OAuth endpoint
+     * Authorisation endpoint.
+     *
+     * For OAuth this will be the reply endpoint.
      *
      * @param \Silex\Application $app
      * @param Request            $request
@@ -122,49 +124,124 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationEndpoint(Application $app, Request $request)
     {
-        $url = $this->getRedirectUrl($app);
-        $this->clearRedirectUrl($app);
-
-        // Check 'code' isn't empty
-        $code = $app['request']->get('code');
-        if (empty($code)) {
-            $html = '<h1>Authentication Code Error!</h1><p>Oh... look... kitten...</p><img src="http://emergencykitten.com/img/random" />';
-            return new Response($html, Response::HTTP_FORBIDDEN);
-        }
-
-        // Given state must match previously stored one to mitigate CSRF attack
-        if (!$app['clientlogin.session']->checkStateToken($request->get('state'))) {
-            $html = '<h1>Authentication Token Error!</h1><p>Oh... look... kitten...</p><img src="http://emergencykitten.com/img/random" />';
-            return new Response($html, Response::HTTP_FORBIDDEN);
-        }
-
-        $app['clientlogin.session']->loginCheckOAuth($request, $url);
-
-        return $app['clientlogin.session']->getResponse();
+        return $this->getFinalResponse($app, $request, 'process');
     }
 
     /**
-     * Save the redirect URL
+     * Get the required route response.
+     *
+     * @param Application $app
+     * @param Request     $request
+     * @param string      $action
+     *
+     * @return Response
+     */
+    private function getFinalResponse(Application $app, Request $request, $action)
+    {
+            $authorise = $this->getAuthoriseClass($app, $request);
+
+            $response = $authorise->{$action}($this->getRedirectUrl($app));
+
+//         try {
+//         }
+//         catch (IdentityProviderException $e) {
+//             // Thrown by the OAuth2 library
+//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
+//             $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
+//             $response = new Response('Access denied!', Response::HTTP_FORBIDDEN);
+//         }
+//         catch (InvalidAuthorisationRequestException $e) {
+//             // Thrown deliberately internally
+//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
+//             $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
+//             $response = new Response('Access denied!', Response::HTTP_FORBIDDEN);
+//             $response = new RedirectResponse($this->getRedirectUrl($app));
+//         }
+//         catch (\Exception $e) {
+//             // Yeah, this can't be good…
+//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
+//             $app['clientlogin.feedback']->set('message', 'A server error occurred, we are very sorry and someone has been notified!');
+//             $response = new RedirectResponse($this->getRedirectUrl($app));
+//         }
+
+        return $response;
+    }
+
+    /**
+     * Get the Authorisation\AuthorisationInterface class to handle the request.
      *
      * @param \Silex\Application $app
+     * @param Request            $request
+     *
+     * @throws InvalidAuthorisationRequestException
+     *
+     * @return AuthoriseInterface
      */
-    private function setRedirectUrl(Application $app)
+    private function getAuthoriseClass(Application $app, Request $request)
     {
-        $returnpage = $app['request']->get('redirect');
+        if (!$providerName = $this->getProviderName($app, $request)) {
+            $app['logger.system']->debug('[ClientLogin][Controller]: Request was missing a provider in the GET.', ['event' => 'extensions']);
+            throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
+        }
 
-        if ($returnpage) {
+        if ($app['clientlogin.config']->getProvider($providerName) === null) {
+            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider did not match any configured providers.', ['event' => 'extensions']);
+            throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
+        }
+
+        $providerConfig = $app['clientlogin.config']->getProvider($providerName);
+        if ($providerConfig['enabled'] !== true && $providerName !== 'Generic') {
+            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider was disabled.', ['event' => 'extensions']);
+            throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
+        }
+
+        if ($providerName === 'Password') {
+            return $app['clientlogin.handler.local'];
+        }
+
+        return $app['clientlogin.handler.remote'];
+    }
+
+    /**
+     * Get the provider name used.
+     *
+     * @param Application $app
+     * @param Request     $request
+     *
+     * @return string
+     */
+    private function getProviderName(Application $app, Request $request)
+    {
+        if ($providerName = $request->query->get('provider')) {
+            return $providerName;
+        } elseif ($providerName = $request->query->get(str_replace('.', '_', $app['clientlogin.config']->get('response_noun')))) {
+            return $providerName;
+        }
+    }
+
+    /**
+     * Save the redirect URL to the session.
+     *
+     * @param \Silex\Application $app
+     * @param Request            $request
+     *
+     * @return string
+     */
+    private function setFinalRedirectUrl(Application $app, Request $request)
+    {
+        if ($returnpage = $request->get('redirect')) {
             $returnpage = str_replace($app['resources']->getUrl('hosturl'), '', $returnpage);
         } else {
             $returnpage = $app['resources']->getUrl('hosturl');
         }
 
-        $app['session']->set(self::TOKENNAME, $returnpage);
+        $app['session']->set(self::FINAL_REDIRECT_KEY, $returnpage);
 
         return $returnpage;
     }
 
     /**
-     * Get the redirect URL
+     * Get the saved redirect URL from the session.
      *
      * @param \Silex\Application $app
      *
@@ -172,9 +249,7 @@ class ClientLoginController implements ControllerProviderInterface
      */
     private function getRedirectUrl($app)
     {
-        $returnpage = $app['session']->get(self::TOKENNAME);
-
-        if ($returnpage) {
+        if ($returnpage = $app['session']->get(self::FINAL_REDIRECT_KEY)) {
             return $returnpage;
         }
 
@@ -182,12 +257,12 @@ class ClientLoginController implements ControllerProviderInterface
     }
 
     /**
-     * Clear the redirect URL
+     * Clear the redirect URL.
      *
      * @param \Silex\Application $app
      */
     private function clearRedirectUrl($app)
     {
-        $app['session']->remove(self::TOKENNAME);
+        $app['session']->remove(self::FINAL_REDIRECT_KEY);
     }
 }

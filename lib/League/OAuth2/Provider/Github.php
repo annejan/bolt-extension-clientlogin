@@ -2,30 +2,59 @@
 
 namespace League\OAuth2\Client\Provider;
 
-use League\OAuth2\Client\Entity\User;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
+use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
+use Psr\Http\Message\ResponseInterface;
 
 class Github extends AbstractProvider
 {
-    public $responseType = 'string';
+    use BearerAuthorizationTrait;
 
-    public $authorizationHeader = 'token';
-
+    /**
+     * Domain
+     *
+     * @var string
+     */
     public $domain = 'https://github.com';
 
+    /**
+     * Api domain
+     *
+     * @var string
+     */
     public $apiDomain = 'https://api.github.com';
 
-    public function urlAuthorize()
+    /**
+     * Get authorization url to begin OAuth flow
+     *
+     * @return string
+     */
+    public function getBaseAuthorizationUrl()
     {
         return $this->domain.'/login/oauth/authorize';
     }
 
-    public function urlAccessToken()
+    /**
+     * Get access token url to retrieve token
+     *
+     * @param  array $params
+     *
+     * @return string
+     */
+    public function getBaseAccessTokenUrl(array $params)
     {
         return $this->domain.'/login/oauth/access_token';
     }
 
-    public function urlUserDetails(AccessToken $token)
+    /**
+     * Get provider url to fetch user details
+     *
+     * @param  AccessToken $token
+     *
+     * @return string
+     */
+    public function getResourceOwnerDetailsUrl(AccessToken $token)
     {
         if ($this->domain === 'https://github.com') {
             return $this->apiDomain.'/user';
@@ -33,67 +62,50 @@ class Github extends AbstractProvider
         return $this->domain.'/api/v3/user';
     }
 
-    public function urlUserEmails(AccessToken $token)
+    /**
+     * Get the default scopes used by this provider.
+     *
+     * This should not be a complete list of all scopes, but the minimum
+     * required for the provider user interface!
+     *
+     * @return array
+     */
+    protected function getDefaultScopes()
     {
-        if ($this->domain === 'https://github.com') {
-            return $this->apiDomain.'/user/emails';
+        return [];
+    }
+
+    /**
+     * Check a provider response for errors.
+     *
+     * @link   https://developer.github.com/v3/#client-errors
+     * @throws IdentityProviderException
+     * @param  ResponseInterface $response
+     * @param  string $data Parsed response data
+     * @return void
+     */
+    protected function checkResponse(ResponseInterface $response, $data)
+    {
+        if ($response->getStatusCode() >= 400) {
+            throw new IdentityProviderException(
+                $data['message'] ?: $response->getReasonPhrase(),
+                $response->getStatusCode(),
+                $response
+            );
         }
-        return $this->domain.'/api/v3/user/emails';
     }
 
-    public function userDetails($response, AccessToken $token)
+    /**
+     * Generate a user object from a successful user details request.
+     *
+     * @param array $response
+     * @param AccessToken $token
+     * @return League\OAuth2\Client\Provider\ResourceOwnerInterface
+     */
+    protected function createResourceOwner(array $response, AccessToken $token)
     {
-        $user = new User();
+        $user = new GithubResourceOwner($response);
 
-        $name = (isset($response->name)) ? $response->name : null;
-        $email = (isset($response->email)) ? $response->email : null;
-
-        $user->exchangeArray([
-            'uid' => $response->id,
-            'nickname' => $response->login,
-            'name' => $name,
-            'email' => $email,
-            'urls'  => [
-                'GitHub' => $this->domain.'/'.$response->login,
-            ],
-        ]);
-
-        return $user;
-    }
-
-    public function userUid($response, AccessToken $token)
-    {
-        return $response->id;
-    }
-
-    public function getUserEmails(AccessToken $token)
-    {
-        $response = $this->fetchUserEmails($token);
-
-        return $this->userEmails(json_decode($response), $token);
-    }
-
-    public function userEmail($response, AccessToken $token)
-    {
-        return isset($response->email) && $response->email ? $response->email : null;
-    }
-
-    public function userEmails($response, AccessToken $token)
-    {
-        return $response;
-    }
-
-    public function userScreenName($response, AccessToken $token)
-    {
-        return $response->name;
-    }
-
-    protected function fetchUserEmails(AccessToken $token)
-    {
-        $url = $this->urlUserEmails($token);
-
-        $headers = $this->getHeaders($token);
-
-        return $this->fetchProviderData($url, $headers);
+        return $user->setDomain($this->domain);
     }
 }

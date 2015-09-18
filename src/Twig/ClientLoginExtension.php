@@ -4,26 +4,23 @@ namespace Bolt\Extension\Bolt\ClientLogin\Twig;
 
 use Bolt\Application;
 use Bolt\Extension\Bolt\ClientLogin\Extension;
-use Bolt\Extension\Bolt\ClientLogin\UserInterface;
+use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 
 /**
  * Twig functions
  */
 class ClientLoginExtension extends \Twig_Extension
 {
-    /** @var UserInterface class object */
-    private $userinterface;
+    /** @var UserInterface */
+    protected $userInterface;
 
     public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->userinterface = new UserInterface($app);
     }
 
     /**
-     * Return the name of the extension
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -31,9 +28,7 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * The functions we add to Twig
-     *
-     * @return array Function names and their local callbacks
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -44,6 +39,14 @@ class ClientLoginExtension extends \Twig_Extension
             'displaylogin'  => new \Twig_Function_Method($this, 'getDisplayLogin'),
             'displaylogout' => new \Twig_Function_Method($this, 'getDisplayLogout')
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGlobals()
+    {
+        return ['clientlogin' => ['feedback' => $this->app['clientlogin.feedback']]];
     }
 
     /**
@@ -109,7 +112,7 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayAuth($redirect = false)
     {
-        return $this->userinterface->doDisplayAuth($redirect);
+        return $this->getUserInterface()->displayAuth($redirect);
     }
 
     /**
@@ -121,7 +124,7 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayLogin($redirect = false)
     {
-        return $this->userinterface->doDisplayLogin($redirect);
+        return $this->getUserInterface()->displayLogin($redirect);
     }
 
     /**
@@ -133,6 +136,20 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getDisplayLogout($redirect = false)
     {
-        return $this->userinterface->doDisplayLogout($redirect);
+        return $this->getUserInterface()->displayLogout($redirect);
+    }
+
+    /**
+     * Return a UserInterface object and ensure our Twig global extists.
+     *
+     * @return UserInterface
+     */
+    protected function getUserInterface()
+    {
+        if ($this->userInterface === null) {
+            $this->userInterface = new UserInterface($this->app);
+        }
+
+        return $this->userInterface;
     }
 }

@@ -180,6 +180,28 @@ is logged in or our, you can use:
     {{ displayauth() }}
 ```
 
+Overriding Templates
+====================
+
+Twig templates used by ClientLogin can be overridden in your config file.
+
+Assuming you're using a theme directory of `theme/my-site-theme/` you can:
+
+1. Create the directory `theme/my-site-theme/extensions/clientlogin/`
+2. Copy the contents of `extensions/vendor/bolt/clientlogin/assets/` to `theme/my-site-theme/extensions/clientlogin/`
+3. In your `app/config/extensions/clientlogin.bolt.yml` file, set the `template`
+  key to something similar too:
+```yaml
+template:
+    login: extensions/clientlogin/_login.twig
+    password: extensions/clientlogin/_password.twig
+    password_parent: extensions/clientlogin/password.twig
+    feedback: extensions/clientlogin/_feedback.twig
+    button: extensions/clientlogin/_button.twig
+```
+At this point you can customise the files in `theme/my-site-theme/extensions/clientlogin/`
+as you need for your site.
+
 ClientLogin in Bolt Extensions
 ==============================
 

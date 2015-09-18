@@ -10,16 +10,19 @@
 		"Twitter",
 		"GitHub"
 	],
-	"require" : {
-		"php" : ">=5.4.0",
-		"bolt/bolt" : ">=2.2.0,<3.0.0"
-	},
 	"license" : "GPL-3.0+",
 	"authors" : [{
 			"name" : "Gawain Lynch",
 			"email" : "gawain.lynch@gmail.com"
 		}
 	],
+	"require" : {
+		"php" : ">=5.5.9",
+		"bolt/bolt" : ">=2.3.0,<3.0.0"
+	},
+	"require-dev" : {
+		"phpunit/phpunit" : "^4.8"
+	},
 	"minimum-stability" : "dev",
 	"prefer-stable" : true,
 	"autoload" : {
@@ -32,21 +35,19 @@
 				"src/"
 			],
 			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
-			"Ivory\\HttpAdapter\\" : "lib/Ivory/HttpAdapter/",
-			"League\\OAuth1\\" : "lib/League/OAuth1/",
 			"League\\OAuth2\\Client\\" : "lib/League/OAuth2/",
-			"Psr\\Http\\Message\\" : "lib/Psr/Http/",
-			"Guzzle\\" : "lib/Guzzle/"
+			"Stevenmaguire\\OAuth2\\Client\\" : "lib/League/OAuth2/"
 		}
 	},
 	"autoload-dev" : {
 		"psr-4" : {
-			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/"
+			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
+			"Bolt\\Tests\\" : "vendor/bolt/bolt/tests/phpunit/unit/"
 		}
 	},
 	"extra" : {
 		"branch-alias" : {
-			"dev-master" : "2.2.x-dev"
+			"dev-development" : "3.0.x-dev"
 		}
 	}
 }

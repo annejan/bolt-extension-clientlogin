@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Tests;
 
 use Bolt\Extension\Bolt\ClientLogin\Extension;
-use Bolt\Nut\CronRunner;
 use Bolt\Nut\DatabaseRepair;
 use Bolt\Tests\BoltUnitTest;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -40,20 +39,7 @@ class ExtensionTest extends BoltUnitTest
         $this->assertArrayHasKey('template',      $this->extension->config);
         $this->assertArrayHasKey('zocial',        $this->extension->config);
         $this->assertArrayHasKey('login_expiry',  $this->extension->config);
-        $this->assertArrayHasKey('debug_mode',    $this->extension->config);
+        $this->assertArrayHasKey('debug',         $this->extension->config);
         $this->assertArrayHasKey('response_noun', $this->extension->config);
-    }
-
-    public function testCronDaily()
-    {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-
-        $command = new CronRunner($this->app);
-        $tester = new CommandTester($command);
-        $tester->execute([]);
-        $result = $tester->getDisplay();
-        $this->assertRegExp('/ClientLogin: Clearing old sessions/', $result);
     }
 }

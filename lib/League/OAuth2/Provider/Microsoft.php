@@ -1,69 +1,130 @@
-<?php
+<?php namespace Stevenmaguire\OAuth2\Client\Provider;
 
-namespace League\OAuth2\Client\Provider;
-
-use League\OAuth2\Client\Entity\User;
+use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
+use Psr\Http\Message\ResponseInterface;
 
 class Microsoft extends AbstractProvider
 {
-    public $scopes = ['wl.basic', 'wl.emails'];
-    public $responseType = 'json';
+    /**
+     * Default scopes
+     *
+     * @var array
+     */
+    public $defaultScopes = ['wl.basic', 'wl.emails'];
 
-    public function urlAuthorize()
+    /**
+     * Get authorization url to begin OAuth flow
+     *
+     * @return string
+     */
+    public function getBaseAuthorizationUrl()
     {
         return 'https://login.live.com/oauth20_authorize.srf';
     }
 
-    public function urlAccessToken()
+    /**
+     * Get access token url to retrieve token
+     *
+     * @return string
+     */
+    public function getBaseAccessTokenUrl(array $params)
     {
         return 'https://login.live.com/oauth20_token.srf';
     }
 
-    public function urlUserDetails(AccessToken $token)
+    /**
+     * Get default scopes
+     *
+     * @return array
+     */
+    protected function getDefaultScopes()
+    {
+        return $this->defaultScopes;
+    }
+
+    /**
+     * Check a provider response for errors.
+     *
+     * @throws IdentityProviderException
+     * @param  ResponseInterface $response
+     * @return void
+     */
+    protected function checkResponse(ResponseInterface $response, $data)
+    {
+        if (isset($data['error'])) {
+            throw new IdentityProviderException(
+                $data['error']['message'] ?: $response->getReasonPhrase(),
+                $response->getStatusCode(),
+                $response
+            );
+        }
+    }
+
+    /**
+     * Generate a user object from a successful user details request.
+     *
+     * @param array $response
+     * @param AccessToken $token
+     * @return \League\OAuth2\Client\Provider\UserInterface
+     */
+    protected function createResourceOwner(array $response, AccessToken $token)
+    {
+        $user = new MicrosoftResourceOwner($response);
+
+        $imageUrl = $this->getUserImageUrl($response, $token);
+
+        return $user->setImageurl($imageUrl);
+    }
+
+    /**
+     * Get provider url to fetch user details
+     *
+     * @param  AccessToken $token
+     *
+     * @return string
+     */
+    public function getResourceOwnerDetailsUrl(AccessToken $token)
     {
         return 'https://apis.live.net/v5.0/me?access_token='.$token;
     }
 
-    public function userDetails($response, AccessToken $token)
+    /**
+     * Get user image from provider
+     *
+     * @param  array        $response
+     * @param  AccessToken  $token
+     *
+     * @return array
+     */
+    protected function getUserImage(array $response, AccessToken $token)
     {
-        $client = $this->getHttpClient();
-        $client->setBaseUrl('https://apis.live.net/v5.0/'.$response->id.'/picture');
-        $request = $client->get()->send();
-        $info = $request->getInfo();
-        $imageUrl = $info['url'];
+        $url = 'https://apis.live.net/v5.0/'.$response['id'].'/picture';
 
-        $user = new User();
+        $request = $this->getAuthenticatedRequest('get', $url, $token);
 
-        $email = (isset($response->emails->preferred)) ? $response->emails->preferred : null;
+        $response = $this->getResponse($request);
 
-        $user->exchangeArray([
-            'uid' => $response->id,
-            'name' => $response->name,
-            'firstname' => $response->first_name,
-            'lastname' => $response->last_name,
-            'email' => $email,
-            'imageurl' => $imageUrl,
-            'urls' => $response->link.'/cid-'.$response->id,
-        ]);
-
-        return $user;
+        return $response;
     }
 
-    public function userUid($response, AccessToken $token)
+    /**
+     * Get user image url from provider, if available
+     *
+     * @param  array        $response
+     * @param  AccessToken  $token
+     *
+     * @return string
+     */
+    protected function getUserImageUrl(array $response, AccessToken $token)
     {
-        return $response->id;
-    }
+        $image = $this->getUserImage($response, $token);
 
-    public function userEmail($response, AccessToken $token)
-    {
-        return isset($response->emails->preferred) && $response->emails->preferred
-            ? $response->emails->preferred
-            : null;
-    }
+        if (isset($image['url'])) {
+            return $image['url'];
+        }
 
-    public function userScreenName($response, AccessToken $token)
-    {
-        return [$response->first_name, $response->last_name];
+        return null;
     }
 }
