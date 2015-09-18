@@ -11,9 +11,6 @@ use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
  */
 class ClientLoginExtension extends \Twig_Extension
 {
-    /** @var UserInterface */
-    protected $userInterface;
-
     public function __construct(Application $app)
     {
         $this->app = $app;
@@ -146,10 +143,6 @@ class ClientLoginExtension extends \Twig_Extension
      */
     protected function getUserInterface()
     {
-        if ($this->userInterface === null) {
-            $this->userInterface = new UserInterface($this->app);
-        }
-
-        return $this->userInterface;
+        return $this->app['clientlogin.ui'];
     }
 }

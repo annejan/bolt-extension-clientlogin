@@ -10,6 +10,7 @@ use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
 use Bolt\Extension\Bolt\ClientLogin\Feedback;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
+use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 
 class ServiceProvider implements ServiceProviderInterface
 {
@@ -79,6 +80,12 @@ class ServiceProvider implements ServiceProviderInterface
                 $app->after([$feedback, 'after']);
 
                 return $feedback;
+            }
+        );
+
+        $app['clientlogin.ui'] = $app->share(
+            function ($app) {
+                return new UserInterface($app);
             }
         );
 
