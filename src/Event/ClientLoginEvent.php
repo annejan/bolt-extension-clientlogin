@@ -7,6 +7,9 @@ use Symfony\Component\EventDispatcher\Event;
 
 class ClientLoginEvent extends Event
 {
+    const LOGIN_POST = 'clientlogin.Login';
+    const LOGOUT_POST = 'clientlogin.Logout';
+
     /** @var SessionToken */
     private $sessionToken;
 

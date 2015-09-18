@@ -71,7 +71,7 @@ abstract class HandlerBase
         $sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
 
         // Event dispatcher
-        $this->dispatchEvent('clientlogin.Login', $sessionToken);
+        $this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $sessionToken);
 
         // Set user feedback messages
         $this->app['clientlogin.feedback']->set('message', 'Login was successful.');
@@ -278,7 +278,7 @@ abstract class HandlerBase
     /**
      * Dispatch event to any listeners.
      *
-     * @param string       $type         Either 'clientlogin.Login' or 'clientlogin.Logout'
+     * @param string       $type         Either ClientLoginEvent::LOGIN_POST' or ClientLoginEvent::LOGOUT_POST
      * @param SessionToken $sessionToken
      */
     protected function dispatchEvent($type, SessionToken $sessionToken)

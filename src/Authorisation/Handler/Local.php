@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 
 /**
  * Password login provider.
@@ -45,7 +46,7 @@ class Local extends HandlerBase implements HandlerInterface
             throw new InvalidAuthorisationRequestException('No matching profile record for token: ' . (string) $token);
         }
 
-        $this->dispatchEvent('clientlogin.Login', $profile);
+        $this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $profile);
 
         // User is logged in already, from whence they came return them now.
         return new RedirectResponse($returnpage);
