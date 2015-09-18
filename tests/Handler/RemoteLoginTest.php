@@ -104,7 +104,7 @@ class RemoteLoginTest extends HandlerUnitTest
         $app['request'] = $request;
         $app['request_stack'] = $requestStack;
         $app['clientlogin.session'] = $this->getClientLoginSession($app, true);
-        $app['session'] = $this->getLoggedInSession($app);
+        $this->setLoggedInSession($app);
 
         $base = new Remote($app, $app['request_stack']);
         $response = $base->login('/gum-tree/koala');

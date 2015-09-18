@@ -30,7 +30,7 @@ abstract class HandlerUnitTest extends BoltUnitTest
         return $mock;
     }
 
-    protected function getLoggedInSession(Application $app)
+    protected function setLoggedInSession(Application $app)
     {
         $accessToken = new AccessToken([
             'access_token'      => '0verTher3Dad!',
@@ -38,7 +38,5 @@ abstract class HandlerUnitTest extends BoltUnitTest
         ]);
         $sessionToken = new SessionToken('fe4687dd-6d5b-44ae-af5e-db0e4c8b407c', $accessToken);
         $app['session']->set(Manager\Token::TOKEN_ACCESS, $sessionToken);
-
-        return $app['session'];
     }
 }
