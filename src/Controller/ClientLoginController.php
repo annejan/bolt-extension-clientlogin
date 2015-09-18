@@ -4,7 +4,6 @@ namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Types;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Monolog\Handler\StreamHandler;
@@ -138,9 +137,9 @@ class ClientLoginController implements ControllerProviderInterface
      */
     private function getFinalResponse(Application $app, Request $request, $action)
     {
-            $authorise = $this->getAuthoriseClass($app, $request);
+        $authorise = $this->getAuthoriseClass($app, $request);
 
-            $response = $authorise->{$action}($this->getRedirectUrl($app));
+        $response = $authorise->{$action}($this->getRedirectUrl($app));
 
 //         try {
 //         }

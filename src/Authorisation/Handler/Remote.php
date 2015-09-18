@@ -2,7 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use Bolt\Extension\Bolt\ClientLogin\Database;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
@@ -54,7 +53,7 @@ class Remote extends HandlerBase implements HandlerInterface
 
     protected function getOauthResourceOwner(Request $request)
     {
-/*
+        /*
         if ($cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME)) {
             $profile = $this->getRecordManager()->getProfileByAccessToken($cookie);
 

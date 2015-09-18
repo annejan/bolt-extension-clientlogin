@@ -8,9 +8,9 @@ use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
 use Bolt\Extension\Bolt\ClientLogin\Feedback;
+use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
-use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 
 class ServiceProvider implements ServiceProviderInterface
 {

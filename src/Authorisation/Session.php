@@ -2,7 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
@@ -48,7 +47,7 @@ class Session
      */
     public function getLoggedIn(Request $request = null)
     {
-    if (!$this->checkRequest($request)) {
+        if (!$this->checkRequest($request)) {
             return;
         }
 

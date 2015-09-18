@@ -3,6 +3,8 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Twig\Helper;
 
 use Bolt\Application;
+use Bolt\Extension\Bolt\ClientLogin\FormFields;
+use Bolt\Extension\Bolt\ClientLogin\Types;
 use Bolt\Helpers\String;
 
 /**
@@ -107,6 +109,28 @@ class UserInterface
         $html = $this->app['render']->render($this->config->getTemplate('button'), $context);
 
         return new \Twig_Markup($html, 'UTF-8');
+    }
+
+    /**
+     * .
+     *
+     * @return \Twig_Markup
+     */
+    public function displayPasswordPrompt()
+    {
+        $formFields = FormFields::Password();
+        $this->app['boltforms']->makeForm(Types::FORM_NAME_PASSWORD, 'form', [], []);
+        $this->app['boltforms']->addFieldArray(Types::FORM_NAME_PASSWORD, $formFields['fields']);
+
+        //
+        $fields = $this->app['boltforms']->getForm(Types::FORM_NAME_PASSWORD)->all();
+        $context = [
+            'parent'  => $this->config->getTemplate('password_parent'),
+            'fields'  => $fields,
+        ];
+
+        // Render the Twig_Markup
+        return $this->app['boltforms']->renderForm(Types::FORM_NAME_PASSWORD, $this->config->getTemplate('password'), $context);
     }
 
     /**

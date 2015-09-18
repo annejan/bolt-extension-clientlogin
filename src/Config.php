@@ -157,8 +157,8 @@ class Config
                 'Generic'  => $options,
             ],
             'allowed_cookie_paths' => null,
-            'basepath' => 'authenticate',
-            'template' => [
+            'basepath'             => 'authenticate',
+            'template'             => [
                 'button'          => '_button.twig',
                 'feedback'        => '_feedback.twig',
                 'profile'         => '_profile.twig',

@@ -50,7 +50,7 @@ class Cookie
      * Have the response clear browser cookies for given paths.
      *
      * @param Response $response
-     * @param array $cookiePaths
+     * @param array    $cookiePaths
      */
     public static function clearResponseCookies(Response $response, array $cookiePaths)
     {

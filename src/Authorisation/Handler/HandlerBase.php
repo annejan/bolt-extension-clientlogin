@@ -278,7 +278,7 @@ abstract class HandlerBase
     /**
      * Dispatch event to any listeners.
      *
-     * @param string       $type    Either 'clientlogin.Login' or 'clientlogin.Logout'
+     * @param string       $type         Either 'clientlogin.Login' or 'clientlogin.Logout'
      * @param SessionToken $sessionToken
      */
     protected function dispatchEvent($type, SessionToken $sessionToken)
