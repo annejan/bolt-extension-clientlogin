@@ -13,6 +13,8 @@ class Types
     const AUTH_OAUTH1 = 'oauth1';
     const AUTH_OAUTH2 = 'oauth2';
 
+    const FORM_NAME_PASSWORD = 'clientlogin_password';
+
     /**
      * We are the Singleton. You will be assimilated. Resistance is futile.
      */
