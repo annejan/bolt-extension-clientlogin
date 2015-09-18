@@ -3,10 +3,9 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
-use Bolt\Extension\Bolt\ClientLogin\Exception\DisabledProviderException;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
-use Bolt\Extension\Bolt\ClientLogin\FormFields;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
+use Bolt\Extension\Bolt\ClientLogin\Types;
 use Hautelook\Phpass\PasswordHash;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -20,8 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Local extends HandlerBase implements HandlerInterface
 {
-    const FORM_NAME = 'clientlogin_password';
-
     /**
      * {@inheritdoc}
      */
@@ -85,15 +82,10 @@ class Local extends HandlerBase implements HandlerInterface
      */
     protected function render()
     {
-        $formFields = FormFields::Password();
-        $this->app['boltforms']->makeForm(self::FORM_NAME, 'form', [], []);
-        $this->app['boltforms']->addFieldArray(self::FORM_NAME, $formFields['fields']);
-        $message = '';
-
         if ($this->request->isMethod('POST')) {
             // Validate the form data
             $form = $this->app['boltforms']
-                ->getForm(self::FORM_NAME)
+                ->getForm(Types::FORM_NAME_PASSWORD)
                 ->handleRequest($this->request);
 
             // Validate against saved password data
@@ -113,16 +105,7 @@ class Local extends HandlerBase implements HandlerInterface
             }
         }
 
-        $fields = $this->app['boltforms']->getForm(self::FORM_NAME)->all();
-        $context = [
-            'parent'  => $this->getConfig()->getTemplate('password_parent'),
-            'fields'  => $fields,
-            'message' => $message
-        ];
-
-        // Render the Twig_Markup
-        $html = $this->app['boltforms']->renderForm(self::FORM_NAME, $this->getConfig()->getTemplate('password'), $context);
-
+        $html = $this->app['clientlogin.ui']->displayPasswordPrompt();
         return new Response($html, Response::HTTP_OK);
     }
 
@@ -173,7 +156,7 @@ class Local extends HandlerBase implements HandlerInterface
     protected function getInvaildPassword($formData)
     {
         $this->setDebugMessage(sprintf('No user profile record found for %s', $formData['username']));
-        $this->app['boltforms']->getForm(self::FORM_NAME)->addError(new FormError('Invalid user name or password.'));
+        $this->app['boltforms']->getForm(Types::FORM_NAME_PASSWORD)->addError(new FormError('Invalid user name or password.'));
 
         return false;
     }
