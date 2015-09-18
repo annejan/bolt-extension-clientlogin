@@ -19,19 +19,23 @@ class RemoteLogoutTest extends AbstractHandlerUnitTest
      */
     public function testLogout()
     {
-//         $app = $this->getApp();
-//         $extension = new Extension($app);
-//         $app['extensions']->register($extension);
-//         $app['extensions']->initialize();
+        $app = $this->getApp();
+        $extension = new Extension($app);
+        $app['extensions']->register($extension);
+        $app['extensions']->initialize();
 
-//         $request = Request::create('/authenticate/login');
-//         $requestStack = new RequestStack();
-//         $requestStack->push($request);
-//         $app['request'] = $request;
-//         $app['request_stack'] = $requestStack;
+        $request = Request::create('/authenticate/login');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $app['request'] = $request;
+        $app['request_stack'] = $requestStack;
 
-//         $base = new Remote($app, $app['request_stack']);
-//         $response = $base->logout('/gum-tree/koala');
-// dump($response);
+        $base = new Remote($app, $app['request_stack']);
+        $response = $base->logout('/gum-tree/koala');
+
+        $this->assertSame('/gum-tree/koala', $response->getTargetUrl());
+        $this->assertSame(302, $response->getStatusCode());
+
+        $this->assertTrue($response->isRedirect('/gum-tree/koala'));
     }
 }
