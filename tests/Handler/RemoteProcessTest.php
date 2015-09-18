@@ -14,17 +14,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RemoteProcessTest extends AbstractHandlerUnitTest
 {
-
-    /**
-     * @covers ::process
-     * @covers ::getOauthResourceOwner
-     * @covers ::getAuthorisationRedirectResponse
-     * @covers ::getRefreshToken
-     * @covers ::getProviderOptions
-     */
-    public function testProcessAll()
-    {
-    }
+//     /**
+//      * @covers ::process
+//      * @covers ::getOauthResourceOwner
+//      * @covers ::getAuthorisationRedirectResponse
+//      * @covers ::getRefreshToken
+//      * @covers ::getProviderOptions
+//      */
+//     public function testProcessAll()
+//     {
+//     }
 
     /**
      * @covers ::process
