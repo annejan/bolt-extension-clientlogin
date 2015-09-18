@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
 
 use League\OAuth2\Client\Provider\GenericProvider as LeagueGenericProvider;
-use League\OAuth2\Client\Provider\GenericResourceOwner;
 use League\OAuth2\Client\Token\AccessToken;
 
 /**
