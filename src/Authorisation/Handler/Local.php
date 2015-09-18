@@ -2,7 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use Bolt\Extension\Bolt\ClientLogin\Exception\DisabledProviderException;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use Bolt\Extension\Bolt\ClientLogin\FormFields;
@@ -27,25 +27,12 @@ class Local extends HandlerBase implements HandlerInterface
      */
     public function login($returnpage)
     {
-        $provider = $this->getConfig()->getProvider('Password');
-        if ($provider['enabled'] !== true) {
-            throw new DisabledProviderException();
-        }
-
-        if ($token = $this->isLoggedIn($request)) {
-            $profile = $this->getRecordManager()->getProfileByProviderId('Password', $token->getResourceOwnerId());
-
-            if (!$profile) {
-                throw new InvalidAuthorisationRequestException('No matching profile record for token: ' . (string) $token);
-            }
-
-            $this->dispatchEvent('clientlogin.Login', $profile);
-
+        if (parent::login($returnpage)) {
             // User is logged in already, from whence they came return them now.
             return new RedirectResponse($returnpage);
         }
 
-        return $this->render($request);
+        return $this->render();
     }
 
     /**
@@ -53,7 +40,7 @@ class Local extends HandlerBase implements HandlerInterface
      */
     public function process($returnpage)
     {
-        if (!$token = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS)) {
+        if (!$token = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS)) {
             throw new InvalidAuthorisationRequestException('No token found for password endpoint.');
         }
 
@@ -72,13 +59,7 @@ class Local extends HandlerBase implements HandlerInterface
      */
     public function logout($returnpage)
     {
-        if ($token = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS)) {
-            $this->getRecordManager()->deleteSession($sessionId);
-        }
-
-        $this->getTokenManager()->removeToken(TokenManager::TOKEN_ACCESS);
-
-        return new RedirectResponse($returnpage);
+        return parent::logout($returnpage);
     }
 
     /**
@@ -124,7 +105,7 @@ class Local extends HandlerBase implements HandlerInterface
                     throw new InvalidAuthorisationRequestException('No matching profile found');
                 }
 
-                $token = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
+                $token = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
                 $cookie = $this->getCookieManager()->create($profile->getId(), $token);
 
                 $response = new RedirectResponse($this->getCallbackUrl('Password'));
@@ -169,7 +150,7 @@ class Local extends HandlerBase implements HandlerInterface
         if ($profile === false) {
             return $this->getInvaildPassword($formData);
         }
-
+// TODO how password is stored
         // Check the stored hash versus the POSTed one.
         if ($this->getHasher()->CheckPassword($formData['password'], $profile->getPassword())) {
             // Calculate the expiry time
