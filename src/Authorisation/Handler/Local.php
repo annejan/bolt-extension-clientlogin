@@ -81,22 +81,20 @@ class Local extends HandlerBase implements HandlerInterface
     /**
      * Render a password login page.
      *
-     * @param Request $request
-     *
      * @return Response
      */
-    protected function render(Request $request)
+    protected function render()
     {
         $formFields = FormFields::Password();
         $this->app['boltforms']->makeForm(self::FORM_NAME, 'form', [], []);
         $this->app['boltforms']->addFieldArray(self::FORM_NAME, $formFields['fields']);
         $message = '';
 
-        if ($request->isMethod('POST')) {
+        if ($this->request->isMethod('POST')) {
             // Validate the form data
             $form = $this->app['boltforms']
                 ->getForm(self::FORM_NAME)
-                ->handleRequest($request);
+                ->handleRequest($this->request);
 
             // Validate against saved password data
             if ($form->isValid() && $this->check($form->getData())) {
