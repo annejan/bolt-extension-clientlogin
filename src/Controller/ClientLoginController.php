@@ -196,6 +196,9 @@ class ClientLoginController implements ControllerProviderInterface
         }
 
         if ($providerName === 'Password') {
+            if (!isset($app['boltforms'])) {
+                throw new \RuntimeException('Local handler requires BoltForms v2.5.0 or later.');
+            }
             return $app['clientlogin.handler.local'];
         }
 
