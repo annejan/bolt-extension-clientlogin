@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
 
 use League\OAuth2\Client\Provider\Github as LeagueGitHub;
-use League\OAuth2\Client\Provider\GithubResourceOwner;
 use League\OAuth2\Client\Token\AccessToken;
 
 /**
@@ -18,6 +17,6 @@ class GitHub extends LeagueGitHub
      */
     protected function createResourceOwner(array $response, AccessToken $token)
     {
-        return new GithubResourceOwner($response);
+        return new GitHubResourceOwner($response);
     }
 }
