@@ -149,7 +149,7 @@ class Config
 
         return [
             'providers' => [
-                'Password' => $options,
+                'Local'    => $options,
                 'Google'   => $options,
                 'Facebook' => $options,
                 'Twitter'  => $options,

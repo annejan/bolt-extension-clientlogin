@@ -1,8 +1,12 @@
 # Enabled OpenID providers
 providers:
-    Password:
+    Local:
+        label: Sign in with a local account
         enabled: false
-
+        keys:
+            id: 
+            secret: localdefault
+        scopes: [ user ]
     Google:
         label: Sign in with Google
         enabled: false
