@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Response;
+namespace Bolt\Extension\Bolt\ClientLogin\Response;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
