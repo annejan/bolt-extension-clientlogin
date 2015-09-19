@@ -45,6 +45,12 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
+        $app['clientlogin.handler'] = $app->share(
+            function ($app) {
+                throw new \RuntimeException('ClientLogin authentication handler not set up!');
+            }
+        );
+
         $app['clientlogin.handler.local'] = $app->share(
             function ($app) {
                 return new Handler\Local($app, $app['request_stack']);
