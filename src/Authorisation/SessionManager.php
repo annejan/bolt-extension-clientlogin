@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Session
+class SessionManager
 {
     /** @var RecordManager */
     private $recordManager;
