@@ -96,7 +96,8 @@ class Remote extends HandlerBase implements HandlerInterface
             $provider->setAccessType('offline');
         }
 
-        $options = array_merge($this->getProviderOptions($this->getProviderName()), ['approval_prompt' => $approvalPrompt]);
+        $providerOptions = $this->app['clientlogin.provider.manager']->getProviderOptions($this->getProviderName());
+        $options = array_merge($providerOptions, ['approval_prompt' => $approvalPrompt]);
         $authorizationUrl = $provider->getAuthorizationUrl($options);
 
         // Get the state generated and store it to the session.
@@ -123,36 +124,5 @@ class Remote extends HandlerBase implements HandlerInterface
         }
 
         return $accessToken;
-    }
-
-    /**
-     * Get a provider config for passing to the library.
-     *
-     * @param string $providerName
-     *
-     * @throws Exception\ConfigurationException
-     *
-     * @return array
-     */
-    protected function getProviderOptions($providerName)
-    {
-        $providerConfig = $this->getConfig()->getProvider($providerName);
-
-        if (empty($providerConfig['clientId'])) {
-            throw new Exception\ConfigurationException('Provider client ID required: ' . $providerName);
-        }
-        if (empty($providerConfig['clientSecret'])) {
-            throw new Exception\ConfigurationException('Provider secret key required: ' . $providerName);
-        }
-        if (empty($providerConfig['scopes'])) {
-            throw new Exception\ConfigurationException('Provider scope(s) required: ' . $providerName);
-        }
-
-        return[
-            'clientId'     => $providerConfig['clientId'],
-            'clientSecret' => $providerConfig['clientSecret'],
-            'scope'        => $providerConfig['scopes'],
-            'redirectUri'  => $this->getCallbackUrl($providerName),
-        ];
     }
 }
