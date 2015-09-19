@@ -7,7 +7,10 @@ use Bolt\Extension\Bolt\ClientLogin\Authorisation\Session;
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
+use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Feedback;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\ProviderManager;
 use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
@@ -20,6 +23,10 @@ class ServiceProvider implements ServiceProviderInterface
     public function __construct($config)
     {
         $this->config = $config;
+    }
+
+    public function boot(Application $app)
+    {
     }
 
     public function register(Application $app)
@@ -95,6 +102,41 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
+        //
+        $app['clientlogin.provider.manager'] = $app->share(
+            function ($app) {
+                $rootUrl = $app['resources']->getUrl('rooturl');
+
+                return new ProviderManager($app['clientlogin.config'], $app['clientlogin.guzzle'], $app['logger.system'], $rootUrl);
+            }
+        );
+
+        // This will become the active provider during the request cycle
+        $app['clientlogin.provider'] = $app->share(
+            function ($this) {
+                return new Provider\Generic([]);
+            }
+        );
+
+        // A generic provider
+        $app['clientlogin.provider.generic'] = $app->share(
+            function ($this) {
+                return new Provider\Generic([]);
+            }
+        );
+
+        // Build provider closures for each enabled provider
+        foreach ($this->config['providers'] as $providerName => $providerConfig) {
+            if ($providerConfig['enabled'] === true) {
+                $app['clientlogin.provider.' . strtolower($providerName)] = $app->share(
+                    function ($app, $this) use ($providerName) {
+                        return $app['clientlogin.provider.manager']->getProvider($providerName);
+                    }
+                );
+            }
+        }
+
+        /** @deprecated Temporary workaround until Bolt core can update to Guzzle 6. */
         $app['clientlogin.guzzle'] = $app->share(
             function ($app) {
                 // We're needed, pop the pimple.
@@ -129,7 +171,30 @@ class ServiceProvider implements ServiceProviderInterface
         );
     }
 
-    public function boot(Application $app)
+    /**
+     * Get a provider class object for the request.
+     *
+     * @param Application $app
+     * @param string      $providerName
+     *
+     * @throws Exception\InvalidProviderException
+     *
+     * @return AbstractProvider
+     */
+    protected function getProvider(Application $app, $providerName)
     {
+        $app['logger.system']->debug('[ClientLogin] Creating provider ' . $providerName);
+
+        /** @var \League\OAuth2\Client\Provider\AbstractProvider $providerClass */
+        $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $providerName;
+
+        if (!class_exists($providerClass)) {
+            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
+        }
+
+        $options = $this->getProviderOptions($providerName);
+        $collaborators = ['httpClient' => $app['clientlogin.guzzle']];
+
+        return $this->provider = new $providerClass($options, $collaborators);
     }
 }
