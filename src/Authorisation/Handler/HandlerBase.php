@@ -164,25 +164,7 @@ abstract class HandlerBase
     }
 
     /**
-     * Construct the authorisation URL with query parameters.
-     *
-     * @param string $providerName
-     *
-     * @return string
-     */
-    protected function getCallbackUrl($providerName)
-    {
-        $key = $this->config->get('response_noun');
-        $url = $this->app['resources']->getUrl('rooturl') . $this->getConfig()->get('basepath') . "/endpoint?$key=$providerName";
-        $this->setDebugMessage("Setting callback URL: $url");
-
-        return $url;
-    }
-
-    /**
      * Get a provider class object for the request.
-     *
-     * @param string $providerName
      *
      * @throws Exception\InvalidProviderException
      *
@@ -190,23 +172,7 @@ abstract class HandlerBase
      */
     protected function getProvider()
     {
-        if ($this->provider !== null) {
-            return $this->provider;
-        }
-
-        $this->setDebugMessage('Creating provider ' .$this->getProviderName());
-
-        /** @var \League\OAuth2\Client\Provider\AbstractProvider $providerClass */
-        $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $this->getProviderName();
-
-        if (!class_exists($providerClass)) {
-            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
-        }
-
-        $options = $this->getProviderOptions($this->getProviderName());
-        $collaborators = ['httpClient' => $this->app['clientlogin.guzzle']];
-
-        return $this->provider = new $providerClass($options, $collaborators);
+        return $this->app['clientlogin.handler'];
     }
 
     /**
@@ -223,12 +189,6 @@ abstract class HandlerBase
         }
 
         $provider = $this->request->query->get('provider');
-
-        // Handle BC for old library
-        if (empty($provider)) {
-            $provider = $this->request->query->get('hauth_done');
-        }
-
         if (empty($provider)) {
             throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
         }
