@@ -58,18 +58,23 @@ class ClientLoginController implements ControllerProviderInterface
     }
 
     /**
-     * Before middleware to load Guzzle 6.
+     * Before middleware to:
+     * - Add our logging handler during debug mode
+     * - Set the request's provider in the provider manager
      *
      * @param Request     $request
      * @param Application $app
      */
     public function before(Request $request, Application $app)
     {
-        // Debug logger
         if ($this->config->isDebug()) {
             $debuglog = $app['resources']->getPath('cache') . '/authenticate.log';
             $app['logger.system']->pushHandler(new StreamHandler($debuglog, Logger::DEBUG));
         }
+
+        // Fetch the request off the stack so we don't get called out of cycle
+        $request = $app['request_stack']->getCurrentRequest();
+        $app['clientlogin.provider.manager']->setProvider($app, $request);
     }
 
     /**
