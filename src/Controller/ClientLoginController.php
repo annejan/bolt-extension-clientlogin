@@ -77,6 +77,7 @@ class ClientLoginController implements ControllerProviderInterface
         // Fetch the request off the stack so we don't get called out of cycle
         $request = $app['request_stack']->getCurrentRequest();
         $app['clientlogin.provider.manager']->setProvider($app, $request);
+        $app['clientlogin.provider.manager']->setProviderHandler($app);
     }
 
     /**
@@ -200,45 +201,6 @@ class ClientLoginController implements ControllerProviderInterface
         }
 
         throw \Exception('ClientLogin handler returned a response of type: ' . gettype($response) . ' and must be either SuccessRedirectResponse or FailureResponse');
-    }
-
-    /**
-     * Get the Authorisation\AuthorisationInterface class to handle the request.
-     *
-     * @param \Silex\Application $app
-     * @param Request            $request
-     *
-     * @throws InvalidAuthorisationRequestException
-     *
-     * @return AuthoriseInterface
-     */
-    private function getAuthoriseClass(Application $app, Request $request)
-    {
-        $providerName = $app['clientlogin.provider.manager']->getProviderName();
-        if ($providerName === null) {
-            $app['logger.system']->debug('[ClientLogin][Controller]: Request was missing a provider in the GET.', ['event' => 'extensions']);
-            throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
-        }
-
-        $providerConfig = $app['clientlogin.config']->getProvider($providerName);
-        if ($providerConfig === null) {
-            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider did not match any configured providers.', ['event' => 'extensions']);
-            throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
-        }
-
-        if ($providerConfig['enabled'] !== true && $providerName !== 'Generic') {
-            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider was disabled.', ['event' => 'extensions']);
-            throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
-        }
-
-        if ($providerName === 'Password') {
-            if (!isset($app['boltforms'])) {
-                throw new \RuntimeException('Local handler requires BoltForms v2.5.0 or later.');
-            }
-            return $app['clientlogin.handler.local'];
-        }
-
-        return $app['clientlogin.handler.remote'];
     }
 
     /**

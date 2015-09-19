@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Bolt\Filesystem\Plugin\PublicUrl;
 
 /**
  * Provider object management class.
@@ -139,6 +140,44 @@ class ProviderManager
             'scope'        => $providerConfig['scopes'],
             'redirectUri'  => $this->getCallbackUrl($providerName),
         ];
+    }
+
+    /**
+     * Get the Authorisation\AuthorisationInterface class to handle the request.
+     *
+     * @param \Silex\Application $app
+     *
+     * @throws InvalidAuthorisationRequestException
+     */
+    public function setProviderHandler(Application $app)
+    {
+        $providerName = $this->getProviderName();
+        if ($providerName === null) {
+            $app['logger.system']->debug('[ClientLogin][Controller]: Request was missing a provider in the GET.', ['event' => 'extensions']);
+            throw new Exception\InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
+        }
+
+        $providerConfig = $app['clientlogin.config']->getProvider($providerName);
+        if ($providerConfig === null) {
+            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider did not match any configured providers.', ['event' => 'extensions']);
+            throw new Exception\InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
+        }
+
+        if ($providerConfig['enabled'] !== true && $providerName !== 'Generic') {
+            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider was disabled.', ['event' => 'extensions']);
+            throw new Exception\InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
+        }
+
+        if ($providerName === 'Local') {
+            if (!isset($app['boltforms'])) {
+                throw new \RuntimeException('Local handler requires BoltForms (v2.5.0 or later preferred).');
+            }
+            $app['clientlogin.handler'] = $app['clientlogin.handler.local'];
+
+            return;
+        }
+
+        $app['clientlogin.handler'] =  $app['clientlogin.handler.remote'];
     }
 
     /**
