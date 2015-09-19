@@ -41,6 +41,20 @@ class ProviderManager
     }
 
     /**
+     * Set the provider for this request.
+     *
+     * @param Application $app
+     * @param Request     $request
+     *
+     * @throws Exception\InvalidProviderException
+     */
+    public function setProvider(Application $app, Request $request)
+    {
+        $providerName = $this->getProviderName($request);
+        $app['clientlogin.provider'] = $app['clientlogin.provider.' . strtolower($providerName)];
+    }
+
+    /**
      * Get a provider class object.
      *
      * @param string $providerName
@@ -64,20 +78,6 @@ class ProviderManager
         $collaborators = ['httpClient' => $this->guzzleClient];
 
         return $this->provider = new $providerClass($options, $collaborators);
-    }
-
-    /**
-     * Set the provider for this request.
-     *
-     * @param Application $app
-     * @param Request     $request
-     *
-     * @throws Exception\InvalidProviderException
-     */
-    public function setProvider(Application $app, Request $request)
-    {
-        $providerName = $this->getProviderName($request);
-        $app['clientlogin.provider'] = $app['clientlogin.provider.' . strtolower($providerName)];
     }
 
     /**
