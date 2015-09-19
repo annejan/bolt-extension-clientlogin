@@ -148,6 +148,10 @@ class ClientLoginController implements ControllerProviderInterface
 
         $response = $authorise->{$action}($this->getRedirectUrl($app));
 
+// Check that our response classes are OK
+//$this->isResponseValid($response);
+
+
 //         try {
 //         }
 //         catch (IdentityProviderException $e) {
@@ -171,6 +175,28 @@ class ClientLoginController implements ControllerProviderInterface
 //         }
 
         return $response;
+    }
+
+    /**
+     * For now have a fit if the responses are invalid.
+     *
+     * @param Response $response
+     *
+     * @throws \Exception
+     *
+     * @internal
+     */
+    private function isResponseValid(Response $response)
+    {
+        if ($response instanceof SuccessRedirectResponse) {
+            return;
+        }
+
+        if ($response instanceof FailureResponse) {
+            return;
+        }
+
+        throw \Exception('ClientLogin handler returned a response of type: ' . gettype($response) . ' and must be either SuccessRedirectResponse or FailureResponse');
     }
 
     /**
