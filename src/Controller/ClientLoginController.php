@@ -3,7 +3,9 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\CookieManager;
+use Bolt\Extension\Bolt\ClientLogin\Response\FailureResponse;
+use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Monolog\Handler\StreamHandler;
@@ -13,7 +15,6 @@ use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager\Cookie;
 
 /**
  * ClientLogin authentication controller
@@ -112,9 +113,7 @@ class ClientLoginController implements ControllerProviderInterface
             $request->query->set('provider', 'Generic');
         }
         $response = $this->getFinalResponse($app, $request, 'logout');
-        foreach ($app['clientlogin.config']->getCookiePaths() as $path) {
-            Cookie::clearResponseCookies($response);
-        }
+        CookieManager::clearResponseCookies($response, $app['clientlogin.config']->getCookiePaths());
 
         return $response;
     }
