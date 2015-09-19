@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Twig\Helper;
 
 use Bolt\Application;
-use Bolt\Extension\Bolt\ClientLogin\FormFields;
 use Bolt\Extension\Bolt\ClientLogin\Types;
 use Bolt\Helpers\String;
 

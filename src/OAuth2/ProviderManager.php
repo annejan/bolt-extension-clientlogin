@@ -70,7 +70,7 @@ class ProviderManager
      * Set the provider for this request.
      *
      * @param Application $app
-     * @param Request $request
+     * @param Request     $request
      *
      * @throws Exception\InvalidProviderException
      */
