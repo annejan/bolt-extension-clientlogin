@@ -6,6 +6,8 @@ use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
+use Silex\Application;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provider object management class.
@@ -22,6 +24,8 @@ class ProviderManager
     protected $logger;
     /** @var string */
     protected $rootUrl;
+    /** @var string */
+    protected $providerName;
 
     /**
      * Constructor.
@@ -60,6 +64,50 @@ class ProviderManager
         $collaborators = ['httpClient' => $this->guzzleClient];
 
         return $this->provider = new $providerClass($options, $collaborators);
+    }
+
+    /**
+     * Set the provider for this request.
+     *
+     * @param Application $app
+     * @param Request $request
+     *
+     * @throws Exception\InvalidProviderException
+     */
+    public function setProvider(Application $app, Request $request)
+    {
+        $providerName = getProviderName($request);
+        $app['clientlogin.provider'] = $app['clientlogin.provider.' . strtolower($providerName)];
+    }
+
+    /**
+     * Get a corrected provider name form a request
+     *
+     * @param Request $request
+     *
+     * @throws Exception\InvalidProviderException
+     *
+     * @return string
+     */
+    public function getProviderName(Request $request = null)
+    {
+        // If the provider name is set, we assume this is called post ->before()
+        if ($this->providerName !== null) {
+            return $this->providerName;
+        }
+
+        // If we have no provider name set, and no valid request, we're out of
+        // cycle… and that's like bad… 'n stuff
+        if ($request === null) {
+            throw new \RuntimeException('Attempting to get provider name outside of the request cycle.');
+        }
+
+        $provider = $this->request->query->get('provider');
+        if (empty($provider)) {
+            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
+        }
+
+        return $this->providerName = ucwords(strtolower($provider));
     }
 
     /**
