@@ -63,7 +63,7 @@ class Schema
         // User password table
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($tableName) {
-                $table = $schema->createTable($tableName . '_password');
+                $table = $schema->createTable($tableName . '_local_account');
                 $table->addColumn('guid',              'guid',     []);
                 $table->addColumn('resource_owner_id', 'string',   ['length' => 128]);
                 $table->addColumn('password',          'string',   ['length' => 64, ]);
