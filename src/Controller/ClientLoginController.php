@@ -146,7 +146,10 @@ class ClientLoginController implements ControllerProviderInterface
     {
         $authorise = $this->getAuthoriseClass($app, $request);
 
-        $response = $authorise->{$action}($this->getRedirectUrl($app));
+        $response = $authorise->{$action}();
+        if ($response instanceof SuccessRedirectResponse) {
+            $response->setTargetUrl($this->getRedirectUrl($app));
+        }
 
 // Check that our response classes are OK
 //$this->isResponseValid($response);
