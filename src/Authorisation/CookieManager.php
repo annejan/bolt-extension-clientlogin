@@ -1,8 +1,7 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\Cookie as CookieBase;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Cookie
+class CookieManager
 {
     /**
      * Create an authentication cookie.

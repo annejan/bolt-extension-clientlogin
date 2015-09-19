@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\SessionToken;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Token
+class TokenManager
 {
     /** Session key name of the access token ID */
     const TOKEN_ACCESS = 'bolt.clientlogin.token.access';
