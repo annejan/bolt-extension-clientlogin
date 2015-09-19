@@ -113,14 +113,14 @@ class ServiceProvider implements ServiceProviderInterface
 
         // This will become the active provider during the request cycle
         $app['clientlogin.provider'] = $app->share(
-            function ($this) {
+            function () {
                 return new Provider\Generic([]);
             }
         );
 
         // A generic provider
         $app['clientlogin.provider.generic'] = $app->share(
-            function ($this) {
+            function () {
                 return new Provider\Generic([]);
             }
         );
@@ -129,7 +129,7 @@ class ServiceProvider implements ServiceProviderInterface
         foreach ($this->config['providers'] as $providerName => $providerConfig) {
             if ($providerConfig['enabled'] === true) {
                 $app['clientlogin.provider.' . strtolower($providerName)] = $app->share(
-                    function ($app, $this) use ($providerName) {
+                    function ($app) use ($providerName) {
                         return $app['clientlogin.provider.manager']->getProvider($providerName);
                     }
                 );

@@ -76,7 +76,7 @@ class ProviderManager
      */
     public function setProvider(Application $app, Request $request)
     {
-        $providerName = getProviderName($request);
+        $providerName = $this->getProviderName($request);
         $app['clientlogin.provider'] = $app['clientlogin.provider.' . strtolower($providerName)];
     }
 
@@ -102,7 +102,7 @@ class ProviderManager
             throw new \RuntimeException('Attempting to get provider name outside of the request cycle.');
         }
 
-        $provider = $this->request->query->get('provider');
+        $provider = $request->query->get('provider');
         if (empty($provider)) {
             throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
         }
