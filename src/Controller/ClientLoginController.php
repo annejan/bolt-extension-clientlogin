@@ -112,8 +112,9 @@ class ClientLoginController implements ControllerProviderInterface
             $request->query->set('provider', 'Generic');
         }
         $response = $this->getFinalResponse($app, $request, 'logout');
-        $response->headers->clearCookie(Manager\Token::TOKEN_COOKIE_NAME, $app['resources']->getUrl('root'));
-//         Cookie::clearResponseCookies();
+        foreach ($app['clientlogin.config']->getCookiePaths() as $path) {
+            Cookie::clearResponseCookies($response);
+        }
 
         return $response;
     }
