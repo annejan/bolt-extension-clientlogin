@@ -22,10 +22,6 @@ abstract class HandlerBase
 {
     /** @var \Bolt\Application */
     protected $app;
-    /** @var AbstractProvider */
-    protected $provider;
-    /** @var string */
-    protected $providerName;
     /** @var \Symfony\Component\HttpFoundation\Request */
     protected $request;
 
@@ -57,7 +53,8 @@ abstract class HandlerBase
      */
     protected function login($returnpage)
     {
-        $provider = $this->getConfig()->getProvider($this->getProviderName());
+        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+        $provider = $this->getConfig()->getProvider($providerName);
 
         if ($provider['enabled'] !== true) {
             throw new Exception\DisabledProviderException();
@@ -109,21 +106,22 @@ abstract class HandlerBase
      */
     protected function process($returnpage)
     {
+        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
         $accessToken = $this->getAccessToken($this->request);
         $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
-        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
         if ($profile === false) {
-            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
-            $this->getRecordManager()->writeProfile('insert', $this->getProviderName(), $accessToken, $resourceOwner);
+            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $providerName, $resourceOwner->getId()));
+            $this->getRecordManager()->writeProfile('insert', $providerName, $accessToken, $resourceOwner);
         } else {
-            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
-            $this->getRecordManager()->writeProfile($profile['guid'], $this->getProviderName(), $accessToken, $resourceOwner);
+            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $providerName, $resourceOwner->getId()));
+            $this->getRecordManager()->writeProfile($profile['guid'], $providerName, $accessToken, $resourceOwner);
         }
 
         // Update the session record
-        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
-        $this->getRecordManager()->writeSession($profile['guid'], $this->getProviderName(), $accessToken);
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
+        $this->getRecordManager()->writeSession($profile['guid'], $providerName, $accessToken);
         $this->getTokenManager()->setAuthToken($profile['guid'], $accessToken);
 
         $response = new RedirectResponse($returnpage);
@@ -173,27 +171,6 @@ abstract class HandlerBase
     protected function getProvider()
     {
         return $this->app['clientlogin.handler'];
-    }
-
-    /**
-     * Get a corrected provider name form a request
-     *
-     * @throws Exception\InvalidProviderException
-     *
-     * @return string
-     */
-    protected function getProviderName()
-    {
-        if ($this->providerName !== null) {
-            return $this->providerName;
-        }
-
-        $provider = $this->request->query->get('provider');
-        if (empty($provider)) {
-            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
-        }
-
-        return $this->providerName = ucwords(strtolower($provider));
     }
 
     /**
