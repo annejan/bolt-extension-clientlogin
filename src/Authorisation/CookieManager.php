@@ -27,7 +27,7 @@ class CookieManager
             $expire = time() + 3600;
         }
 
-        return new CookieBase(Manager\Token::TOKEN_COOKIE_NAME, $accessToken->getToken(), $expire, $path);
+        return new CookieBase(TokenManager::TOKEN_COOKIE_NAME, $accessToken->getToken(), $expire, $path);
     }
 
     /**
@@ -54,7 +54,7 @@ class CookieManager
     public static function clearResponseCookies(Response $response, array $cookiePaths)
     {
         foreach ($cookiePaths as $cookiePath) {
-            $response->headers->clearCookie(Manager\Token::TOKEN_COOKIE_NAME, $cookiePath);
+            $response->headers->clearCookie(TokenManager::TOKEN_COOKIE_NAME, $cookiePath);
         }
     }
 }

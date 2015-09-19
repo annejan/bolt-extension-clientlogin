@@ -65,7 +65,7 @@ abstract class HandlerBase
         }
 
         // Get the user object for the event
-        $sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
+        $sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
 
         // Event dispatcher
         $this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $sessionToken);
@@ -86,13 +86,13 @@ abstract class HandlerBase
     protected function logout($returnpage)
     {
         if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
-            $this->getTokenManager()->removeToken(Manager\Token::TOKEN_ACCESS);
+            $this->getTokenManager()->removeToken(TokenManager::TOKEN_ACCESS);
             $this->app['clientlogin.feedback']->set('message', 'Logout was successful.');
         }
 
         $cookiePaths = $this->getConfig()->getCookiePaths();
         $response = new RedirectResponse($returnpage);
-        Manager\Cookie::clearResponseCookies($response, $cookiePaths);
+        CookieManager::clearResponseCookies($response, $cookiePaths);
 
         return $response;
     }
@@ -126,7 +126,7 @@ abstract class HandlerBase
 
         $response = new RedirectResponse($returnpage);
         $cookiePaths = $this->getConfig()->getCookiePaths();
-        Manager\Cookie::setResponseCookies($response, $accessToken, $cookiePaths);
+        CookieManager::setResponseCookies($response, $accessToken, $cookiePaths);
 
         return $response;
     }
