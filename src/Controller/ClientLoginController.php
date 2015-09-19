@@ -13,6 +13,7 @@ use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager\Cookie;
 
 /**
  * ClientLogin authentication controller
@@ -107,11 +108,12 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogout(Application $app, Request $request)
     {
-        if (!$this->getProviderName($app, $request)) {
+        if (!$app['clientlogin.provider.manager']->getProviderName()) {
             $request->query->set('provider', 'Generic');
         }
         $response = $this->getFinalResponse($app, $request, 'logout');
         $response->headers->clearCookie(Manager\Token::TOKEN_COOKIE_NAME, $app['resources']->getUrl('root'));
+//         Cookie::clearResponseCookies();
 
         return $response;
     }
@@ -183,17 +185,18 @@ class ClientLoginController implements ControllerProviderInterface
      */
     private function getAuthoriseClass(Application $app, Request $request)
     {
-        if (!$providerName = $this->getProviderName($app, $request)) {
+        $providerName = $app['clientlogin.provider.manager']->getProviderName();
+        if ($providerName === null) {
             $app['logger.system']->debug('[ClientLogin][Controller]: Request was missing a provider in the GET.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
-        if ($app['clientlogin.config']->getProvider($providerName) === null) {
+        $providerConfig = $app['clientlogin.config']->getProvider($providerName);
+        if ($providerConfig === null) {
             $app['logger.system']->debug('[ClientLogin][Controller]: Request provider did not match any configured providers.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
-        $providerConfig = $app['clientlogin.config']->getProvider($providerName);
         if ($providerConfig['enabled'] !== true && $providerName !== 'Generic') {
             $app['logger.system']->debug('[ClientLogin][Controller]: Request provider was disabled.', ['event' => 'extensions']);
             throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
@@ -207,23 +210,6 @@ class ClientLoginController implements ControllerProviderInterface
         }
 
         return $app['clientlogin.handler.remote'];
-    }
-
-    /**
-     * Get the provider name used.
-     *
-     * @param Application $app
-     * @param Request     $request
-     *
-     * @return string
-     */
-    private function getProviderName(Application $app, Request $request)
-    {
-        if ($providerName = $request->query->get('provider')) {
-            return $providerName;
-        } elseif ($providerName = $request->query->get(str_replace('.', '_', $app['clientlogin.config']->get('response_noun')))) {
-            return $providerName;
-        }
     }
 
     /**

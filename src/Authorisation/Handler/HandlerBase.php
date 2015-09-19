@@ -170,7 +170,7 @@ abstract class HandlerBase
      */
     protected function getProvider()
     {
-        return $this->app['clientlogin.handler'];
+        return $this->app['clientlogin.provider'];
     }
 
     /**

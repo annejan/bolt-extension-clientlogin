@@ -51,9 +51,9 @@ class Remote extends HandlerBase implements HandlerInterface
         return parent::logout($returnpage);
     }
 
+/*
     protected function getOauthResourceOwner(Request $request)
     {
-        /*
         if ($cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME)) {
             $profile = $this->getRecordManager()->getProfileByAccessToken($cookie);
 
@@ -76,10 +76,11 @@ class Remote extends HandlerBase implements HandlerInterface
             $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
             // Save the new token data
-            $this->getRecordManager()->updateProfile($this->getProviderName(), $accessToken, $resourceOwner);
+            $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+            $this->getRecordManager()->updateProfile($providerName, $accessToken, $resourceOwner);
         }
-*/
     }
+*/
 
     /**
      * Create a redirect response to fetch an authorisation code.
@@ -91,12 +92,13 @@ class Remote extends HandlerBase implements HandlerInterface
     protected function getAuthorisationRedirectResponse($approvalPrompt = 'auto')
     {
         $provider = $this->getProvider();
+        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
 
-        if ($this->getProviderName() === 'Google' && $approvalPrompt == 'force') {
+        if ($providerName === 'Google' && $approvalPrompt == 'force') {
             $provider->setAccessType('offline');
         }
 
-        $providerOptions = $this->app['clientlogin.provider.manager']->getProviderOptions($this->getProviderName());
+        $providerOptions = $this->app['clientlogin.provider.manager']->getProviderOptions($providerName);
         $options = array_merge($providerOptions, ['approval_prompt' => $approvalPrompt]);
         $authorizationUrl = $provider->getAuthorizationUrl($options);
 
