@@ -40,7 +40,7 @@ class AccountRead extends QueryBase
             ->select('*')
             ->from($this->tableNameAccount, 'a')
             ->leftJoin('a', $this->tableNameProvider, 'p', 'a.guid = p.guid')
-            ->where('p.resource_owner_ids = :resource_owner_id')
+            ->where('a.resource_owner_id = :resource_owner_id')
             ->setParameters([
                 ':resource_owner_id' => $resourceOwnerId,
             ])

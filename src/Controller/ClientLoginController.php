@@ -202,7 +202,7 @@ class ClientLoginController implements ControllerProviderInterface
         }
 // DEBUG:
 // Check that our response classes are OK
-$this->isResponseValid($response);
+// $this->isResponseValid($response);
 
         return $response;
     }
