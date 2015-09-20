@@ -145,35 +145,61 @@ class ClientLoginController implements ControllerProviderInterface
     private function getFinalResponse(Application $app, Request $request, $action)
     {
         $response = $app['clientlogin.handler']->{$action}();
+// DEBUG:
+// Check that our response classes are OK
+//$this->isResponseValid($response);
+
+        try {
+        }
+        catch (\Exception $e) {
+            return $this->getExceptionResponse($app, $e);
+        }
+
         if ($response instanceof SuccessRedirectResponse) {
             $response->setTargetUrl($this->getRedirectUrl($app));
         }
 
-// Check that our response classes are OK
-//$this->isResponseValid($response);
+        return $response;
+    }
 
+    /**
+     * Get an exception state's HTML response page.
+     *
+     * @param Application $app
+     * @param \Exception  $e
+     *
+     * @return Response
+     */
+    private function getExceptionResponse(Application $app, \Exception $e)
+    {
+        if ($e instanceof IdentityProviderException) {
+            // Thrown by the OAuth2 library
+            $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
+            // 'Access denied!'
+            $response = new Response('', Response::HTTP_FORBIDDEN);
+        } elseif ($e instanceof InvalidAuthorisationRequestException) {
+            // Thrown deliberately internally
+            $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
+            // 'Access denied!'
+            $response = new Response('', Response::HTTP_FORBIDDEN);
+        } else {
+            // Yeah, this can't be good…
+            $app['clientlogin.feedback']->set('message', 'A server error occurred, we are very sorry and someone has been notified!');
+            $response = new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
-//         try {
+        // Dispatch an event so that subscribers can extend exception handling
+//         if ($this->app['dispatcher']->hasListeners('clientlogin.error')) {
+//             $event = new ClientLoginExceptionEvent();
+//             try {
+//                 $this->app['dispatcher']->dispatch('clientlogin.error', $event);
+//             } catch (\Exception $e) {
+//                 $this->app['logger.system']->critical('ClientLogin event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
+//             }
 //         }
-//         catch (IdentityProviderException $e) {
-//             // Thrown by the OAuth2 library
-//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
-//             $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
-//             $response = new Response('Access denied!', Response::HTTP_FORBIDDEN);
-//         }
-//         catch (InvalidAuthorisationRequestException $e) {
-//             // Thrown deliberately internally
-//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
-//             $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
-//             $response = new Response('Access denied!', Response::HTTP_FORBIDDEN);
-//             $response = new RedirectResponse($this->getRedirectUrl($app));
-//         }
-//         catch (\Exception $e) {
-//             // Yeah, this can't be good…
-//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
-//             $app['clientlogin.feedback']->set('message', 'A server error occurred, we are very sorry and someone has been notified!');
-//             $response = new RedirectResponse($this->getRedirectUrl($app));
-//         }
+
+        $app['clientlogin.feedback']->set('debug', $e->getMessage());
+        $response->setContent($app['clientlogin.config']->displayExceptionPage($e));
 
         return $response;
     }
