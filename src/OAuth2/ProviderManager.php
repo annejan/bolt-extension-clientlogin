@@ -149,7 +149,7 @@ class ProviderManager
      *
      * @throws InvalidAuthorisationRequestException
      */
-    public function setProviderHandler(Application $app)
+    protected function setProviderHandler(Application $app)
     {
         $providerName = $this->getProviderName();
         if ($providerName === null) {
