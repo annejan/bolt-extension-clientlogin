@@ -77,7 +77,6 @@ class ClientLoginController implements ControllerProviderInterface
         // Fetch the request off the stack so we don't get called out of cycle
         $request = $app['request_stack']->getCurrentRequest();
         $app['clientlogin.provider.manager']->setProvider($app, $request);
-        $app['clientlogin.provider.manager']->setProviderHandler($app);
     }
 
     /**
