@@ -3,8 +3,9 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Application;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\CookieManager;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\SessionToken;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
@@ -43,7 +44,7 @@ abstract class HandlerBase
 
         $this->app    = $app;
         $this->config = $app['clientlogin.config'];
-        $this->tm     = new Manager\Token($app['session'], $app['randomgenerator'], $app['logger.system']);
+        $this->tm     = new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
     }
 
     /**
