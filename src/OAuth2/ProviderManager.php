@@ -56,6 +56,7 @@ class ProviderManager
         $providerName = $this->getProviderName();
 
         $app['clientlogin.provider'] = clone $app['clientlogin.provider.' . strtolower($providerName)];
+        $app['logger.system']->debug('[ClientLogin][Provider]: Created provider name: ' . $providerName, ['event' => 'extensions']);
 
         $this->setProviderHandler($app);
     }
@@ -71,7 +72,7 @@ class ProviderManager
      */
     public function getProvider($providerName)
     {
-        $this->logger->debug('[ClientLogin]: Creating provider ' . $providerName);
+        $this->logger->debug('[ClientLogin][Provider]: Fetching provider object: ' . $providerName);
 
         /** @var \League\OAuth2\Client\Provider\AbstractProvider $providerClass */
         $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $providerName;
@@ -117,7 +118,6 @@ class ProviderManager
         if ($request === null) {
             throw new \RuntimeException('Attempting to set provider name outside of the request cycle.');
         }
-
         $provider = $request->query->get('provider', 'Generic');
 
         $this->providerName = ucwords(strtolower($provider));
@@ -165,18 +165,18 @@ class ProviderManager
     {
         $providerName = $this->getProviderName();
         if ($providerName === null) {
-            $app['logger.system']->debug('[ClientLogin][Controller]: Request was missing a provider in the GET.', ['event' => 'extensions']);
+            $app['logger.system']->debug('[ClientLogin][Provider]: Request was missing a provider in the GET.', ['event' => 'extensions']);
             throw new Exception\InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
         $providerConfig = $app['clientlogin.config']->getProvider($providerName);
         if ($providerConfig === null) {
-            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider did not match any configured providers.', ['event' => 'extensions']);
+            $app['logger.system']->debug('[ClientLogin][Provider]: Request provider did not match any configured providers.', ['event' => 'extensions']);
             throw new Exception\InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
         if ($providerConfig['enabled'] !== true && $providerName !== 'Generic') {
-            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider was disabled.', ['event' => 'extensions']);
+            $app['logger.system']->debug('[ClientLogin][Provider]: Request provider was disabled.', ['event' => 'extensions']);
             throw new Exception\InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
