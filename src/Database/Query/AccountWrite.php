@@ -17,11 +17,12 @@ class AccountWrite extends QueryBase
      *
      * @param string  $resourceOwnerId
      * @param string  $passwordHash
+     * @param string  $emailAddress
      * @param boolean $enabled
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryInsert($resourceOwnerId, $passwordHash, $enabled = false)
+    public function queryInsert($resourceOwnerId, $passwordHash, $emailAddress, $enabled = false)
     {
         return $this->getQueryBuilder()
             ->insert($this->tableNameAccount)
@@ -29,12 +30,14 @@ class AccountWrite extends QueryBase
                 'guid'              => ':guid',
                 'resource_owner_id' => ':resource_owner_id',
                 'password'          => ':password',
+                'email'             => ':email',
                 'enabled'           => ':enabled',
             ])
             ->setParameters([
                 'guid'              => $this->getGuidV4(),
                 'resource_owner_id' => $resourceOwnerId,
                 'password'          => $passwordHash,
+                'email'             => $emailAddress,
                 'enabled'           => $enabled,
             ])
         ;
