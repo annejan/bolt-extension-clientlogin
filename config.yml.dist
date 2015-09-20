@@ -46,6 +46,8 @@ template:
     password_parent: password.twig
     feedback: _feedback.twig
     button: _button.twig
+    error: error/_clientlogin_error.twig
+    error_parent: error/clientlogin_error.twig
 
 label:
     logout: Logout

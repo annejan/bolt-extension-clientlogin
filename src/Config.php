@@ -163,7 +163,9 @@ class Config
                 'feedback'        => '_feedback.twig',
                 'profile'         => '_profile.twig',
                 'password'        => '_password.twig',
-                'password_parent' => 'password.twig'
+                'password_parent' => 'password.twig',
+                'error'           => 'error/_clientlogin_error.twig',
+                'error_parent'    => 'error/clientlogin_error.twig',
             ],
             'label' => array(
                 'logout' => 'Logout'
