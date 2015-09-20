@@ -48,23 +48,6 @@ Google
 
 **NOTE** It may take as long as 10 minutes for the changes to propagate and the client ID and secret to work
 
-Twitter
--------
-1. Login to: https://apps.twitter.com/
-1. Click 'Create New App' and set:
-  - Name
-  - Description
-  - Website: http://your-bolt-site.example.com/  
-  *(change the domain name to match yours)*
-  - Callback URL: http://your-bolt-site.example.com/oauth2/callback?provider=Twitter  
-  *(change the domain name to match yours)*
-1. Click 'Create your Twitter application'
-1. Select the 'Settings' tab
-  - Check 'Allow this application to be used to Sign in with Twitter'
-  - Click 'Update settings' button at the bottom of the page
-1. Select the 'API Keys' tab
-1. Add the 'Client ID' and 'Client Secret' in your config.yml
-
 Facebook
 --------
 1. Login to Facebook with the account you want to use for the site
