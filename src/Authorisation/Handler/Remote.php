@@ -107,7 +107,7 @@ class Remote extends HandlerBase implements HandlerInterface
         $this->getTokenManager()->setStateToken($provider->getState());
         $this->setDebugMessage('Storing state token: ' . $provider->getState());
 
-        return new RedirectResponse($authorizationUrl);
+        return new SuccessRedirectResponse($authorizationUrl);
     }
 
     /**

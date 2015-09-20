@@ -147,8 +147,7 @@ class ClientLoginController implements ControllerProviderInterface
     {
         try {
             $response = $app['clientlogin.handler']->{$action}();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return $this->getExceptionResponse($app, $e);
         }
 
@@ -157,7 +156,7 @@ class ClientLoginController implements ControllerProviderInterface
         }
 // DEBUG:
 // Check that our response classes are OK
-//$this->isResponseValid($response);
+$this->isResponseValid($response);
 
         return $response;
     }
@@ -222,7 +221,7 @@ class ClientLoginController implements ControllerProviderInterface
             return;
         }
 
-        throw \Exception('ClientLogin handler returned a response of type: ' . gettype($response) . ' and must be either SuccessRedirectResponse or FailureResponse');
+        throw new \Exception('ClientLogin handler returned a response of type: ' . get_class($response) . ' and must be either SuccessRedirectResponse or FailureResponse');
     }
 
     /**
