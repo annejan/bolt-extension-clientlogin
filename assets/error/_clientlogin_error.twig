@@ -7,5 +7,10 @@
 {% block client_login_error %}
 <div class="errors">
     </h1>We broke!</h1>
+
+    {{ dump(feedback) }}
+    {{ dump(exception.getmessage()) }}
+    {{ dump(exception) }}
+
 </div>
 {% endblock client_login_error %}

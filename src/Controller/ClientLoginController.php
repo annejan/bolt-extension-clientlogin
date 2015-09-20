@@ -145,12 +145,8 @@ class ClientLoginController implements ControllerProviderInterface
      */
     private function getFinalResponse(Application $app, Request $request, $action)
     {
-        $response = $app['clientlogin.handler']->{$action}();
-// DEBUG:
-// Check that our response classes are OK
-//$this->isResponseValid($response);
-
         try {
+            $response = $app['clientlogin.handler']->{$action}();
         }
         catch (\Exception $e) {
             return $this->getExceptionResponse($app, $e);
@@ -159,6 +155,9 @@ class ClientLoginController implements ControllerProviderInterface
         if ($response instanceof SuccessRedirectResponse) {
             $response->setTargetUrl($this->getRedirectUrl($app));
         }
+// DEBUG:
+// Check that our response classes are OK
+//$this->isResponseValid($response);
 
         return $response;
     }
@@ -190,16 +189,16 @@ class ClientLoginController implements ControllerProviderInterface
         }
 
         // Dispatch an event so that subscribers can extend exception handling
-        if ($this->app['dispatcher']->hasListeners(ExceptionEvent::ERROR)) {
+        if ($app['dispatcher']->hasListeners(ExceptionEvent::ERROR)) {
             try {
-                $this->app['dispatcher']->dispatch(ExceptionEvent::ERROR, new ExceptionEvent($e));
+                $app['dispatcher']->dispatch(ExceptionEvent::ERROR, new ExceptionEvent($e));
             } catch (\Exception $e) {
-                $this->app['logger.system']->critical('[ClientLogin][Controller] Event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
+                $app['logger.system']->critical('[ClientLogin][Controller] Event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
             }
         }
 
         $app['clientlogin.feedback']->set('debug', $e->getMessage());
-        $response->setContent($app['clientlogin.config']->displayExceptionPage($e));
+        $response->setContent($app['clientlogin.ui']->displayExceptionPage($e));
 
         return $response;
     }
