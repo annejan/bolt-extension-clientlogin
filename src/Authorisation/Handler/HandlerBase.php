@@ -11,6 +11,8 @@ use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
+use League\OAuth2\Client\Provider\ResourceOwnerInterface;
+use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -64,7 +66,7 @@ abstract class HandlerBase
         }
 
         if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
-            return new SuccessRedirectResponse('/');;
+            return new SuccessRedirectResponse('/');
         }
 
         // Get the user object for the event
@@ -107,16 +109,18 @@ abstract class HandlerBase
     {
         $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
         $accessToken = $this->getAccessToken($this->request);
-        $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
+        $resourceOwner = $this->getResourceOwner($accessToken);
 
         $profile = $this->getRecordManager()->getAccountByResourceOwnerId($providerName, $resourceOwner->getId());
         if ($profile === false) {
             $this->setDebugMessage(sprintf('No profile found for %s ID %s', $providerName, $resourceOwner->getId()));
-            $this->getRecordManager()->writeProfile('insert', $providerName, $accessToken, $resourceOwner);
+            $this->getRecordManager()->insertAccount($resourceOwner->getId(), null, null, true);
+            $profile = $this->getRecordManager()->getAccountByResourceOwnerId($providerName, $resourceOwner->getId());
         } else {
             $this->setDebugMessage(sprintf('Profile found for %s ID %s', $providerName, $resourceOwner->getId()));
-            $this->getRecordManager()->writeProfile($profile['guid'], $providerName, $accessToken, $resourceOwner);
         }
+
+        $this->getRecordManager()->writeProfile($profile['guid'], $providerName, $accessToken, $resourceOwner);
 
         // Update the session record
         $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
@@ -128,6 +132,20 @@ abstract class HandlerBase
         CookieManager::setResponseCookies($response, $accessToken, $cookiePaths);
 
         return $response;
+    }
+
+    /**
+     * Query the provider for the resrouce owner.
+     *
+     * @param AccessToken $accessToken
+     *
+     * @throws IdentityProviderException
+     *
+     * @return ResourceOwnerInterface
+     */
+    protected function getResourceOwner(AccessToken $accessToken)
+    {
+        return $this->getProvider()->getResourceOwner($accessToken);
     }
 
     /**
