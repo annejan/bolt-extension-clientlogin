@@ -152,10 +152,11 @@ abstract class RecordManagerBase
     {
         $this->logger->debug('[ClientLogin][Database]: ' . (string) $query, ['event' => 'extensions']);
 
-        return $query->execute();
         try {
+            return $query->execute();
         } catch (\Doctrine\DBAL\DBALException $e) {
             $this->logger->critical('[ClientLogin][Database]: Database exception.', ['event' => 'exception', 'exception' => $e]);
+            throw $e;
         }
     }
 
@@ -170,12 +171,13 @@ abstract class RecordManagerBase
     {
         $this->logger->debug('[ClientLogin][Database]: ' . (string) $query, ['event' => 'extensions']);
 
-        return $query
+        try {
+            return $query
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC);
-        try {
         } catch (\Doctrine\DBAL\DBALException $e) {
             $this->logger->critical('[ClientLogin][Database]: Database exception.', ['event' => 'exception', 'exception' => $e]);
+            throw $e;
         }
     }
 }
