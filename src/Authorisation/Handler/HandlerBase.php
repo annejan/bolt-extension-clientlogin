@@ -51,7 +51,9 @@ abstract class HandlerBase
     /**
      * Check the login.
      *
-     * @return boolean
+     * @throws Exception\DisabledProviderException
+     *
+     * @return Response|null
      */
     protected function login()
     {
@@ -63,7 +65,7 @@ abstract class HandlerBase
         }
 
         if (!$this->app['clientlogin.session']->isLoggedIn($this->request)) {
-            return false;
+            return;
         }
 
         // Get the user object for the event
@@ -75,7 +77,7 @@ abstract class HandlerBase
         // Set user feedback messages
         $this->app['clientlogin.feedback']->set('message', 'Login was successful.');
 
-        return true;
+        return new SuccessRedirectResponse('/');
     }
 
     /**

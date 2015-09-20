@@ -29,9 +29,9 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     public function login()
     {
-        if (parent::login()) {
+        if ($response = parent::login()) {
             // User is logged in already, from whence they came return them now.
-            return new SuccessRedirectResponse('/');
+            return $response;
         }
         return $this->getAuthorisationRedirectResponse();
     }
