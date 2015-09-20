@@ -48,17 +48,36 @@ class AccountWrite extends QueryBase
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function querySetPassword($guid, $passwordHash)
+    public function querySetPasswordByGuid($guid, $passwordHash)
     {
         return $this->getQueryBuilder()
             ->update($this->tableNameAccount)
-            ->set('lastupdate',     ':lastupdate')
-            ->set('resource_owner', ':resource_owner')
-            ->where('provider  = :provider')
-            ->andWhere('resource_owner_id  = :resource_owner_id')
+            ->set('password', ':password')
+            ->where('guid = :guid')
             ->setParameters([
-                'provider'          => $guid,
-                'resource_owner_id' => $passwordHash,
+                'guid'     => $guid,
+                'password' => $passwordHash,
+            ])
+        ;
+    }
+
+    /**
+     * Query to set and account password.
+     *
+     * @param string $resourceOwnerId
+     * @param string $passwordHash
+     *
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function querySetPasswordByResourceOwnerId($resourceOwnerId, $passwordHash)
+    {
+        return $this->getQueryBuilder()
+            ->update($this->tableNameAccount)
+            ->set('password', ':password')
+            ->where('resource_owner_id = :resource_owner_id')
+            ->setParameters([
+                'resource_owner_id' => $resourceOwnerId,
+                'password' => $passwordHash,
             ])
         ;
     }
