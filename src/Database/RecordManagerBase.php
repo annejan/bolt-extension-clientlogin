@@ -52,6 +52,36 @@ abstract class RecordManagerBase
     }
 
     /**
+     * Get the account read query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\AccountRead
+     */
+    protected function getAccountQueriesRead()
+    {
+        return new Query\AccountRead($this->db, $this->tableName);
+    }
+
+    /**
+     * Get the account remove query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\AccountDelete
+     */
+    protected function getAccountQueriesDelete()
+    {
+        return new Query\AccountDelete($this->db, $this->tableName);
+    }
+
+    /**
+     * Get the account write query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\AccountWrite
+     */
+    protected function getAccountQueriesWrite()
+    {
+        return new Query\AccountWrite($this->db, $this->tableName);
+    }
+
+    /**
      * Get the profile read query builder.
      *
      * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProviderRead
