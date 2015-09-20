@@ -15,27 +15,27 @@ class AccountWrite extends QueryBase
     /**
      * Query to insert an account record.
      *
-     * @param string  $username
+     * @param string  $resourceOwnerId
      * @param string  $passwordHash
      * @param boolean $enabled
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryInsert($username, $passwordHash, $enabled = false)
+    public function queryInsert($resourceOwnerId, $passwordHash, $enabled = false)
     {
         return $this->getQueryBuilder()
             ->insert($this->tableNameAccount)
             ->values([
-                'guid'     => ':guid',
-                'username' => ':username',
-                'password' => ':password',
-                'enabled'  => ':enabled',
+                'guid'              => ':guid',
+                'resource_owner_id' => ':resource_owner_id',
+                'password'          => ':password',
+                'enabled'           => ':enabled',
             ])
             ->setParameters([
-                'guid'     => $this->getGuidV4(),
-                'username' => $username,
-                'password' => $passwordHash,
-                'enabled'  => $enabled,
+                'guid'              => $this->getGuidV4(),
+                'resource_owner_id' => $resourceOwnerId,
+                'password'          => $passwordHash,
+                'enabled'           => $enabled,
             ])
         ;
     }

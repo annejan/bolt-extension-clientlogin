@@ -43,7 +43,7 @@ class Schema
             function (DbalSchema $schema) use ($tableName) {
                 $table = $schema->createTable($tableName . '_account');
                 $table->addColumn('guid',              'guid',     []);
-                $table->addColumn('username',          'string',   ['notnull' => false, 'length' => 128]);
+                $table->addColumn('resource_owner_id', 'string',   ['notnull' => false, 'length' => 128]);
                 $table->addColumn('password',          'string',   ['notnull' => false, 'length' => 64]);
                 $table->addColumn('enabled',           'boolean',  ['default' => false]);
 
