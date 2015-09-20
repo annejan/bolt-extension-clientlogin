@@ -120,12 +120,12 @@ class ServiceProvider implements ServiceProviderInterface
         // This will become the active provider during the request cycle
         $app['clientlogin.provider'] = $app->share(
             function () {
-                return new Provider\Generic([]);
+                throw new \RuntimeException('ClientLogin authentication provider not set up!');
             }
         );
 
         // A generic provider
-        $app['clientlogin.provider.generic'] = $app->share(
+        $app['clientlogin.provider.generic'] = $app->protect(
             function () {
                 return new Provider\Generic([]);
             }
@@ -134,7 +134,7 @@ class ServiceProvider implements ServiceProviderInterface
         // Build provider closures for each enabled provider
         foreach ($this->config['providers'] as $providerName => $providerConfig) {
             if ($providerConfig['enabled'] === true) {
-                $app['clientlogin.provider.' . strtolower($providerName)] = $app->share(
+                $app['clientlogin.provider.' . strtolower($providerName)] = $app->protect(
                     function ($app) use ($providerName) {
                         return $app['clientlogin.provider.manager']->getProvider($providerName);
                     }
