@@ -53,8 +53,8 @@ class ClientLoginController implements ControllerProviderInterface
             ->method('GET');
 
         // OAuth callback URI
-        $ctr->match('/endpoint', [$this, 'authenticationEndpoint'])
-            ->bind('authenticationEndpoint')
+        $ctr->match('/oauth2/callback', [$this, 'authenticationCallback'])
+            ->bind('authenticationCallback')
             ->method('GET|POST');
 
         return $ctr;
@@ -96,9 +96,6 @@ class ClientLoginController implements ControllerProviderInterface
             $app['logger.system']->critical($msg, ['event' => 'extensions']);
         }
         $this->setFinalRedirectUrl($app, $request);
-// dump($this->getFinalResponse($app, $request, 'login'));
-// die();
-//         return $this->getFinalResponse($app, $request, 'login');
 
         $response = $this->getFinalResponse($app, $request, 'login');
 
@@ -130,16 +127,14 @@ class ClientLoginController implements ControllerProviderInterface
     }
 
     /**
-     * Authorisation endpoint.
-     *
-     * For OAuth this will be the reply endpoint.
+     * Authorisation callback.
      *
      * @param \Silex\Application $app
      * @param Request            $request
      *
      * @return Response
      */
-    public function authenticationEndpoint(Application $app, Request $request)
+    public function authenticationCallback(Application $app, Request $request)
     {
         $response = $this->getFinalResponse($app, $request, 'process');
 

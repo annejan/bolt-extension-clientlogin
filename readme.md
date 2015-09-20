@@ -31,7 +31,7 @@ Google
   1. Set **Application Type**: Web Application
   1. Set **Authorized JavaScript Origins**: http://your-bolt-site.example.com  
     *(change the domain name to match yours)*
-  1. Set **Authorized Redirect URI**: http://your-bolt-site.example.com/authenticate/endpoint?provider=Google  
+  1. Set **Authorized Redirect URI**: http://your-bolt-site.example.com/oauth2/callback?provider=Google  
     *(change the domain name to match yours)*
   1. Click 'Create Client ID'
 1. Under the 'APIs & auth' menu select 'APIs'
@@ -56,7 +56,7 @@ Twitter
   - Description
   - Website: http://your-bolt-site.example.com/  
   *(change the domain name to match yours)*
-  - Callback URL: http://your-bolt-site.example.com/authenticate/endpoint?provider=Twitter  
+  - Callback URL: http://your-bolt-site.example.com/oauth2/callback?provider=Twitter  
   *(change the domain name to match yours)*
 1. Click 'Create your Twitter application'
 1. Select the 'Settings' tab
@@ -115,7 +115,7 @@ GitHub
   1. **Homepage URL**: http://your-bolt-site.example.com
   *(change the domain name to match yours)*
   1. **Application description**
-  1. **Authorization callback URL**: http://your-bolt-site.example.com/authenticate/endpoint?provider=Github  
+  1. **Authorization callback URL**: http://your-bolt-site.example.com/oauth2/callback?provider=Github  
   *(change the domain name to match yours)*
 1. Click 'Register application'
 1. Add the 'Client ID' and 'Client Secret' to your config.yml
