@@ -10,6 +10,7 @@ use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
+use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -52,7 +53,7 @@ abstract class HandlerBase
      *
      * @return boolean
      */
-    protected function login($returnpage)
+    protected function login()
     {
         $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
         $provider = $this->getConfig()->getProvider($providerName);
@@ -80,11 +81,9 @@ abstract class HandlerBase
     /**
      * Logout a profile.
      *
-     * @param string $returnpage
-     *
      * @return Response
      */
-    protected function logout($returnpage)
+    protected function logout()
     {
         if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
             $this->getTokenManager()->removeToken(TokenManager::TOKEN_ACCESS);
@@ -92,7 +91,7 @@ abstract class HandlerBase
         }
 
         $cookiePaths = $this->getConfig()->getCookiePaths();
-        $response = new RedirectResponse($returnpage);
+        $response = new SuccessRedirectResponse('/');
         CookieManager::clearResponseCookies($response, $cookiePaths);
 
         return $response;
@@ -105,7 +104,7 @@ abstract class HandlerBase
      *
      * @return Response
      */
-    protected function process($returnpage)
+    protected function process()
     {
         $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
         $accessToken = $this->getAccessToken($this->request);
@@ -125,7 +124,7 @@ abstract class HandlerBase
         $this->getRecordManager()->writeSession($profile['guid'], $providerName, $accessToken);
         $this->getTokenManager()->setAuthToken($profile['guid'], $accessToken);
 
-        $response = new RedirectResponse($returnpage);
+        $response = new SuccessRedirectResponse('/');
         $cookiePaths = $this->getConfig()->getCookiePaths();
         CookieManager::setResponseCookies($response, $accessToken, $cookiePaths);
 

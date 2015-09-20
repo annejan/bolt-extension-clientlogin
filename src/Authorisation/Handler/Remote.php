@@ -5,6 +5,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 use Bolt\Extension\Bolt\ClientLogin\Database;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
+use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -26,11 +27,11 @@ class Remote extends HandlerBase implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function login($returnpage)
+    public function login()
     {
-        if (parent::login($returnpage)) {
+        if (parent::login()) {
             // User is logged in already, from whence they came return them now.
-            return new RedirectResponse($returnpage);
+            return new SuccessRedirectResponse('/');
         }
         return $this->getAuthorisationRedirectResponse();
     }
@@ -38,17 +39,17 @@ class Remote extends HandlerBase implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function process($returnpage)
+    public function process()
     {
-        return parent::process($returnpage);
+        return parent::process();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function logout($returnpage)
+    public function logout()
     {
-        return parent::logout($returnpage);
+        return parent::logout();
     }
 
 /*
