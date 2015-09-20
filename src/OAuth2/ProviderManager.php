@@ -50,12 +50,12 @@ class ProviderManager
      */
     public function setProvider(Application $app, Request $request)
     {
-        try {
-            $providerName = $this->getProviderName($request);
-        } catch (Exception\InvalidProviderException $e) {
-            $providerName = 'generic';
-        }
-        $app['clientlogin.provider'] = $app['clientlogin.provider.' . strtolower($providerName)];
+        // Set the provider name that we're using for this request
+        $this->setProviderName($request);
+
+        $providerName = $this->getProviderName();
+
+        $app['clientlogin.provider'] = clone $app['clientlogin.provider.' . strtolower($providerName)];
 
         $this->setProviderHandler($app);
     }
@@ -87,15 +87,13 @@ class ProviderManager
     }
 
     /**
-     * Get a corrected provider name form a request
+     * Get a corrected provider name for the request.
      *
-     * @param Request $request
-     *
-     * @throws Exception\InvalidProviderException
+     * @throws \RuntimeException
      *
      * @return string
      */
-    public function getProviderName(Request $request = null)
+    public function getProviderName()
     {
         // If the provider name is set, we assume this is called post ->before()
         if ($this->providerName !== null) {
@@ -104,16 +102,25 @@ class ProviderManager
 
         // If we have no provider name set, and no valid request, we're out of
         // cycle… and that's like bad… 'n stuff
+        throw new \RuntimeException('Attempting to get provider name outside of the request cycle.');
+    }
+
+    /**
+     * Set a corrected provider name from a request object.
+     *
+     * @param Request $request
+     *
+     * @throws \RuntimeException
+     */
+    protected function setProviderName(Request $request = null)
+    {
         if ($request === null) {
-            throw new \RuntimeException('Attempting to get provider name outside of the request cycle.');
+            throw new \RuntimeException('Attempting to set provider name outside of the request cycle.');
         }
 
-        $provider = $request->query->get('provider');
-        if (empty($provider)) {
-            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
-        }
+        $provider = $request->query->get('provider', 'Generic');
 
-        return $this->providerName = ucwords(strtolower($provider));
+        $this->providerName = ucwords(strtolower($provider));
     }
 
     /**
