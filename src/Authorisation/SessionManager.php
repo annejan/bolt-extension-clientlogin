@@ -65,7 +65,6 @@ class SessionManager
     {
         // If we have a cookie, check there is a matching session
         if ($this->checkRequest($request)) {
-
             return $this->checkSession($request);
         }
 

@@ -2,8 +2,8 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\CookieManager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginExceptionEvent as ExceptionEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use Bolt\Extension\Bolt\ClientLogin\Response\FailureResponse;

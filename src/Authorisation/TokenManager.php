@@ -2,7 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\SessionToken;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;

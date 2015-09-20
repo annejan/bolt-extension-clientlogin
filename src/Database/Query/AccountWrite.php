@@ -2,9 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Database\Query;
 
-use League\OAuth2\Client\Provider\ResourceOwnerInterface;
-use League\OAuth2\Client\Token\AccessToken;
-
 /**
  * Client account table write queries.
  *

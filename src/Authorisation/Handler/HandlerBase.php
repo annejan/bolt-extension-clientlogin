@@ -171,7 +171,6 @@ abstract class HandlerBase
     }
 
     /**
-     *
      * @param array $record
      *
      * @throws \RuntimeException
