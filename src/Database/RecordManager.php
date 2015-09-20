@@ -2,7 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Database;
 
-use Bolt\Extension\Bolt\ClientLogin\Profile;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 
@@ -22,7 +21,7 @@ class RecordManager extends RecordManagerBase
      */
     public function getProfile($guid)
     {
-        $query = $this->getProfileQueriesRead()->queryFetchById($guid);
+        $query = $this->getProviderQueriesRead()->queryFetchById($guid);
 
         return $this->fetchArray($query);
     }
@@ -34,7 +33,7 @@ class RecordManager extends RecordManagerBase
      *
      * @return array|false
      */
-    public function getProfileSessions($guid)
+    public function getProviderSessions($guid)
     {
         $query = $this->getSessionQueriesRead()->queryFetchByGuid($guid);
 
@@ -48,7 +47,7 @@ class RecordManager extends RecordManagerBase
      *
      * @return array|false
      */
-    public function getProfileByAccessTokenId($accessTokenId)
+    public function getProviderByAccessTokenId($accessTokenId)
     {
         $query = $this->getSessionQueriesRead()->queryFetchByAccessToken($accessTokenId);
 
@@ -63,9 +62,9 @@ class RecordManager extends RecordManagerBase
      *
      * @return array|false
      */
-    public function getProfileByResourceOwnerId($provider, $resourceOwnerId)
+    public function getProviderByResourceOwnerId($provider, $resourceOwnerId)
     {
-        $query = $this->getProfileQueriesRead()->queryFetchByResourceOwnerId($provider, $resourceOwnerId);
+        $query = $this->getProviderQueriesRead()->queryFetchByResourceOwnerId($provider, $resourceOwnerId);
 
         return $this->fetchArray($query);
     }
@@ -80,12 +79,12 @@ class RecordManager extends RecordManagerBase
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function writeProfile($guid, $provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    public function writeProvider($guid, $provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         if ($guid === 'insert') {
-            return $this->insertProfile($provider, $accessToken, $resourceOwner);
+            return $this->insertProvider($provider, $accessToken, $resourceOwner);
         } else {
-            return $this->updateProfile($guid, $provider, $accessToken, $resourceOwner);
+            return $this->updateProvider($guid, $provider, $accessToken, $resourceOwner);
         }
     }
 
@@ -98,10 +97,10 @@ class RecordManager extends RecordManagerBase
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    protected function insertProfile($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    protected function insertProvider($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         $resourceOwnerId = $resourceOwner->getId();
-        $query = $this->getProfileQueriesWrite()->queryInsert($provider, $resourceOwnerId, $accessToken, $resourceOwner);
+        $query = $this->getProviderQueriesWrite()->queryInsert($provider, $resourceOwnerId, $accessToken, $resourceOwner);
 
         return $this->executeQuery($query);
     }
@@ -116,10 +115,10 @@ class RecordManager extends RecordManagerBase
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    protected function updateProfile($guid, $provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    protected function updateProvider($guid, $provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         $resourceOwnerId = $resourceOwner->getId();
-        $query = $this->getProfileQueriesWrite()->queryUpdate($provider, $resourceOwnerId, $accessToken, $resourceOwner);
+        $query = $this->getProviderQueriesWrite()->queryUpdate($provider, $resourceOwnerId, $accessToken, $resourceOwner);
 
         return $this->executeQuery($query);
     }
@@ -135,7 +134,7 @@ class RecordManager extends RecordManagerBase
      */
     public function writeSession($guid, $provider, AccessToken $accessToken)
     {
-        $session = $this->getProfileSessions($guid);
+        $session = $this->getProviderSessions($guid);
 
         if ($session) {
             $query = $this->getSessionQueriesWrite()->queryUpdate($accessToken);

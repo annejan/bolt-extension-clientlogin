@@ -7,7 +7,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Database\Query;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class ProfileDelete extends QueryBase
+class ProviderDelete extends QueryBase
 {
     /**
      * Query to delete a profile based on provider and ID.

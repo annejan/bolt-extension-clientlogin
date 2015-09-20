@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Database;
 
 use Bolt\Extension\Bolt\ClientLogin\Config;
-use Bolt\Extension\Bolt\ClientLogin\Profile;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Psr\Log\LoggerInterface;
@@ -55,31 +54,31 @@ abstract class RecordManagerBase
     /**
      * Get the profile read query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileRead
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProviderRead
      */
-    protected function getProfileQueriesRead()
+    protected function getProviderQueriesRead()
     {
-        return new Query\ProfileRead($this->db, $this->tableName);
+        return new Query\ProviderRead($this->db, $this->tableName);
     }
 
     /**
      * Get the profile remove query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileDelete
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProviderDelete
      */
-    protected function getProfileQueriesDelete()
+    protected function getProviderQueriesDelete()
     {
-        return new Query\ProfileDelete($this->db, $this->tableName);
+        return new Query\ProviderDelete($this->db, $this->tableName);
     }
 
     /**
      * Get the profile write query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileWrite
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProviderWrite
      */
-    protected function getProfileQueriesWrite()
+    protected function getProviderQueriesWrite()
     {
-        return new Query\ProfileWrite($this->db, $this->tableName);
+        return new Query\ProviderWrite($this->db, $this->tableName);
     }
 
     /**

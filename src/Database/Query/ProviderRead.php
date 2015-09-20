@@ -7,7 +7,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Database\Query;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class ProfileRead extends QueryBase
+class ProviderRead extends QueryBase
 {
     /**
      * Query to fetch a profile by GUID.

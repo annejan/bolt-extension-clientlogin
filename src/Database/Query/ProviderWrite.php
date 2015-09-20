@@ -10,7 +10,7 @@ use League\OAuth2\Client\Token\AccessToken;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class ProfileWrite extends QueryBase
+class ProviderWrite extends QueryBase
 {
     /**
      * Query to insert a profile record.
