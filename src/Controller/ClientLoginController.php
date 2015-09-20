@@ -96,8 +96,13 @@ class ClientLoginController implements ControllerProviderInterface
             $app['logger.system']->critical($msg, ['event' => 'extensions']);
         }
         $this->setFinalRedirectUrl($app, $request);
+// dump($this->getFinalResponse($app, $request, 'login'));
+// die();
+//         return $this->getFinalResponse($app, $request, 'login');
 
-        return $this->getFinalResponse($app, $request, 'login');
+        $response = $this->getFinalResponse($app, $request, 'login');
+
+        return $response;
     }
 
     /**
@@ -113,7 +118,12 @@ class ClientLoginController implements ControllerProviderInterface
         if (!$app['clientlogin.provider.manager']->getProviderName()) {
             $request->query->set('provider', 'Generic');
         }
+
         $response = $this->getFinalResponse($app, $request, 'logout');
+        if ($response instanceof SuccessRedirectResponse) {
+            $response->setTargetUrl($this->getRedirectUrl($app));
+        }
+
         CookieManager::clearResponseCookies($response, $app['clientlogin.config']->getCookiePaths());
 
         return $response;
@@ -131,7 +141,13 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationEndpoint(Application $app, Request $request)
     {
-        return $this->getFinalResponse($app, $request, 'process');
+        $response = $this->getFinalResponse($app, $request, 'process');
+
+        if ($response instanceof SuccessRedirectResponse) {
+            $response->setTargetUrl($this->getRedirectUrl($app));
+        }
+
+        return $response;
     }
 
     /**
@@ -149,10 +165,6 @@ class ClientLoginController implements ControllerProviderInterface
             $response = $app['clientlogin.handler']->{$action}();
         } catch (\Exception $e) {
             return $this->getExceptionResponse($app, $e);
-        }
-
-        if ($response instanceof SuccessRedirectResponse) {
-            $response->setTargetUrl($this->getRedirectUrl($app));
         }
 // DEBUG:
 // Check that our response classes are OK
