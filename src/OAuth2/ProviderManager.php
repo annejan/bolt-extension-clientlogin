@@ -172,12 +172,12 @@ class ProviderManager
             if (!isset($app['boltforms'])) {
                 throw new \RuntimeException('Local handler requires BoltForms (v2.5.0 or later preferred).');
             }
-            $app['clientlogin.handler'] = $app['clientlogin.handler.local'];
+            $app['clientlogin.handler'] = clone $app['clientlogin.handler.local'];
 
             return;
         }
 
-        $app['clientlogin.handler'] =  $app['clientlogin.handler.remote'];
+        $app['clientlogin.handler'] = clone $app['clientlogin.handler.remote'];
     }
 
     /**
