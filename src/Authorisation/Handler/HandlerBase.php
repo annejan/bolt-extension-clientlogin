@@ -58,7 +58,7 @@ abstract class HandlerBase
         $provider = $this->getConfig()->getProvider($providerName);
 
         if ($provider['enabled'] !== true) {
-            throw new Exception\DisabledProviderException();
+            throw new Exception\DisabledProviderException('Invalid provider setting.');
         }
 
         if (!$this->app['clientlogin.session']->isLoggedIn($this->request)) {
