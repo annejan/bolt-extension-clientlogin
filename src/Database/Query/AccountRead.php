@@ -20,27 +20,34 @@ class AccountRead extends QueryBase
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->tableNameAccount)
-            ->where('guid = :guid')
+            ->from($this->tableNameAccount, 'a')
+            ->leftJoin('a', $this->tableNameProvider, 'p', 'a.guid = p.guid')
+            ->where('p.resource_owner_id = :resource_owner_id')
+            ->andWhere('guid = :guid')
             ->setParameter(':guid', $guid)
         ;
     }
 
     /**
-     * Query to fetch aa account by resource owner.
+     * Query to fetch a account by resource owner.
      *
-     * @param string $provider
+     * @param string $providerName
      * @param string $resourceOwnerId
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryFetchByResourceOwnerId($resourceOwnerId)
+    public function queryFetchByResourceOwnerId($providerName, $resourceOwnerId)
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->tableNameProvider)
-            ->Where('resource_owner_id = :resource_owner_id')
-            ->setParameter(':resource_owner_id', $resourceOwnerId)
+            ->from($this->tableNameAccount, 'a')
+            ->leftJoin('a', $this->tableNameProvider, 'p', 'a.guid = p.guid')
+            ->where('p.provider = :provider')
+            ->andWhere('p.resource_owner_id = :resource_owner_id')
+            ->setParameters([
+                ':provider'          => $providerName,
+                ':resource_owner_id' => $resourceOwnerId,
+            ])
         ;
     }
 }
