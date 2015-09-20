@@ -38,15 +38,32 @@ class Schema
     {
         $tableName = $this->tableName;
 
+        // User/client account table
+        $this->schemaManager->registerExtensionTable(
+            function (DbalSchema $schema) use ($tableName) {
+                $table = $schema->createTable($tableName . '_account');
+                $table->addColumn('guid',              'guid',     []);
+                $table->addColumn('username',          'string',   ['notnull' => false, 'length' => 128]);
+                $table->addColumn('password',          'string',   ['notnull' => false, 'length' => 64]);
+                $table->addColumn('enabled',           'boolean',  ['default' => false]);
+
+                $table->setPrimaryKey(['guid']);
+
+                $table->addIndex(['username']);
+                $table->addIndex(['enabled']);
+
+                return $table;
+            }
+        );
+
         // User/client provider table
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($tableName) {
-                $table = $schema->createTable($tableName);
+                $table = $schema->createTable($tableName . '_provider');
                 $table->addColumn('guid',              'guid',     []);
-                $table->addColumn('enabled',           'boolean',  ['default' => true]);
                 $table->addColumn('provider',          'string',   ['length' => 64]);
                 $table->addColumn('resource_owner_id', 'string',   ['length' => 128]);
-                $table->addColumn('refresh_token',     'string',   ['notnull' => false, 'default' => null, 'length' => 128, ]);
+                $table->addColumn('refresh_token',     'string',   ['notnull' => false, 'default' => null, 'length' => 128]);
                 $table->addColumn('resource_owner',    'text',     ['notnull' => false, 'default' => null]);
                 $table->addColumn('lastupdate',        'datetime', ['notnull' => false, 'default' => null]);
 
@@ -55,22 +72,6 @@ class Schema
                 $table->addIndex(['provider']);
                 $table->addIndex(['resource_owner_id']);
                 $table->addIndex(['refresh_token']);
-
-                return $table;
-            }
-        );
-
-        // User password table
-        $this->schemaManager->registerExtensionTable(
-            function (DbalSchema $schema) use ($tableName) {
-                $table = $schema->createTable($tableName . '_local_account');
-                $table->addColumn('guid',              'guid',     []);
-                $table->addColumn('resource_owner_id', 'string',   ['length' => 128]);
-                $table->addColumn('password',          'string',   ['length' => 64, ]);
-
-                $table->setPrimaryKey(['guid']);
-
-                $table->addIndex(['resource_owner_id']);
 
                 return $table;
             }
