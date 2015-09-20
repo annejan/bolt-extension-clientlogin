@@ -76,7 +76,7 @@ class RecordManager extends RecordManagerBase
     /**
      * Get a profile record by GUID.
      *
-     * @param integer $guid
+     * @param string $guid
      *
      * @return array|false
      */
