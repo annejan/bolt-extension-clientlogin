@@ -59,6 +59,21 @@ class RecordManager extends RecordManagerBase
     }
 
     /**
+     * Get an account by resource owner ID.
+     *
+     * @param boolean $providerName
+     * @param string  $resourceOwnerId
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
+     */
+    public function getAccountByResourceOwnerId($providerName, $resourceOwnerId)
+    {
+        $query = $this->getAccountQueriesRead()->queryFetchByResourceOwnerId($providerName, $resourceOwnerId);
+
+        return $this->fetchArray($query);
+    }
+
+    /**
      * Get a profile record by GUID.
      *
      * @param integer $guid
