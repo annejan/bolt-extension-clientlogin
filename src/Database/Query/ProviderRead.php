@@ -20,7 +20,7 @@ class ProviderRead extends QueryBase
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->tableName)
+            ->from($this->tableNameProvider)
             ->where('guid = :guid')
             ->setParameter(':guid', $guid)
         ;
@@ -38,7 +38,7 @@ class ProviderRead extends QueryBase
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->tableName)
+            ->from($this->tableNameProvider)
             ->where('provider = :provider')
             ->andWhere('resource_owner_id = :resource_owner_id')
             ->setParameter(':provider', $provider)

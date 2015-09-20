@@ -25,7 +25,7 @@ class ProviderWrite extends QueryBase
     public function queryInsert($provider, $resourceOwnerId, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         return $this->getQueryBuilder()
-            ->insert($this->tableName)
+            ->insert($this->tableNameProvider)
             ->values([
                 'guid'              => ':guid',
                 'provider'          => ':provider',
@@ -58,7 +58,7 @@ class ProviderWrite extends QueryBase
     public function queryUpdate($provider, $resourceOwnerId, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         return $this->getQueryBuilder()
-            ->update($this->tableName)
+            ->update($this->tableNameProvider)
             ->set('lastupdate',     ':lastupdate')
             ->set('resource_owner', ':resource_owner')
             ->where('provider  = :provider')
@@ -84,7 +84,7 @@ class ProviderWrite extends QueryBase
     public function queryUpdateResourceOwner($provider, $resourceOwnerId, ResourceOwnerInterface $resourceOwner)
     {
         return $this->getQueryBuilder()
-            ->update($this->tableName)
+            ->update($this->tableNameProvider)
             ->set('lastupdate',     ':lastupdate')
             ->set('resource_owner', ':resource_owner')
             ->where('provider  = :provider')
@@ -110,7 +110,7 @@ class ProviderWrite extends QueryBase
     public function querySetEnable($provider, $resourceOwnerId, $enable)
     {
         return $this->getQueryBuilder()
-            ->update($this->tableName)
+            ->update($this->tableNameProvider)
             ->set('enabled', $enable)
             ->where('provider  = :provider')
             ->andWhere('resource_owner_id  = :resource_owner_id')
