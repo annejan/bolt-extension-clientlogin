@@ -5,6 +5,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\CookieManager;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginExceptionEvent as ExceptionEvent;
+use Bolt\Extension\Bolt\ClientLogin\Exception\AccessDeniedException;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use Bolt\Extension\Bolt\ClientLogin\Response\FailureResponse;
 use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
@@ -61,6 +62,12 @@ class ClientLoginController implements ControllerProviderInterface
         $ctr->match('/oauth2/authorise', [$this, 'authenticationAuthorise'])
             ->bind('authenticationAuthorise')
             ->method('GET|POST');
+
+        // Own the rest of the base route
+        $ctr->match('/{url}', [$this, 'authenticationDefault'])
+            ->bind('authenticationDefault')
+            ->method('GET|POST')
+            ->assert('url', '.+');
 
         return $ctr;
     }
@@ -160,6 +167,21 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationAuthorise(Application $app, Request $request)
     {
+    }
+
+    /**
+     * Default route to throw an error on.
+     *
+     * @param \Silex\Application $app
+     * @param Request            $request
+     *
+     * @return Response
+     */
+    public function authenticationDefault(Application $app, Request $request)
+    {
+        $e = new  AccessDeniedException('Invalid route!');
+
+        return $this->getExceptionResponse($app, $e);
     }
 
     /**
