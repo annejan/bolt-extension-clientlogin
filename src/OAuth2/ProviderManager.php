@@ -146,12 +146,20 @@ class ProviderManager
             throw new Exception\ConfigurationException('Provider scope(s) required: ' . $providerName);
         }
 
-        return[
+        $options = [
             'clientId'     => $providerConfig['clientId'],
             'clientSecret' => $providerConfig['clientSecret'],
             'scope'        => $providerConfig['scopes'],
             'redirectUri'  => $this->getCallbackUrl($providerName),
         ];
+
+        if ($providerName === 'Local') {
+            $options['urlAuthorize'] = $this->config->getUriAuthorise();
+            $options['urlAccessToken'] = $this->config->getUriAccessToken();
+            $options['urlResourceOwnerDetails'] = $this->config->getUriResourceOwnerDetails();
+        }
+
+        return $options;
     }
 
     /**
