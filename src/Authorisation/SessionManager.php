@@ -47,13 +47,11 @@ class SessionManager
      */
     public function getLoggedIn(Request $request = null)
     {
-        if (!$this->checkRequest($request)) {
-            return;
-        }
-
-        if ($this->checkSession($request)) {
+        if ($this->checkRequest($request) && $this->checkSession($request)) {
             return $this->session->get(TokenManager::TOKEN_ACCESS);
         }
+
+        return;
     }
 
     /**
@@ -65,11 +63,13 @@ class SessionManager
      */
     public function isLoggedIn(Request $request = null)
     {
-        if (!$this->checkRequest($request)) {
-            return false;
+        // If we have a cookie, check there is a matching session
+        if ($this->checkRequest($request)) {
+
+            return $this->checkSession($request);
         }
 
-        return $this->checkSession($request);
+        return false;
     }
 
     /**
@@ -143,6 +143,8 @@ class SessionManager
 
             return true;
         }
+
+        $this->setDebugMessage('checkSession() found no matching session.');
 
         return false;
     }
