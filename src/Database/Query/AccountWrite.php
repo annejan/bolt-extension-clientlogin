@@ -80,7 +80,7 @@ class AccountWrite extends QueryBase
             ->where('resource_owner_id = :resource_owner_id')
             ->setParameters([
                 'resource_owner_id' => $resourceOwnerId,
-                'password' => $passwordHash,
+                'password'          => $passwordHash,
             ])
         ;
     }
@@ -93,7 +93,7 @@ class AccountWrite extends QueryBase
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function querySetEnable($guid, $enable)
+    public function querySetEnableByGuid($guid, $enable)
     {
         return $this->getQueryBuilder()
             ->update($this->tableNameAccount)
@@ -102,6 +102,27 @@ class AccountWrite extends QueryBase
             ->setParameters([
                 'guid'    => $guid,
                 'enabled' => $enable,
+            ])
+        ;
+    }
+
+    /**
+     * Query to toggle the "enabled" value for an account record.
+     *
+     * @param string  $resourceOwnerId
+     * @param boolean $enable
+     *
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function querySetEnableByResourceOwnerId($resourceOwnerId, $enable)
+    {
+        return $this->getQueryBuilder()
+            ->update($this->tableNameAccount)
+            ->set('enabled', ':enabled')
+            ->where('resource_owner_id  = :resource_owner_id')
+            ->setParameters([
+                'resource_owner_id' => $resourceOwnerId,
+                'enabled'           => $enable,
             ])
         ;
     }
