@@ -129,6 +129,26 @@ class UserInterface
     }
 
     /**
+     * Render one of our exception pages.
+     *
+     * @param \Exception $e
+     *
+     * @return \Twig_Markup
+     */
+    public function displayExceptionPage(\Exception $e)
+    {
+        $context = [
+            'parent'    => $this->app['clientlogin.config']->getTemplate('error_parent'),
+            'feedback'  => $this->app['clientlogin.feedback']->get(),
+            'exception' => $e,
+        ];
+
+        $html = $this->app['render']->render($this->config->getTemplate('error'), $context);
+
+        return new \Twig_Markup($html, 'UTF-8');
+    }
+
+    /**
      * Get a button's class
      *
      * @param string $provider
