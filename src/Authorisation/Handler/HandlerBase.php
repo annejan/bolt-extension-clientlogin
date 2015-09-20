@@ -120,11 +120,13 @@ abstract class HandlerBase
             $this->setDebugMessage(sprintf('Profile found for %s ID %s', $providerName, $resourceOwner->getId()));
         }
 
-        $this->getRecordManager()->writeProfile($profile['guid'], $providerName, $accessToken, $resourceOwner);
+        // Update the provider record
+        $this->getRecordManager()->writeProvider($profile['guid'], $providerName, $accessToken, $resourceOwner);
 
-        // Update the session record
-        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
+        // Update the session token record
         $this->getRecordManager()->writeSession($profile['guid'], $providerName, $accessToken);
+
+        // Update the PHP session
         $this->getTokenManager()->setAuthToken($profile['guid'], $accessToken);
 
         $response = new SuccessRedirectResponse('/');
