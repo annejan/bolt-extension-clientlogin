@@ -20,9 +20,9 @@ class AccountEnable extends BaseCommand
     protected function configure()
     {
         $this
-        ->setName('clientlogin:enable')
-        ->setDescription('Enable a ClientLogin account')
-        ->addOption('login', null, InputOption::VALUE_REQUIRED, 'Login name for the account')
+            ->setName('clientlogin:enable')
+            ->setDescription('Enable a ClientLogin account')
+            ->addOption('login', null, InputOption::VALUE_REQUIRED, 'Login name for the account')
         ;
     }
 
@@ -31,9 +31,13 @@ class AccountEnable extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $login = $input->getOption('login');
+        $resourceOwnerId = $input->getOption('login');
 
-        $this->auditLog(__CLASS__, 'ClientLogin admin command run');
-        $output->writeln("\n<info>ClientLogin admin command run!</info>");
+        if ($this->app['clientlogin.records']->setAccountEnabledStatus($resourceOwnerId, true)) {
+            $this->auditLog(__CLASS__, 'ClientLogin admin command enabled account: ' . $resourceOwnerId);
+            $output->writeln("\n<info>Enabled account: {$resourceOwnerId}</info>");
+        } else {
+            $output->writeln("\n<error>Unable to enable account!</error>");
+        }
     }
 }
