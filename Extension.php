@@ -45,7 +45,8 @@ class Extension extends BaseExtension
         }
 
         // Controller routes
-        $this->app->mount('/' . $this->config['basepath'], new Controller\ClientLoginController());
+        $base = isset($this->config['uris']['base']) ? $this->config['uris']['base'] : 'authenticate';
+        $this->app->mount('/' . $base, new Controller\ClientLoginController());
 
         // Scheduled cron listener
         $this->app['dispatcher']->addListener(CronEvents::CRON_DAILY, [$this, 'cronDaily']);

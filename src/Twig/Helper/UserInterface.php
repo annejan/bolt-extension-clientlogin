@@ -60,7 +60,7 @@ class UserInterface
         }
 
         // Render
-        $link    = $this->app['resources']->getUrl('root') . $this->config->get('basepath') . '/login?provider=';
+        $link    = $this->app['resources']->getUrl('root') . $this->config->getUriBase() . '/login?provider=';
         $context = [];
 
         foreach ($this->config->get('providers') as $provider => $values) {
@@ -98,7 +98,7 @@ class UserInterface
         $context = [
             'providers' => [
                 'logout' => [
-                    'link'  => $this->app['resources']->getUrl('root') . $this->config->get('basepath') . '/logout' . $target,
+                    'link'  => $this->app['resources']->getUrl('root') . $this->config->getUriBase() . '/logout' . $target,
                     'label' => $this->config->getLabel('logout') ?: 'Logout',
                     'class' => 'logout'
                 ]
