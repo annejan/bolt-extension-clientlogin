@@ -8,7 +8,6 @@ use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
-use Bolt\Filesystem\Plugin\PublicUrl;
 
 /**
  * Provider object management class.

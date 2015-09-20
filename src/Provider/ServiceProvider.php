@@ -51,13 +51,13 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $app['clientlogin.handler.local'] = $app->share(
+        $app['clientlogin.handler.local'] = $app->protect(
             function ($app) {
                 return new Handler\Local($app, $app['request_stack']);
             }
         );
 
-        $app['clientlogin.handler.remote'] = $app->share(
+        $app['clientlogin.handler.remote'] = $app->protect(
             function ($app) {
                 return new Handler\Remote($app, $app['request_stack']);
             }
