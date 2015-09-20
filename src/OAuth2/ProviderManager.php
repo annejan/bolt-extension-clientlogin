@@ -51,8 +51,14 @@ class ProviderManager
      */
     public function setProvider(Application $app, Request $request)
     {
-        $providerName = $this->getProviderName($request);
+        try {
+            $providerName = $this->getProviderName($request);
+        } catch (Exception\InvalidProviderException $e) {
+            $providerName = 'generic';
+        }
         $app['clientlogin.provider'] = $app['clientlogin.provider.' . strtolower($providerName)];
+
+        $this->setProviderHandler($app);
     }
 
     /**
