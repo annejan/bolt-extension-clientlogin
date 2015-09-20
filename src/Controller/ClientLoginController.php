@@ -57,6 +57,11 @@ class ClientLoginController implements ControllerProviderInterface
             ->bind('authenticationCallback')
             ->method('GET|POST');
 
+        // OAuth authorise URI
+        $ctr->match('/oauth2/authorise', [$this, 'authenticationAuthorise'])
+            ->bind('authenticationAuthorise')
+            ->method('GET|POST');
+
         return $ctr;
     }
 
@@ -143,6 +148,18 @@ class ClientLoginController implements ControllerProviderInterface
         }
 
         return $response;
+    }
+
+    /**
+     * Authorisation endpoint.
+     *
+     * @param \Silex\Application $app
+     * @param Request            $request
+     *
+     * @return Response
+     */
+    public function authenticationAuthorise(Application $app, Request $request)
+    {
     }
 
     /**
