@@ -49,6 +49,5 @@ class AccountCreate extends BaseCommand
         } catch (UniqueConstraintViolationException $e) {
             $output->writeln("\n<error>Account already exists!</error>");
         }
-
     }
 }

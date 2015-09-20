@@ -3,6 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Nut;
 
 use Bolt\Nut\BaseCommand;
+use Hautelook\Phpass\PasswordHash;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -32,10 +33,17 @@ class PasswordReset extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $login = $input->getOption('login');
+        $resourceOwnerId = $input->getOption('login');
         $password = $input->getOption('password');
 
-        $this->auditLog(__CLASS__, 'ClientLogin admin command run');
-        $output->writeln("\n<info>ClientLogin admin command run!</info>");
+        $hasher = new PasswordHash(12, true);
+        $passwordHash = $hasher->HashPassword($password);
+
+        if ($this->app['clientlogin.records']->setAccountPassword($resourceOwnerId, $passwordHash)) {
+            $this->auditLog(__CLASS__, 'ClientLogin admin command set password for account: ' . $resourceOwnerId);
+            $output->writeln("\n<info>Set password for account: {$resourceOwnerId}</info>");
+        } else {
+            $output->writeln("\n<error>Unable to set password for account: {$resourceOwnerId}</error>");
+        }
     }
 }
