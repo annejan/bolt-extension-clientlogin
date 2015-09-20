@@ -9,14 +9,20 @@ abstract class QueryBase
     /** @var \Doctrine\DBAL\Connection */
     protected $db;
     /** @var string */
-    protected $tableName;
+    protected $tableNameBase;
+    /** @var string */
+    protected $tableNameAccount;
+    /** @var string */
+    protected $tableNameProvider;
     /** @var string */
     protected $tableNameTokens;
 
     public function __construct(Connection $db, $tableName)
     {
         $this->db = $db;
-        $this->tableName = $tableName;
+        $this->tableNameBase = $tableName;
+        $this->tableNameAccount = $tableName . '_account';
+        $this->tableNameProvider = $tableName . '_provider';
         $this->tableNameTokens = $tableName . '_tokens';
     }
 
