@@ -4,9 +4,10 @@ namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\CookieManager;
+use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginExceptionEvent as ExceptionEvent;
+use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use Bolt\Extension\Bolt\ClientLogin\Response\FailureResponse;
 use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
-use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -189,14 +190,13 @@ class ClientLoginController implements ControllerProviderInterface
         }
 
         // Dispatch an event so that subscribers can extend exception handling
-//         if ($this->app['dispatcher']->hasListeners('clientlogin.error')) {
-//             $event = new ClientLoginExceptionEvent();
-//             try {
-//                 $this->app['dispatcher']->dispatch('clientlogin.error', $event);
-//             } catch (\Exception $e) {
-//                 $this->app['logger.system']->critical('ClientLogin event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
-//             }
-//         }
+        if ($this->app['dispatcher']->hasListeners(ExceptionEvent::ERROR)) {
+            try {
+                $this->app['dispatcher']->dispatch(ExceptionEvent::ERROR, new ExceptionEvent($e));
+            } catch (\Exception $e) {
+                $this->app['logger.system']->critical('[ClientLogin][Controller] Event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
+            }
+        }
 
         $app['clientlogin.feedback']->set('debug', $e->getMessage());
         $response->setContent($app['clientlogin.config']->displayExceptionPage($e));
