@@ -107,33 +107,82 @@ abstract class HandlerBase
      */
     protected function process()
     {
-        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
         $accessToken = $this->getAccessToken($this->request);
-        $resourceOwner = $this->getResourceOwner($accessToken);
-
-        $profile = $this->getRecordManager()->getAccountByResourceOwnerId($providerName, $resourceOwner->getId());
-        if ($profile === false) {
-            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $providerName, $resourceOwner->getId()));
-            $this->getRecordManager()->insertAccount($resourceOwner->getId(), null, null, true);
-            $profile = $this->getRecordManager()->getAccountByResourceOwnerId($providerName, $resourceOwner->getId());
-        } else {
-            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $providerName, $resourceOwner->getId()));
-        }
-
-        // Update the provider record
-        $this->getRecordManager()->writeProvider($profile['guid'], $providerName, $accessToken, $resourceOwner);
-
-        // Update the session token record
-        $this->getRecordManager()->writeSession($profile['guid'], $providerName, $accessToken);
+        $guid = $this->handleAccountTransition($accessToken);
 
         // Update the PHP session
-        $this->getTokenManager()->setAuthToken($profile['guid'], $accessToken);
+        $this->getTokenManager()->setAuthToken($guid, $accessToken);
 
         $response = new SuccessRedirectResponse('/');
         $cookiePaths = $this->getConfig()->getCookiePaths();
         CookieManager::setResponseCookies($response, $accessToken, $cookiePaths);
 
         return $response;
+    }
+
+    /**
+     * Handle a successful account authentication.
+     *
+     * @param AccessToken $accessToken
+     *
+     * @throws Exception\RecordHandlerException
+     *
+     * @return string
+     */
+    protected function handleAccountTransition(AccessToken $accessToken)
+    {
+        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+        $resourceOwner = $this->getResourceOwner($accessToken);
+
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
+        if ($profile === false) {
+            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $providerName, $resourceOwner->getId()));
+            $this->getRecordManager()->writeProvider(null, $providerName, $accessToken, $resourceOwner);
+
+            // Now re-fetch the profile for provider record
+            $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
+            if ($profile === false) {
+                throw new Exception\RecordHandlerException('Unable to re-fetch newly created profile.');
+            }
+
+            $guid = $this->getValidGuid($profile);
+            $account = $this->getRecordManager()->getAccountByGuid($guid);
+            if ($account === false) {
+                $this->setDebugMessage(sprintf('No account found for GUID %s', $guid));
+
+                // Create the account record with a matching GUID
+                $result = $this->getRecordManager()->insertAccount($guid, null, null, null, true);
+                if ($result === false) {
+                    throw new Exception\RecordHandlerException('Unable to re-fetch newly created account.');
+                }
+            }
+        } else {
+            $guid = $this->getValidGuid($profile);
+            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $providerName, $resourceOwner->getId()));
+            // Update the provider record
+            $this->getRecordManager()->writeProvider($guid, $providerName, $accessToken, $resourceOwner);
+        }
+
+        // Update the session token record
+        $this->setDebugMessage(sprintf('Writing session token for %s ID %s', $providerName, $resourceOwner->getId()));
+        $this->getRecordManager()->writeSession($guid, $providerName, $accessToken);
+
+        return $guid;
+    }
+
+    /**
+     *
+     * @param array $record
+     *
+     * @throws \RuntimeException
+     */
+    protected function getValidGuid(array $record)
+    {
+        if (strlen($record['guid']) !== 36) {
+            throw new \RuntimeException('Invalid GUID value being used!');
+        }
+
+        return $record['guid'];
     }
 
     /**
