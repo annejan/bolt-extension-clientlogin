@@ -31,7 +31,7 @@ abstract class HandlerBase
     private $config;
     /** @var \Symfony\Component\HttpFoundation\Response */
     private $response;
-    /** @var Manager\Token */
+    /** @var TokenManager */
     private $tm;
 
     /**
