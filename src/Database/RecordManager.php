@@ -13,6 +13,52 @@ use League\OAuth2\Client\Token\AccessToken;
 class RecordManager extends RecordManagerBase
 {
     /**
+     * Insert an account.
+     *
+     * @param string $resourceOwnerId
+     * @param string $passwordHash
+     * @param string $emailAddress
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
+     */
+    public function insertAccount($resourceOwnerId, $passwordHash, $emailAddress, $enabled = false)
+    {
+        $query = $this->getAccountQueriesWrite()->queryInsert($resourceOwnerId, $passwordHash, $emailAddress, $enabled);
+
+        return $this->executeQuery($query);
+    }
+
+    /**
+     * Set an account password.
+     *
+     * @param string $resourceOwnerId
+     * @param string $passwordHash
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
+     */
+    public function setAccountPassword($resourceOwnerId, $passwordHash)
+    {
+        $query = $this->getAccountQueriesWrite()->querySetPasswordByResourceOwnerId($resourceOwnerId, $passwordHash);
+
+        return $this->executeQuery($query);
+    }
+
+    /**
+     * Set an account enabled status.
+     *
+     * @param string  $resourceOwnerId
+     * @param boolean $enabled
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
+     */
+    public function setAccountEnabledStatus($resourceOwnerId, $enabled)
+    {
+        $query = $this->getAccountQueriesWrite()->querySetEnableByResourceOwnerId($resourceOwnerId, $enabled);
+
+        return $this->executeQuery($query);
+    }
+
+    /**
      * Get a profile record by GUID.
      *
      * @param integer $guid
