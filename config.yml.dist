@@ -67,8 +67,8 @@ response_noun: provider
 # Number of days to allow login sessions to be valid for
 login_expiry: 14
 
-# Enabling debug_mode will make this extension write out a logfile to
-# {BOLT_CACHE_DIR}/authenticate.log.
+# Enabling debug_mode will make this extension write out a logfile to the
+# {BOLT_CACHE_DIR}/authenticate.log file.
 #
 # Note: This file wil get huge, quickly!
 debug:
