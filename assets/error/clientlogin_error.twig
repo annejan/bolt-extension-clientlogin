@@ -4,12 +4,12 @@
  ### Installing in your theme:
  # Create a Twig template file in your theme directory, that inherits your page
  # layout and then add the following block:
- #     {% block password %}
- #     {% endblock password %}
+ #     {% block client_login_error %}
+ #     {% endblock client_login_error %}
  #
  ### Configuring ClientLogin to use your template parent:
  #
- # Next step is to set the password_parent: template key to the relative path to
+ # Next step is to set the error_parent: template key to the relative path to
  # template file.
  #
  # For example if you have a theme directory 'koala' and you create the directory
@@ -19,7 +19,7 @@
  # In app/config/extensions/clientlogin.bolt.yml set the following to override
  #
  #     template:
- #       password_parent: extensions/clientlogin/password.twig
+ #       error_parent: extensions/clientlogin/clientlogin_error.twig
  #}
-{% block password %}
-{% endblock password %}
+{% block client_login_error %}
+{% endblock client_login_error %}
