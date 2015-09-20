@@ -63,20 +63,18 @@ abstract class HandlerBase
             throw new Exception\DisabledProviderException('Invalid provider setting.');
         }
 
-        if (!$this->app['clientlogin.session']->isLoggedIn($this->request)) {
-            return;
+        if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
+            return new SuccessRedirectResponse('/');;
         }
 
         // Get the user object for the event
         $sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
 
         // Event dispatcher
-        $this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $sessionToken);
+//$this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $sessionToken);
 
         // Set user feedback messages
-        $this->app['clientlogin.feedback']->set('message', 'Login was successful.');
-
-        return new SuccessRedirectResponse('/');
+        $this->app['clientlogin.feedback']->set('message', 'Login was route complete, redirecting for authentication.');
     }
 
     /**
@@ -111,7 +109,7 @@ abstract class HandlerBase
         $accessToken = $this->getAccessToken($this->request);
         $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
-        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
+        $profile = $this->getRecordManager()->getAccountByResourceOwnerId($providerName, $resourceOwner->getId());
         if ($profile === false) {
             $this->setDebugMessage(sprintf('No profile found for %s ID %s', $providerName, $resourceOwner->getId()));
             $this->getRecordManager()->writeProfile('insert', $providerName, $accessToken, $resourceOwner);

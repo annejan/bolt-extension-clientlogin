@@ -29,11 +29,18 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     public function login()
     {
-        if ($response = parent::login()) {
+        $response = parent::login();
+        if ($response instanceof Response) {
             // User is logged in already, from whence they came return them now.
             return $response;
         }
-        return $this->getAuthorisationRedirectResponse();
+
+        $response = $this->getAuthorisationRedirectResponse();
+        if ($response instanceof Response) {
+            return $response;
+        }
+
+        throw new \RuntimeException('An error occured with the provider redirect handling.');
     }
 
     /**
