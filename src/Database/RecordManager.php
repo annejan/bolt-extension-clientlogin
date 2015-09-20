@@ -15,15 +15,16 @@ class RecordManager extends RecordManagerBase
     /**
      * Insert an account.
      *
+     * @param string $guid
      * @param string $resourceOwnerId
      * @param string $passwordHash
      * @param string $emailAddress
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function insertAccount($resourceOwnerId, $passwordHash, $emailAddress, $enabled = false)
+    public function insertAccount($guid = null, $resourceOwnerId, $passwordHash, $emailAddress, $enabled = false)
     {
-        $query = $this->getAccountQueriesWrite()->queryInsert($resourceOwnerId, $passwordHash, $emailAddress, $enabled);
+        $query = $this->getAccountQueriesWrite()->queryInsert($guid, $resourceOwnerId, $passwordHash, $emailAddress, $enabled);
 
         return $this->executeQuery($query);
     }
@@ -46,43 +47,71 @@ class RecordManager extends RecordManagerBase
     /**
      * Set an account enabled status.
      *
-     * @param string  $resourceOwnerId
+     * @param string  $guid
      * @param boolean $enabled
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function setAccountEnabledStatus($resourceOwnerId, $enabled)
+    public function setAccountEnabledStatus($guid, $enabled)
     {
-        $query = $this->getAccountQueriesWrite()->querySetEnableByResourceOwnerId($resourceOwnerId, $enabled);
+        $query = $this->getAccountQueriesWrite()->querySetEnableByResourceOwnerId($guid, $enabled);
 
         return $this->executeQuery($query);
     }
 
     /**
-     * Get an account by resource owner ID.
+     * Get an account by GUID.
      *
-     * @param boolean $providerName
-     * @param string  $resourceOwnerId
+     * @param string $guid
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function getAccountByResourceOwnerId($providerName, $resourceOwnerId)
+    public function getAccountByGuid($guid)
     {
-        $query = $this->getAccountQueriesRead()->queryFetchByResourceOwnerId($providerName, $resourceOwnerId);
+        $query = $this->getAccountQueriesRead()->queryFetchByGuid($guid);
 
         return $this->fetchArray($query);
     }
 
     /**
-     * Get a profile record by GUID.
+     * Get an account by resource owner ID.
+     *
+     * @param string $resourceOwnerId
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|integer|null
+     */
+    public function getAccountByResourceOwnerId($resourceOwnerId)
+    {
+        $query = $this->getAccountQueriesRead()->queryFetchByResourceOwnerId($resourceOwnerId);
+
+        return $this->fetchArray($query);
+    }
+
+    /**
+     * Get the profile records for a GUID.
      *
      * @param string $guid
      *
+     * @return array[]|false
+     */
+    public function getProfilesByGuid($guid)
+    {
+        $query = $this->getProviderQueriesRead()->queryFetchByGuid($guid);
+
+        return $this->fetchArray($query);
+    }
+
+    /**
+     * Get the profile records for a GUID.
+     *
+     * @param string $providerName
+     * @param string $resourceOwnerId
+     *
      * @return array|false
      */
-    public function getProfile($guid)
+    public function getProfileByResourceOwnerId($providerName, $resourceOwnerId)
     {
-        $query = $this->getProviderQueriesRead()->queryFetchById($guid);
+        $query = $this->getProviderQueriesRead()->queryFetchByResourceOwnerId($providerName, $resourceOwnerId);
 
         return $this->fetchArray($query);
     }
@@ -142,7 +171,7 @@ class RecordManager extends RecordManagerBase
      */
     public function writeProvider($guid, $provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
-        if ($guid === 'insert') {
+        if ($guid === null) {
             return $this->insertProvider($provider, $accessToken, $resourceOwner);
         } else {
             return $this->updateProvider($guid, $provider, $accessToken, $resourceOwner);
