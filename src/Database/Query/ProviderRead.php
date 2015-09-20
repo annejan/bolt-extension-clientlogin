@@ -29,19 +29,19 @@ class ProviderRead extends QueryBase
     /**
      * Query to fetch a profile by provider and ID.
      *
-     * @param string $provider
+     * @param string $providerName
      * @param string $resourceOwnerId
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryFetchByResourceOwnerId($provider, $resourceOwnerId)
+    public function queryFetchByResourceOwnerId($providerName, $resourceOwnerId)
     {
         return $this->getQueryBuilder()
             ->select('*')
             ->from($this->tableNameProvider)
             ->where('provider = :provider')
             ->andWhere('resource_owner_id = :resource_owner_id')
-            ->setParameter(':provider', $provider)
+            ->setParameter(':provider', $providerName)
             ->setParameter(':resource_owner_id', $resourceOwnerId)
         ;
     }

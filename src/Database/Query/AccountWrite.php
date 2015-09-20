@@ -23,7 +23,7 @@ class AccountWrite extends QueryBase
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryInsert($guid, $resourceOwnerId, $passwordHash, $emailAddress, $enabled = false)
+    public function queryInsert($guid, $resourceOwnerId, $passwordHash, $emailAddress, $enabled)
     {
         if ($guid === null) {
             $guid = $this->getGuidV4();

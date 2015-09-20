@@ -22,8 +22,7 @@ class AccountRead extends QueryBase
             ->select('*')
             ->from($this->tableNameAccount, 'a')
             ->leftJoin('a', $this->tableNameProvider, 'p', 'a.guid = p.guid')
-            ->where('p.resource_owner_id = :resource_owner_id')
-            ->andWhere('guid = :guid')
+            ->where('a.guid = :guid')
             ->setParameter(':guid', $guid)
         ;
     }
@@ -31,21 +30,18 @@ class AccountRead extends QueryBase
     /**
      * Query to fetch a account by resource owner.
      *
-     * @param string $providerName
      * @param string $resourceOwnerId
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryFetchByResourceOwnerId($providerName, $resourceOwnerId)
+    public function queryFetchByResourceOwnerId($resourceOwnerId)
     {
         return $this->getQueryBuilder()
             ->select('*')
             ->from($this->tableNameAccount, 'a')
             ->leftJoin('a', $this->tableNameProvider, 'p', 'a.guid = p.guid')
-            ->where('p.provider = :provider')
-            ->andWhere('p.resource_owner_id = :resource_owner_id')
+            ->where('p.resource_owner_ids = :resource_owner_id')
             ->setParameters([
-                ':provider'          => $providerName,
                 ':resource_owner_id' => $resourceOwnerId,
             ])
         ;
