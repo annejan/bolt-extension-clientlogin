@@ -45,7 +45,7 @@ class Schema
                 $table->addColumn('guid',              'guid',     []);
                 $table->addColumn('resource_owner_id', 'string',   ['notnull' => false, 'length' => 128]);
                 $table->addColumn('password',          'string',   ['notnull' => false, 'length' => 64]);
-                $table->addColumn('email',             'string',   ['length' => 254]);
+                $table->addColumn('email',             'string',   ['notnull' => false, 'length' => 254]);
                 $table->addColumn('enabled',           'boolean',  ['default' => false]);
 
                 $table->setPrimaryKey(['guid']);
