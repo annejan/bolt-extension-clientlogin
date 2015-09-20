@@ -15,14 +15,15 @@ class RecordManager extends RecordManagerBase
     /**
      * Insert an account.
      *
-     * @param string $guid
-     * @param string $resourceOwnerId
-     * @param string $passwordHash
-     * @param string $emailAddress
+     * @param string|null $guid
+     * @param string|null $resourceOwnerId
+     * @param string|null $passwordHash
+     * @param string|null $emailAddress
+     * @param boolean     $enabled
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function insertAccount($guid = null, $resourceOwnerId, $passwordHash, $emailAddress, $enabled = false)
+    public function insertAccount($guid, $resourceOwnerId, $passwordHash, $emailAddress, $enabled = false)
     {
         $query = $this->getAccountQueriesWrite()->queryInsert($guid, $resourceOwnerId, $passwordHash, $emailAddress, $enabled);
 

@@ -43,7 +43,7 @@ class AccountCreate extends BaseCommand
         $passwordHash = $hasher->HashPassword($password);
 
         try {
-            $this->app['clientlogin.records']->insertAccount($resourceOwnerId, $passwordHash, $emailAddress);
+            $this->app['clientlogin.records']->insertAccount(null, $resourceOwnerId, $passwordHash, $emailAddress);
             $this->auditLog(__CLASS__, 'ClientLogin admin command created account: ' . $resourceOwnerId);
             $output->writeln("\n<info>Created account: {$resourceOwnerId}</info>");
         } catch (UniqueConstraintViolationException $e) {
