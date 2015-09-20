@@ -3,6 +3,8 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Nut;
 
 use Bolt\Nut\BaseCommand;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Hautelook\Phpass\PasswordHash;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,11 +35,20 @@ class AccountCreate extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $login = $input->getOption('login');
+        $resourceOwnerId = $input->getOption('login');
         $password = $input->getOption('password');
-        $email = $input->getOption('email');
+        $emailAddress = $input->getOption('email');
 
-        $this->auditLog(__CLASS__, 'ClientLogin admin command run');
-        $output->writeln("\n<info>ClientLogin admin command run!</info>");
+        $hasher = new PasswordHash(12, true);
+        $passwordHash = $hasher->HashPassword($password);
+
+        try {
+            $this->app['clientlogin.records']->insertAccount($resourceOwnerId, $passwordHash, $emailAddress);
+            $this->auditLog(__CLASS__, 'ClientLogin admin command created account: ' . $resourceOwnerId);
+            $output->writeln("\n<info>Created account: {$resourceOwnerId}</info>");
+        } catch (UniqueConstraintViolationException $e) {
+            $output->writeln("\n<error>Account already exists!</error>");
+        }
+
     }
 }
