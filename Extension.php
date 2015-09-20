@@ -37,6 +37,7 @@ class Extension extends BaseExtension
         // Service providers
         $this->app->register(new Provider\ServiceProvider($this->config));
         $this->app['twig']->addExtension(new Twig\ClientLoginExtension($this->app));
+        $this->addNutCommands();
 
         // Check & create database tables if required
         if ($this->app['config']->getWhichEnd() === 'backend' || $this->app['config']->getWhichEnd() === 'cli') {
@@ -59,5 +60,16 @@ class Extension extends BaseExtension
     {
         $event->output->writeln("<comment>ClientLogin: Clearing old sessions</comment>");
         $this->app['clientlogin.db']->doRemoveExpiredSessions();
+    }
+
+    /**
+     * Add our Nut commands to the application.
+     */
+    private function addNutCommands()
+    {
+        $this->app['nut.commands.add'](new Nut\AccountCreate($this->app));
+        $this->app['nut.commands.add'](new Nut\AccountDisable($this->app));
+        $this->app['nut.commands.add'](new Nut\AccountEnable($this->app));
+        $this->app['nut.commands.add'](new Nut\PasswordReset($this->app));
     }
 }
