@@ -84,7 +84,7 @@ class ProviderManager
         $options = $this->getProviderOptions($providerName);
         $collaborators = ['httpClient' => $this->guzzleClient];
 
-        return $this->provider = new $providerClass($options, $collaborators);
+        return $this->providerName = new $providerClass($options, $collaborators);
     }
 
     /**

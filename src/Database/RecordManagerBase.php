@@ -14,10 +14,12 @@ use Psr\Log\LoggerInterface;
  */
 abstract class RecordManagerBase
 {
-    /** @var \Doctrine\DBAL\Connection */
+    /** @var \Doctrine\DBAL\Driver\Connection */
     protected $db;
     /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     protected $config;
+    /** @var LoggerInterface */
+    protected $logger;
     /** @var string */
     protected $tableName;
 
