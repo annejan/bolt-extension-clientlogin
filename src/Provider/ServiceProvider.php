@@ -53,13 +53,13 @@ class ServiceProvider implements ServiceProviderInterface
         );
 
         $app['clientlogin.handler.local'] = $app->protect(
-            function ($app) {
+            function ($app) use ($app) {
                 return new Handler\Local($app, $app['request_stack']);
             }
         );
 
         $app['clientlogin.handler.remote'] = $app->protect(
-            function ($app) {
+            function ($app) use ($app) {
                 return new Handler\Remote($app, $app['request_stack']);
             }
         );
@@ -144,7 +144,7 @@ class ServiceProvider implements ServiceProviderInterface
         foreach ($this->config['providers'] as $providerName => $providerConfig) {
             if ($providerConfig['enabled'] === true) {
                 $app['clientlogin.provider.' . strtolower($providerName)] = $app->protect(
-                    function ($app) use ($providerName) {
+                    function ($app) use ($app, $providerName) {
                         return $app['clientlogin.provider.manager']->getProvider($providerName);
                     }
                 );

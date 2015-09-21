@@ -57,8 +57,14 @@ class ProviderManager
         $this->setProviderName($request);
 
         $providerName = $this->getProviderName();
+        $providerKey = 'clientlogin.provider.' . strtolower($providerName);
 
-        $app['clientlogin.provider'] = clone $app['clientlogin.provider.' . strtolower($providerName)];
+        $app['clientlogin.provider'] = $app->share(
+            function ($app) use ($providerKey) {
+                return $app[$providerKey]([]);
+            }
+        );
+
         $app['logger.system']->debug('[ClientLogin][Provider]: Created provider name: ' . $providerName, ['event' => 'extensions']);
 
         $this->setProviderHandler($app);
@@ -192,18 +198,33 @@ class ProviderManager
             throw new Exception\InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
-        if ($providerName === 'Local') {
-            if (!isset($app['boltforms'])) {
-                throw new \RuntimeException('Local handler requires BoltForms (v2.5.0 or later preferred).');
-            }
-            $app['clientlogin.handler'] = clone $app['clientlogin.handler.local'];
-
-            return;
+        if ($providerName === 'Local' && !isset($app['boltforms'])) {
+            throw new \RuntimeException('Local handler requires BoltForms (v2.5.0 or later preferred).');
         }
 
-        $app['clientlogin.handler'] = clone $app['clientlogin.handler.remote'];
+        $handlerKey = $this->getHandlerKey($providerName);
+        $app['clientlogin.handler'] = $app->share(
+            function ($app) use ($app, $handlerKey) {
+                return $app[$handlerKey]([]);
+            }
+        );
 
         $this->provider = $app['clientlogin.handler'];
+    }
+
+    /**
+     * Get the service key for our provider.
+     *
+     * @param string $providerName
+     *
+     * @return string
+     */
+    protected function getHandlerKey($providerName)
+    {
+        if ($providerName === 'Local') {
+            return 'clientlogin.handler.local';
+        }
+        return 'clientlogin.handler.remote';
     }
 
     /**
