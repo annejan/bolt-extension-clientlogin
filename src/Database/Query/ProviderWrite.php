@@ -50,12 +50,11 @@ class ProviderWrite extends QueryBase
      *
      * @param string                 $provider
      * @param string                 $resourceOwnerId
-     * @param AccessToken            $accessToken
      * @param ResourceOwnerInterface $resourceOwner
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryUpdate($provider, $resourceOwnerId, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    public function queryUpdate($provider, $resourceOwnerId, ResourceOwnerInterface $resourceOwner)
     {
         return $this->getQueryBuilder()
             ->update($this->tableNameProvider)
@@ -69,51 +68,6 @@ class ProviderWrite extends QueryBase
                 'lastupdate'        => date('Y-m-d H:i:s', time()),
                 'resource_owner'    => json_encode($resourceOwner->toArray()),
             ])
-        ;
-    }
-
-    /**
-     * Query to update a profile record's resource ower data.
-     *
-     * @param string                 $provider
-     * @param string                 $resourceOwnerId
-     * @param ResourceOwnerInterface $resourceOwner
-     *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function queryUpdateResourceOwner($provider, $resourceOwnerId, ResourceOwnerInterface $resourceOwner)
-    {
-        return $this->getQueryBuilder()
-            ->update($this->tableNameProvider)
-            ->set('lastupdate',     ':lastupdate')
-            ->set('resource_owner', ':resource_owner')
-            ->where('provider  = :provider')
-            ->andWhere('resource_owner_id  = :resource_owner_id')
-            ->setParameters([
-                'provider'          => $provider,
-                'resource_owner_id' => $resourceOwnerId,
-                'lastupdate'        => date('Y-m-d H:i:s', time()),
-                'resource_owner'    => json_encode($resourceOwner->toArray()),
-            ])
-        ;
-    }
-
-    /**
-     * Query to toggle the "enabled" value for a profile record.
-     *
-     * @param string  $provider
-     * @param string  $resourceOwnerId
-     * @param boolean $enable
-     *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function querySetEnable($provider, $resourceOwnerId, $enable)
-    {
-        return $this->getQueryBuilder()
-            ->update($this->tableNameProvider)
-            ->set('enabled', $enable)
-            ->where('provider  = :provider')
-            ->andWhere('resource_owner_id  = :resource_owner_id')
         ;
     }
 }
