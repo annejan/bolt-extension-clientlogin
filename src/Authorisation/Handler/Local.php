@@ -79,14 +79,14 @@ class Local extends HandlerBase implements HandlerInterface
             $form = $this->app['boltforms']
                 ->getForm(Types::FORM_NAME_PASSWORD)
                 ->handleRequest($this->request);
+            $formData = $form->getData();
 
             // Validate against saved password data
-            if ($form->isValid() && $this->check($form->getData())) {
-                $profile = $this->getRecordManager()->getAccountByResourceOwnerId($form->getData()['username']);
+            if ($form->isValid() && $this->check($formData)) {
+                $profile = $this->getRecordManager()->getAccountByResourceOwnerId($formData['username']);
                 if (!$profile) {
                     throw new InvalidAuthorisationRequestException('No matching profile found');
                 }
-
                 $response = new RedirectResponse($this->app['clientlogin.provider']->getBaseAuthorizationUrl());
 
                 return $response;
@@ -100,7 +100,7 @@ class Local extends HandlerBase implements HandlerInterface
     }
 
     /**
-     * Check the password, login data, and set tokens.
+     * Check the password and login data.
      *
      * @param array $formData
      *
@@ -117,32 +117,26 @@ class Local extends HandlerBase implements HandlerInterface
         // Look up a user profile
         $profile = $this->getRecordManager()->getAccountByResourceOwnerId($formData['username']);
 
-        // If the profile doesn't exist, then we just want to warn of an invalid combination
-        if ($profile === false) {
-            return $this->getInvaildPassword($formData);
-        }
-
-        // Check the stored hash versus the POSTed one.
-        if ($this->getHasher()->CheckPassword($formData['password'], $profile['password'])) {
+        // If the profile doesn't exist, then we just want to warn of an invalid
+        // combination, and check the stored hash versus the POSTed one.
+        if ($profile !== false && $this->getHasher()->CheckPassword($formData['password'], $profile['password'])) {
             return true;
         }
 
-        return $this->getInvaildPassword($formData);
+        $this->setInvaildPasswordError($formData);
+
+        return false;
     }
 
     /**
      * Handle the password logging, etc.
      *
      * @param array $formData
-     *
-     * @return boolean
      */
-    protected function getInvaildPassword($formData)
+    protected function setInvaildPasswordError($formData)
     {
         $this->setDebugMessage(sprintf('No user profile record found for %s', $formData['username']));
         $this->app['boltforms']->getForm(Types::FORM_NAME_PASSWORD)->addError(new FormError('Invalid user name or password.'));
-
-        return false;
     }
 
     /**
