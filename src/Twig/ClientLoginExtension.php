@@ -30,11 +30,11 @@ class ClientLoginExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'hasauth'       => new \Twig_Function_Method($this, 'getHasAuth'),
-            'profile'       => new \Twig_Function_Method($this, 'getWhoAmI'),
-            'displayauth'   => new \Twig_Function_Method($this, 'getDisplayAuth'),
-            'displaylogin'  => new \Twig_Function_Method($this, 'getDisplayLogin'),
-            'displaylogout' => new \Twig_Function_Method($this, 'getDisplayLogout')
+            new \Twig_SimpleFunction('hasauth',       [$this, 'getHasAuth'],       ['is_safe' => ['html'], 'is_safe_callback' => true]),
+            new \Twig_SimpleFunction('profile',       [$this, 'getWhoAmI'],        ['is_safe' => ['html'], 'is_safe_callback' => true]),
+            new \Twig_SimpleFunction('displayauth',   [$this, 'getDisplayAuth'],   ['is_safe' => ['html'], 'is_safe_callback' => true]),
+            new \Twig_SimpleFunction('displaylogin',  [$this, 'getDisplayLogin'],  ['is_safe' => ['html'], 'is_safe_callback' => true]),
+            new \Twig_SimpleFunction('displaylogout', [$this, 'getDisplayLogout'], ['is_safe' => ['html'], 'is_safe_callback' => true]),
         ];
     }
 
