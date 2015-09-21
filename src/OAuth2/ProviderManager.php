@@ -5,6 +5,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\OAuth2;
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use GuzzleHttp\Client;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use Psr\Log\LoggerInterface;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,8 @@ class ProviderManager
     protected $logger;
     /** @var string */
     protected $rootUrl;
+    /** @var AbstractProvider */
+    protected $provider;
     /** @var string */
     protected $providerName;
 
@@ -84,7 +87,7 @@ class ProviderManager
         $options = $this->getProviderOptions($providerName);
         $collaborators = ['httpClient' => $this->guzzleClient];
 
-        return $this->providerName = new $providerClass($options, $collaborators);
+        return $this->provider = new $providerClass($options, $collaborators);
     }
 
     /**
