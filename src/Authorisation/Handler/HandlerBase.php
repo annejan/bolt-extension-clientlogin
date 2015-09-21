@@ -133,7 +133,7 @@ abstract class HandlerBase
         $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
         if ($profile === false) {
             $this->setDebugMessage(sprintf('No profile found for %s ID %s', $providerName, $resourceOwner->getId()));
-            $this->getRecordManager()->writeProvider(null, $providerName, $accessToken, $resourceOwner);
+            $this->getRecordManager()->insertProvider(null, $providerName, $accessToken, $resourceOwner);
 
             // Now re-fetch the profile for provider record
             $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
@@ -156,7 +156,7 @@ abstract class HandlerBase
             $guid = $this->getValidGuid($profile);
             $this->setDebugMessage(sprintf('Profile found for %s ID %s', $providerName, $resourceOwner->getId()));
             // Update the provider record
-            $this->getRecordManager()->writeProvider($guid, $providerName, $accessToken, $resourceOwner);
+            $this->getRecordManager()->updateProvider($guid, $providerName, $resourceOwner);
         }
 
         // Update the session token record
