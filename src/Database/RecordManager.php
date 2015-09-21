@@ -173,7 +173,7 @@ class RecordManager extends RecordManagerBase
     public function writeProvider($guid, $provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         if ($guid === null) {
-            return $this->insertProvider($provider, $accessToken, $resourceOwner);
+            return $this->insertProvider($guid, $provider, $accessToken, $resourceOwner);
         } else {
             return $this->updateProvider($guid, $provider, $accessToken, $resourceOwner);
         }
@@ -182,16 +182,17 @@ class RecordManager extends RecordManagerBase
     /**
      * Insert a user profile.
      *
+     * @param string                 $guid
      * @param string                 $provider
      * @param AccessToken            $accessToken
      * @param ResourceOwnerInterface $resourceOwner
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    protected function insertProvider($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    protected function insertProvider($guid, $provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         $resourceOwnerId = $resourceOwner->getId();
-        $query = $this->getProviderQueriesWrite()->queryInsert($provider, $resourceOwnerId, $accessToken, $resourceOwner);
+        $query = $this->getProviderQueriesWrite()->queryInsert($guid, $provider, $resourceOwnerId, $accessToken, $resourceOwner);
 
         return $this->executeQuery($query);
     }
@@ -199,16 +200,16 @@ class RecordManager extends RecordManagerBase
     /**
      * Update a user profile.
      *
+     * @param string                 $guid
      * @param string                 $provider
-     * @param AccessToken            $accessToken
      * @param ResourceOwnerInterface $resourceOwner
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    protected function updateProvider($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    protected function updateProvider($guid, $provider, ResourceOwnerInterface $resourceOwner)
     {
         $resourceOwnerId = $resourceOwner->getId();
-        $query = $this->getProviderQueriesWrite()->queryUpdate($provider, $resourceOwnerId, $accessToken, $resourceOwner);
+        $query = $this->getProviderQueriesWrite()->queryUpdate($guid, $provider, $resourceOwnerId, $resourceOwner);
 
         return $this->executeQuery($query);
     }

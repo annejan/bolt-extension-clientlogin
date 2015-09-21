@@ -6,7 +6,7 @@ use Doctrine\DBAL\Connection;
 
 abstract class QueryBase
 {
-    /** @var \Doctrine\DBAL\Connection */
+    /** @var \Doctrine\DBAL\Driver\Connection */
     protected $db;
     /** @var string */
     protected $tableNameBase;
@@ -29,7 +29,7 @@ abstract class QueryBase
     /**
      * Get the database connection
      *
-     * @return \Doctrine\DBAL\Connection
+     * @return \Doctrine\DBAL\Driver\Connection
      */
     protected function getConnection()
     {

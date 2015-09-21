@@ -15,6 +15,7 @@ class ProviderWrite extends QueryBase
     /**
      * Query to insert a profile record.
      *
+     * @param string                 $guid
      * @param string                 $provider
      * @param string                 $resourceOwnerId
      * @param AccessToken            $accessToken
@@ -22,8 +23,12 @@ class ProviderWrite extends QueryBase
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryInsert($provider, $resourceOwnerId, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    public function queryInsert($guid, $provider, $resourceOwnerId, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
+        if ($guid === null) {
+            $guid = $this->getGuidV4();
+        }
+
         return $this->getQueryBuilder()
             ->insert($this->tableNameProvider)
             ->values([
@@ -35,7 +40,7 @@ class ProviderWrite extends QueryBase
                 'resource_owner'    => ':resource_owner',
             ])
             ->setParameters([
-                'guid'              => $this->getGuidV4(),
+                'guid'              => $guid,
                 'provider'          => $provider,
                 'resource_owner_id' => $resourceOwnerId,
                 'refresh_token'     => $accessToken->getRefreshToken(),
@@ -48,15 +53,16 @@ class ProviderWrite extends QueryBase
     /**
      * Query to update a user profile.
      *
+     * @param string                 $guid
      * @param string                 $provider
      * @param string                 $resourceOwnerId
      * @param ResourceOwnerInterface $resourceOwner
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryUpdate($provider, $resourceOwnerId, ResourceOwnerInterface $resourceOwner)
+    public function queryUpdate($guid, $provider, $resourceOwnerId, ResourceOwnerInterface $resourceOwner)
     {
-        return $this->getQueryBuilder()
+        $query = $this->getQueryBuilder()
             ->update($this->tableNameProvider)
             ->set('lastupdate',     ':lastupdate')
             ->set('resource_owner', ':resource_owner')
@@ -69,5 +75,13 @@ class ProviderWrite extends QueryBase
                 'resource_owner'    => json_encode($resourceOwner->toArray()),
             ])
         ;
+
+        if ($guid !== null) {
+            $query->andWhere('resource_owner_id  = :resource_owner_id')
+                ->setParameter('guid', ':guid')
+            ;
+        }
+
+        return $query;
     }
 }
