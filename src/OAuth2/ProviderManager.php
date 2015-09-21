@@ -87,7 +87,7 @@ class ProviderManager
         $options = $this->getProviderOptions($providerName);
         $collaborators = ['httpClient' => $this->guzzleClient];
 
-        return $this->provider = new $providerClass($options, $collaborators);
+        return new $providerClass($options, $collaborators);
     }
 
     /**
@@ -201,6 +201,8 @@ class ProviderManager
         }
 
         $app['clientlogin.handler'] = clone $app['clientlogin.handler.remote'];
+
+        $this->provider = $app['clientlogin.handler'];
     }
 
     /**
