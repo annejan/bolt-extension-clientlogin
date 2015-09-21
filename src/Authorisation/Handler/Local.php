@@ -10,8 +10,6 @@ use Bolt\Extension\Bolt\ClientLogin\Profile;
 use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
 use Bolt\Extension\Bolt\ClientLogin\Types;
 use Hautelook\Phpass\PasswordHash;
-use League\OAuth2\Client\Provider\GenericResourceOwner;
-use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

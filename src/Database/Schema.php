@@ -41,6 +41,7 @@ class Schema
         // User/client account table
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($tableName) {
+                // @codingStandardsIgnoreStart
                 $table = $schema->createTable($tableName . '_account');
                 $table->addColumn('guid',              'guid',     []);
                 $table->addColumn('resource_owner_id', 'string',   ['notnull' => false, 'length' => 128]);
@@ -55,12 +56,14 @@ class Schema
                 $table->addIndex(['enabled']);
 
                 return $table;
+                // @codingStandardsIgnoreEnd
             }
         );
 
         // User/client provider table
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($tableName) {
+                // @codingStandardsIgnoreStart
                 $table = $schema->createTable($tableName . '_provider');
                 $table->addColumn('guid',              'guid',     []);
                 $table->addColumn('provider',          'string',   ['length' => 64]);
@@ -76,12 +79,14 @@ class Schema
                 $table->addIndex(['refresh_token']);
 
                 return $table;
+                // @codingStandardsIgnoreEnd
             }
         );
 
         // User/client provider table
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($tableName) {
+                // @codingStandardsIgnoreStart
                 $table = $schema->createTable($tableName . '_tokens');
                 $table->addColumn('access_token',      'string',   ['length' => 128]);
                 $table->addColumn('guid',              'guid',     []);
@@ -94,6 +99,7 @@ class Schema
                 $table->addIndex(['expires']);
 
                 return $table;
+                // @codingStandardsIgnoreEnd
             }
         );
     }

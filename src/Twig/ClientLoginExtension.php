@@ -8,9 +8,19 @@ use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 
 /**
  * Twig functions
+ *
+ * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
 class ClientLoginExtension extends \Twig_Extension
 {
+    /** @var Application */
+    private $app;
+
+    /**
+     * Constructor.
+     *
+     * @param Application $app
+     */
     public function __construct(Application $app)
     {
         $this->app = $app;
@@ -29,6 +39,7 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
+        // @codingStandardsIgnoreStart
         return [
             new \Twig_SimpleFunction('hasauth',       [$this, 'getHasAuth'],       ['is_safe' => ['html'], 'is_safe_callback' => true]),
             new \Twig_SimpleFunction('profile',       [$this, 'getWhoAmI'],        ['is_safe' => ['html'], 'is_safe_callback' => true]),
@@ -36,6 +47,7 @@ class ClientLoginExtension extends \Twig_Extension
             new \Twig_SimpleFunction('displaylogin',  [$this, 'getDisplayLogin'],  ['is_safe' => ['html'], 'is_safe_callback' => true]),
             new \Twig_SimpleFunction('displaylogout', [$this, 'getDisplayLogout'], ['is_safe' => ['html'], 'is_safe_callback' => true]),
         ];
+        // @codingStandardsIgnoreEnd
     }
 
     /**
@@ -47,7 +59,7 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Check login status
+     * Check login status.
      *
      * @return boolean
      */
@@ -61,8 +73,9 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Get profile if user is logged in
-     * If the userr is not logged in just return empty array values
+     * Get profile if user is logged in.
+     *
+     * If the userr is not logged in just return empty array values.
      *
      * @return array
      */
@@ -101,9 +114,9 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Display login/logout depending on status
+     * Display login/logout depending on status.
      *
-     * @param string $redirect
+     * @param boolean $redirect
      *
      * @return \Twig_Markup
      */
@@ -113,9 +126,9 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Display login
+     * Display login buttons.
      *
-     * @param string $redirect
+     * @param boolean $redirect
      *
      * @return \Twig_Markup
      */
@@ -125,9 +138,9 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Display logout
+     * Display logout button.
      *
-     * @param string $redirect
+     * @param boolean $redirect
      *
      * @return \Twig_Markup
      */

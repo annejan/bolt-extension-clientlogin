@@ -29,7 +29,7 @@ class UserInterface
     /**
      * Disply login/logout depending on auth status
      *
-     * @param string $redirect
+     * @param boolean $redirect
      *
      * @return Twig_Markup
      */
