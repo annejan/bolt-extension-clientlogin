@@ -30,8 +30,6 @@ abstract class HandlerBase
 
     /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     private $config;
-    /** @var \Symfony\Component\HttpFoundation\Response */
-    private $response;
     /** @var TokenManager */
     private $tm;
 
@@ -101,8 +99,6 @@ abstract class HandlerBase
     /**
      * Proceess a profile login validation attempt.
      *
-     * @param string $returnpage
-     *
      * @return Response
      */
     protected function process()
@@ -171,13 +167,17 @@ abstract class HandlerBase
     }
 
     /**
+     * Check that a GUID we've been given is valid.
+     *
      * @param array $record
      *
      * @throws \RuntimeException
+     *
+     * @return string
      */
-    protected function getValidGuid(array $record)
+    protected function getValidGuid($record)
     {
-        if (strlen($record['guid']) !== 36) {
+        if (!isset($record['guid']) || strlen($record['guid']) !== 36) {
             throw new \RuntimeException('Invalid GUID value being used!');
         }
 
@@ -263,7 +263,7 @@ abstract class HandlerBase
 
         // Try to get an access token using the authorization code grant.
         $accessToken = $this->getProvider()->getAccessToken('authorization_code', $options);
-        $this->setDebugMessage('OAuth token received', $accessToken->jsonSerialize());
+        $this->setDebugMessage('OAuth token received: ' . $accessToken->jsonSerialize());
 
         return $accessToken;
     }
