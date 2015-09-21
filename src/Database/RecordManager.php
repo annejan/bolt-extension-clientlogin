@@ -208,7 +208,7 @@ class RecordManager extends RecordManagerBase
         $session = $this->getProviderSessions($guid);
 
         if ($session) {
-            $query = $this->getSessionQueriesWrite()->queryUpdate($accessToken);
+            $query = $this->getSessionQueriesWrite()->queryUpdate($guid, $accessToken);
         } else {
             $query = $this->getSessionQueriesWrite()->queryInsert($guid, $accessToken);
         }
