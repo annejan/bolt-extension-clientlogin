@@ -11,6 +11,7 @@ use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\Request;
@@ -221,7 +222,7 @@ abstract class HandlerBase
     /**
      * Get the token manager instance.
      *
-     * @return Manager\Token
+     * @return TokenManager
      */
     protected function getTokenManager()
     {
@@ -293,7 +294,7 @@ abstract class HandlerBase
             try {
                 $this->app['dispatcher']->dispatch($type, $event);
             } catch (\Exception $e) {
-                if ($this->config->get('debug_mode')) {
+                if ($this->getConfig()->get('debug_mode')) {
                     dump($e);
                 }
 
