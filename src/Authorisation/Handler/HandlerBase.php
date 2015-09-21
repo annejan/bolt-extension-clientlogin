@@ -161,7 +161,7 @@ abstract class HandlerBase
 
         // Update the session token record
         $this->setDebugMessage(sprintf('Writing session token for %s ID %s', $providerName, $resourceOwner->getId()));
-        $this->getRecordManager()->writeSession($guid, $providerName, $accessToken);
+        $this->getRecordManager()->writeSession($guid, $accessToken);
 
         return $guid;
     }

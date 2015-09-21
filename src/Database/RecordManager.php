@@ -199,14 +199,13 @@ class RecordManager extends RecordManagerBase
     /**
      * Update a user profile.
      *
-     * @param string                 $guid
      * @param string                 $provider
      * @param AccessToken            $accessToken
      * @param ResourceOwnerInterface $resourceOwner
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    protected function updateProvider($guid, $provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
+    protected function updateProvider($provider, AccessToken $accessToken, ResourceOwnerInterface $resourceOwner)
     {
         $resourceOwnerId = $resourceOwner->getId();
         $query = $this->getProviderQueriesWrite()->queryUpdate($provider, $resourceOwnerId, $accessToken, $resourceOwner);
@@ -218,12 +217,11 @@ class RecordManager extends RecordManagerBase
      * Insert or update a session record for a user's access token.
      *
      * @param string      $guid
-     * @param string      $provider
      * @param AccessToken $accessToken
      *
      * @return \Doctrine\DBAL\Driver\Statement|integer|null
      */
-    public function writeSession($guid, $provider, AccessToken $accessToken)
+    public function writeSession($guid, AccessToken $accessToken)
     {
         $session = $this->getProviderSessions($guid);
 

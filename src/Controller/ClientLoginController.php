@@ -109,7 +109,7 @@ class ClientLoginController implements ControllerProviderInterface
         }
         $this->setFinalRedirectUrl($app, $request);
 
-        $response = $this->getFinalResponse($app, $request, 'login');
+        $response = $this->getFinalResponse($app, 'login');
 
         return $response;
     }
@@ -128,7 +128,7 @@ class ClientLoginController implements ControllerProviderInterface
             $request->query->set('provider', 'Generic');
         }
 
-        $response = $this->getFinalResponse($app, $request, 'logout');
+        $response = $this->getFinalResponse($app, 'logout');
         if ($response instanceof SuccessRedirectResponse) {
             $response->setTargetUrl($this->getRedirectUrl($app));
         }
@@ -148,7 +148,7 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationCallback(Application $app, Request $request)
     {
-        $response = $this->getFinalResponse($app, $request, 'process');
+        $response = $this->getFinalResponse($app, 'process');
 
         if ($response instanceof SuccessRedirectResponse) {
             $response->setTargetUrl($this->getRedirectUrl($app));
@@ -188,12 +188,11 @@ class ClientLoginController implements ControllerProviderInterface
      * Get the required route response.
      *
      * @param Application $app
-     * @param Request     $request
      * @param string      $action
      *
      * @return Response
      */
-    private function getFinalResponse(Application $app, Request $request, $action)
+    private function getFinalResponse(Application $app, $action)
     {
         try {
             $response = $app['clientlogin.handler']->{$action}();
