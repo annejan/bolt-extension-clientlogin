@@ -20,7 +20,8 @@ class TokenManager
     /** Session key name of the access token ID */
     const TOKEN_ACCESS = 'bolt.clientlogin.token.access';
     /** Session key name of the state value used on authentication request to upstream */
-    const TOKEN_STATE  = 'bolt.clientlogin.token.state';
+    const TOKEN_STATE = 'bolt.clientlogin.token.state';
+    const TOKEN_CODE = 'bolt.clientlogin.token.code';
     const TOKEN_COOKIE_NAME = 'clientlogin_access_token';
     const TOKEN_SESSION_NAME = 'clientlogin_session_token';
 
@@ -95,6 +96,28 @@ class TokenManager
         if (!$accessToken instanceof SessionToken) {
             throw new Exception\SystemSetupException('[ClientLogin] Unable to create a Symfony session token!');
         }
+    }
+
+    /**
+     * Save a authorisation code string to the session.
+     *
+     * @throws Exception\SystemSetupException
+     *
+     * @return string
+     */
+    public function setCodeToken()
+    {
+        $codeValue = $this->random->generateString(32);
+        $this->session->set(self::TOKEN_CODE, $codeValue);
+
+        // Retrive the saved token to make sure that the Session is working properly
+        $codeValue = $this->getToken(self::TOKEN_CODE);
+
+        if (empty($codeValue)) {
+            throw new Exception\SystemSetupException('Unable to create a Symfony session token!');
+        }
+
+        return $codeValue;
     }
 
     /**
