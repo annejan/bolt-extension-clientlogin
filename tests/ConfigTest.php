@@ -30,7 +30,7 @@ class ConfigTest extends BoltUnitTest
 
     public function testGetProvider()
     {
-        $providers = array('Password', 'Facebook', 'Google', 'Github', 'Generic');
+        $providers = array('Local', 'Facebook', 'Google', 'Github', 'Generic');
         $config = new Config(array());
 
         foreach ($providers as $provider) {

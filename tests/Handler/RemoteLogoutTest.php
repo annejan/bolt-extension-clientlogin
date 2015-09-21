@@ -19,6 +19,10 @@ class RemoteLogoutTest extends AbstractHandlerUnitTest
      */
     public function testLogout()
     {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+
         $app = $this->getApp();
         $extension = new Extension($app);
         $app['extensions']->register($extension);
