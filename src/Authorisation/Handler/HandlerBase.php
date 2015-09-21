@@ -44,7 +44,7 @@ abstract class HandlerBase
 
         $this->app    = $app;
         $this->config = $app['clientlogin.config'];
-        $this->tm     = new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
+        $this->tm     = $app['clientlogin.manager.token'];
     }
 
     /**

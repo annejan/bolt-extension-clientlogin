@@ -14,6 +14,7 @@ use Bolt\Extension\Bolt\ClientLogin\OAuth2\ProviderManager;
 use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
 
 class ServiceProvider implements ServiceProviderInterface
 {
@@ -60,6 +61,12 @@ class ServiceProvider implements ServiceProviderInterface
         $app['clientlogin.handler.remote'] = $app->protect(
             function ($app) {
                 return new Handler\Remote($app, $app['request_stack']);
+            }
+        );
+
+        $app['clientlogin.manager.token'] = $app->share(
+            function ($app) {
+                return new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
             }
         );
 
