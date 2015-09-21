@@ -10,6 +10,7 @@ use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\ProviderManager;
 use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
@@ -57,7 +58,7 @@ abstract class HandlerBase
      */
     protected function login()
     {
-        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+        $providerName = $this->getProviderManager()->getProviderName();
         $provider = $this->getConfig()->getProvider($providerName);
 
         if ($provider['enabled'] !== true) {
@@ -128,7 +129,7 @@ abstract class HandlerBase
      */
     protected function handleAccountTransition(AccessToken $accessToken)
     {
-        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+        $providerName = $this->getProviderManager()->getProviderName();
         $resourceOwner = $this->getResourceOwner($accessToken);
 
         $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
@@ -239,6 +240,16 @@ abstract class HandlerBase
     protected function getProvider()
     {
         return $this->app['clientlogin.provider'];
+    }
+
+    /**
+     * Get the provider manager.
+     *
+     * @return ProviderManager
+     */
+    protected function getProviderManager()
+    {
+        return $this->app['clientlogin.provider.manager'];
     }
 
     /**
