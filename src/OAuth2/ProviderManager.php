@@ -213,7 +213,7 @@ class ProviderManager
     protected function getCallbackUrl($providerName)
     {
         $key = $this->config->get('response_noun');
-        $url = $this->rootUrl . $this->config->get('basepath') . "/oauth2/callback?$key=$providerName";
+        $url = $this->rootUrl . $this->config->getUriBase() . "/oauth2/callback?$key=$providerName";
         $this->logger->debug("[ClientLogin]: Setting callback URL: $url");
 
         return $url;
