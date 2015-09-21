@@ -12,7 +12,7 @@ class ConfigTest extends BoltUnitTest
 {
     public function testDefaultConfig()
     {
-        $config = new Config(array());
+        $config = new Config(array(), 'http://example.com');
 
         $this->assertTrue($config->has('providers'), "The key 'providers' doesn't exist");
         $this->assertFalse($config->has('koalas'));
@@ -23,7 +23,7 @@ class ConfigTest extends BoltUnitTest
 
     public function testGetLabel()
     {
-        $config = new Config(array());
+        $config = new Config(array(), 'http://example.com');
 
         $this->assertSame('Logout', $config->getLabel('logout'));
     }
@@ -31,7 +31,7 @@ class ConfigTest extends BoltUnitTest
     public function testGetProvider()
     {
         $providers = array('Local', 'Facebook', 'Google', 'Github', 'Generic');
-        $config = new Config(array());
+        $config = new Config(array(), 'http://example.com');
 
         foreach ($providers as $provider) {
             $provider = $config->getProvider($provider);
@@ -46,7 +46,7 @@ class ConfigTest extends BoltUnitTest
 
     public function testGetTemplate()
     {
-        $config = new Config(array());
+        $config = new Config(array(), 'http://example.com');
 
         $this->assertSame('_profile.twig', $config->getTemplate('profile'));
         $this->assertSame('_button.twig', $config->getTemplate('button'));
@@ -57,7 +57,7 @@ class ConfigTest extends BoltUnitTest
 
     public function testIsDebug()
     {
-        $config = new Config(array());
+        $config = new Config(array(), 'http://example.com');
 
         $this->assertFalse($config->isDebug());
     }
