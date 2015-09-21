@@ -177,7 +177,7 @@ class ProviderManager
             throw new Exception\InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
         }
 
-        $providerConfig = $app['clientlogin.config']->getProvider($providerName);
+        $providerConfig = $this->config->getProvider($providerName);
         if ($providerConfig === null) {
             $app['logger.system']->debug('[ClientLogin][Provider]: Request provider did not match any configured providers.', ['event' => 'extensions']);
             throw new Exception\InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
