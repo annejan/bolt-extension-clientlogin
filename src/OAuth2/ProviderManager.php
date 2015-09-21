@@ -217,7 +217,7 @@ class ProviderManager
     {
         $key = $this->config->get('response_noun');
         $url = $this->rootUrl . $this->config->getUriBase() . "/oauth2/callback?$key=$providerName";
-        $this->logger->debug("[ClientLogin]: Setting callback URL: $url");
+        $this->logger->debug("[ClientLogin][Provider]: Setting callback URL: $url");
 
         return $url;
     }
