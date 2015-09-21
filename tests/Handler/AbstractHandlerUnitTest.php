@@ -3,7 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Tests;
 
 use Bolt\Application;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Session;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\SessionToken;
 use Bolt\Tests\BoltUnitTest;
@@ -37,6 +37,6 @@ abstract class AbstractHandlerUnitTest extends BoltUnitTest
             'resource_owner_id' => '2223097779'
         ]);
         $sessionToken = new SessionToken('fe4687dd-6d5b-44ae-af5e-db0e4c8b407c', $accessToken);
-        $app['session']->set(Manager\Token::TOKEN_ACCESS, $sessionToken);
+        $app['session']->set(TokenManager::TOKEN_ACCESS, $sessionToken);
     }
 }

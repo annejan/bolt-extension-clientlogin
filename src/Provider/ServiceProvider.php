@@ -3,11 +3,15 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Provider;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Session;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\SessionManager;
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
+use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Feedback;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\ProviderManager;
+use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
@@ -21,6 +25,10 @@ class ServiceProvider implements ServiceProviderInterface
         $this->config = $config;
     }
 
+    public function boot(Application $app)
+    {
+    }
+
     public function register(Application $app)
     {
         $tablePrefix = rtrim($app['config']->get('general/database/prefix', 'bolt_'), '_') . '_';
@@ -28,7 +36,7 @@ class ServiceProvider implements ServiceProviderInterface
 
         $app['clientlogin.session'] = $app->share(
             function ($app) {
-                return new Session(
+                return new SessionManager(
                     $app['clientlogin.records'],
                     $app['session'],
                     $app['request_stack'],
@@ -37,13 +45,19 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $app['clientlogin.handler.local'] = $app->share(
+        $app['clientlogin.handler'] = $app->share(
+            function () {
+                throw new \RuntimeException('ClientLogin authentication handler not set up!');
+            }
+        );
+
+        $app['clientlogin.handler.local'] = $app->protect(
             function ($app) {
                 return new Handler\Local($app, $app['request_stack']);
             }
         );
 
-        $app['clientlogin.handler.remote'] = $app->share(
+        $app['clientlogin.handler.remote'] = $app->protect(
             function ($app) {
                 return new Handler\Remote($app, $app['request_stack']);
             }
@@ -82,12 +96,53 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
+        $app['clientlogin.ui'] = $app->share(
+            function ($app) {
+                return new UserInterface($app);
+            }
+        );
+
         $app['clientlogin.config'] = $app->share(
             function ($this) {
                 return new Config($this->config);
             }
         );
 
+        //
+        $app['clientlogin.provider.manager'] = $app->share(
+            function ($app) {
+                $rootUrl = $app['resources']->getUrl('rooturl');
+
+                return new ProviderManager($app['clientlogin.config'], $app['clientlogin.guzzle'], $app['logger.system'], $rootUrl);
+            }
+        );
+
+        // This will become the active provider during the request cycle
+        $app['clientlogin.provider'] = $app->share(
+            function () {
+                throw new \RuntimeException('ClientLogin authentication provider not set up!');
+            }
+        );
+
+        // A generic provider
+        $app['clientlogin.provider.generic'] = $app->protect(
+            function () {
+                return new Provider\Generic([]);
+            }
+        );
+
+        // Build provider closures for each enabled provider
+        foreach ($this->config['providers'] as $providerName => $providerConfig) {
+            if ($providerConfig['enabled'] === true) {
+                $app['clientlogin.provider.' . strtolower($providerName)] = $app->protect(
+                    function ($app) use ($providerName) {
+                        return $app['clientlogin.provider.manager']->getProvider($providerName);
+                    }
+                );
+            }
+        }
+
+        /** @deprecated Temporary workaround until Bolt core can update to Guzzle 6. */
         $app['clientlogin.guzzle'] = $app->share(
             function ($app) {
                 // We're needed, pop the pimple.
@@ -120,9 +175,5 @@ class ServiceProvider implements ServiceProviderInterface
                 $loader->register(true);
             }
         );
-    }
-
-    public function boot(Application $app)
-    {
     }
 }

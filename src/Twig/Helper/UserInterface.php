@@ -3,6 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Twig\Helper;
 
 use Bolt\Application;
+use Bolt\Extension\Bolt\ClientLogin\Types;
 use Bolt\Helpers\String;
 
 /**
@@ -28,7 +29,7 @@ class UserInterface
     /**
      * Disply login/logout depending on auth status
      *
-     * @param string $redirect
+     * @param boolean $redirect
      *
      * @return Twig_Markup
      */
@@ -59,7 +60,7 @@ class UserInterface
         }
 
         // Render
-        $link    = $this->app['resources']->getUrl('root') . $this->config->get('basepath') . '/login?provider=';
+        $link    = $this->app['resources']->getUrl('root') . $this->config->getUriBase() . '/login?provider=';
         $context = [];
 
         foreach ($this->config->get('providers') as $provider => $values) {
@@ -97,7 +98,7 @@ class UserInterface
         $context = [
             'providers' => [
                 'logout' => [
-                    'link'  => $this->app['resources']->getUrl('root') . $this->config->get('basepath') . '/logout' . $target,
+                    'link'  => $this->app['resources']->getUrl('root') . $this->config->getUriBase() . '/logout' . $target,
                     'label' => $this->config->getLabel('logout') ?: 'Logout',
                     'class' => 'logout'
                 ]
@@ -105,6 +106,44 @@ class UserInterface
         ];
 
         $html = $this->app['render']->render($this->config->getTemplate('button'), $context);
+
+        return new \Twig_Markup($html, 'UTF-8');
+    }
+
+    /**
+     * .
+     *
+     * @return \Twig_Markup
+     */
+    public function displayPasswordPrompt()
+    {
+        // Fetch th fields for the form
+        $fields = $this->app['boltforms']->getForm(Types::FORM_NAME_PASSWORD)->all();
+        $context = [
+            'parent'  => $this->config->getTemplate('password_parent'),
+            'fields'  => $fields,
+        ];
+
+        // Render the Twig_Markup
+        return $this->app['boltforms']->renderForm(Types::FORM_NAME_PASSWORD, $this->config->getTemplate('password'), $context);
+    }
+
+    /**
+     * Render one of our exception pages.
+     *
+     * @param \Exception $e
+     *
+     * @return \Twig_Markup
+     */
+    public function displayExceptionPage(\Exception $e)
+    {
+        $context = [
+            'parent'    => $this->app['clientlogin.config']->getTemplate('error_parent'),
+            'feedback'  => $this->app['clientlogin.feedback']->get(),
+            'exception' => $e,
+        ];
+
+        $html = $this->app['render']->render($this->config->getTemplate('error'), $context);
 
         return new \Twig_Markup($html, 'UTF-8');
     }

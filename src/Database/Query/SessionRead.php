@@ -21,7 +21,7 @@ class SessionRead extends QueryBase
         return $this->getQueryBuilder()
             ->select('*')
             ->from($this->tableNameTokens, 's')
-            ->innerJoin('s', $this->tableName, 'p', 's.guid = p.guid')
+            ->innerJoin('s', $this->tableNameProvider, 'p', 's.guid = p.guid')
             ->where('p.guid  = :guid')
             ->setParameter(':guid', $guid)
         ;
@@ -39,7 +39,7 @@ class SessionRead extends QueryBase
         return $this->getQueryBuilder()
             ->select('*')
             ->from($this->tableNameTokens, 's')
-            ->innerJoin('s', $this->tableName, 'p', 's.guid = p.guid')
+            ->innerJoin('s', $this->tableNameProvider, 'p', 's.guid = p.guid')
             ->where('s.access_token  = :access_token')
             ->setParameter(':access_token', $cookie)
         ;

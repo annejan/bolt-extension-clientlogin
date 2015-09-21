@@ -8,12 +8,19 @@ use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 
 /**
  * Twig functions
+ *
+ * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
 class ClientLoginExtension extends \Twig_Extension
 {
-    /** @var UserInterface */
-    protected $userInterface;
+    /** @var Application */
+    private $app;
 
+    /**
+     * Constructor.
+     *
+     * @param Application $app
+     */
     public function __construct(Application $app)
     {
         $this->app = $app;
@@ -32,13 +39,15 @@ class ClientLoginExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
+        // @codingStandardsIgnoreStart
         return [
-            'hasauth'       => new \Twig_Function_Method($this, 'getHasAuth'),
-            'profile'       => new \Twig_Function_Method($this, 'getWhoAmI'),
-            'displayauth'   => new \Twig_Function_Method($this, 'getDisplayAuth'),
-            'displaylogin'  => new \Twig_Function_Method($this, 'getDisplayLogin'),
-            'displaylogout' => new \Twig_Function_Method($this, 'getDisplayLogout')
+            new \Twig_SimpleFunction('hasauth',       [$this, 'getHasAuth'],       ['is_safe' => ['html'], 'is_safe_callback' => true]),
+            new \Twig_SimpleFunction('profile',       [$this, 'getWhoAmI'],        ['is_safe' => ['html'], 'is_safe_callback' => true]),
+            new \Twig_SimpleFunction('displayauth',   [$this, 'getDisplayAuth'],   ['is_safe' => ['html'], 'is_safe_callback' => true]),
+            new \Twig_SimpleFunction('displaylogin',  [$this, 'getDisplayLogin'],  ['is_safe' => ['html'], 'is_safe_callback' => true]),
+            new \Twig_SimpleFunction('displaylogout', [$this, 'getDisplayLogout'], ['is_safe' => ['html'], 'is_safe_callback' => true]),
         ];
+        // @codingStandardsIgnoreEnd
     }
 
     /**
@@ -50,7 +59,7 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Check login status
+     * Check login status.
      *
      * @return boolean
      */
@@ -64,8 +73,9 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Get profile if user is logged in
-     * If the userr is not logged in just return empty array values
+     * Get profile if user is logged in.
+     *
+     * If the userr is not logged in just return empty array values.
      *
      * @return array
      */
@@ -104,9 +114,9 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Display login/logout depending on status
+     * Display login/logout depending on status.
      *
-     * @param string $redirect
+     * @param boolean $redirect
      *
      * @return \Twig_Markup
      */
@@ -116,9 +126,9 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Display login
+     * Display login buttons.
      *
-     * @param string $redirect
+     * @param boolean $redirect
      *
      * @return \Twig_Markup
      */
@@ -128,9 +138,9 @@ class ClientLoginExtension extends \Twig_Extension
     }
 
     /**
-     * Display logout
+     * Display logout button.
      *
-     * @param string $redirect
+     * @param boolean $redirect
      *
      * @return \Twig_Markup
      */
@@ -146,10 +156,6 @@ class ClientLoginExtension extends \Twig_Extension
      */
     protected function getUserInterface()
     {
-        if ($this->userInterface === null) {
-            $this->userInterface = new UserInterface($this->app);
-        }
-
-        return $this->userInterface;
+        return $this->app['clientlogin.ui'];
     }
 }

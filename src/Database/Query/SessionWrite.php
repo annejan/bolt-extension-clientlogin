@@ -41,19 +41,22 @@ class SessionWrite extends QueryBase
     /**
      * Query to update a session record.
      *
+     * @param string      $guid
      * @param AccessToken $accessToken
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryUpdate(AccessToken $accessToken)
+    public function queryUpdate($guid, AccessToken $accessToken)
     {
         return $this->getQueryBuilder()
             ->update($this->tableNameTokens)
             ->set('access_token', ':access_token')
             ->set('access_token_data', ':access_token_data')
             ->set('expires', ':expires')
-            ->where('access_token  = :access_token')
+            ->where('guid  = :guid')
+            ->andWhere('access_token  = :access_token')
             ->setParameters([
+                'guid'              => $guid,
                 'access_token'      => (string) $accessToken,
                 'access_token_data' => json_encode($accessToken),
                 'expires'           => $accessToken->getExpires(),

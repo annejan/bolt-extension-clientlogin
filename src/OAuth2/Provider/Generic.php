@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
 
 use League\OAuth2\Client\Provider\GenericProvider as LeagueGenericProvider;
-use League\OAuth2\Client\Provider\GenericResourceOwner;
 use League\OAuth2\Client\Token\AccessToken;
 
 /**
@@ -13,6 +12,25 @@ use League\OAuth2\Client\Token\AccessToken;
  */
 class Generic extends LeagueGenericProvider
 {
+    /**
+     * Constructor.
+     *
+     * @param array $options
+     * @param array $collaborators
+     */
+    public function __construct(array $options = [], array $collaborators = [])
+    {
+        if (empty($options)) {
+            $options = [
+                'urlAuthorize'            => 'invalid',
+                'urlAccessToken'          => 'invalid',
+                'urlResourceOwnerDetails' => 'invalid',
+            ];
+        }
+
+        parent::__construct($options, $collaborators);
+    }
+
     /**
      * {@inheritdoc}
      */

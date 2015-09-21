@@ -3,7 +3,6 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Database;
 
 use Bolt\Extension\Bolt\ClientLogin\Config;
-use Bolt\Extension\Bolt\ClientLogin\Profile;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Psr\Log\LoggerInterface;
@@ -15,10 +14,12 @@ use Psr\Log\LoggerInterface;
  */
 abstract class RecordManagerBase
 {
-    /** @var \Doctrine\DBAL\Connection */
+    /** @var \Doctrine\DBAL\Driver\Connection */
     protected $db;
     /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     protected $config;
+    /** @var LoggerInterface */
+    protected $logger;
     /** @var string */
     protected $tableName;
 
@@ -53,33 +54,63 @@ abstract class RecordManagerBase
     }
 
     /**
+     * Get the account read query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\AccountRead
+     */
+    protected function getAccountQueriesRead()
+    {
+        return new Query\AccountRead($this->db, $this->tableName);
+    }
+
+    /**
+     * Get the account remove query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\AccountDelete
+     */
+    protected function getAccountQueriesDelete()
+    {
+        return new Query\AccountDelete($this->db, $this->tableName);
+    }
+
+    /**
+     * Get the account write query builder.
+     *
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\AccountWrite
+     */
+    protected function getAccountQueriesWrite()
+    {
+        return new Query\AccountWrite($this->db, $this->tableName);
+    }
+
+    /**
      * Get the profile read query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileRead
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProviderRead
      */
-    protected function getProfileQueriesRead()
+    protected function getProviderQueriesRead()
     {
-        return new Query\ProfileRead($this->db, $this->tableName);
+        return new Query\ProviderRead($this->db, $this->tableName);
     }
 
     /**
      * Get the profile remove query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileDelete
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProviderDelete
      */
-    protected function getProfileQueriesDelete()
+    protected function getProviderQueriesDelete()
     {
-        return new Query\ProfileDelete($this->db, $this->tableName);
+        return new Query\ProviderDelete($this->db, $this->tableName);
     }
 
     /**
      * Get the profile write query builder.
      *
-     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProfileWrite
+     * @return \Bolt\Extension\Bolt\ClientLogin\Database\Query\ProviderWrite
      */
-    protected function getProfileQueriesWrite()
+    protected function getProviderQueriesWrite()
     {
-        return new Query\ProfileWrite($this->db, $this->tableName);
+        return new Query\ProviderWrite($this->db, $this->tableName);
     }
 
     /**
@@ -123,10 +154,11 @@ abstract class RecordManagerBase
     {
         $this->logger->debug('[ClientLogin][Database]: ' . (string) $query, ['event' => 'extensions']);
 
-        return $query->execute();
         try {
+            return $query->execute();
         } catch (\Doctrine\DBAL\DBALException $e) {
             $this->logger->critical('[ClientLogin][Database]: Database exception.', ['event' => 'exception', 'exception' => $e]);
+            throw $e;
         }
     }
 
@@ -141,12 +173,13 @@ abstract class RecordManagerBase
     {
         $this->logger->debug('[ClientLogin][Database]: ' . (string) $query, ['event' => 'extensions']);
 
-        return $query
+        try {
+            return $query
                 ->execute()
                 ->fetch(\PDO::FETCH_ASSOC);
-        try {
         } catch (\Doctrine\DBAL\DBALException $e) {
             $this->logger->critical('[ClientLogin][Database]: Database exception.', ['event' => 'exception', 'exception' => $e]);
+            throw $e;
         }
     }
 }

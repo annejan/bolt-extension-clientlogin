@@ -2,7 +2,6 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
@@ -15,7 +14,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Session
+class SessionManager
 {
     /** @var RecordManager */
     private $recordManager;
@@ -48,13 +47,11 @@ class Session
      */
     public function getLoggedIn(Request $request = null)
     {
-    if (!$this->checkRequest($request)) {
-            return;
+        if ($this->checkRequest($request) && $this->checkSession($request)) {
+            return $this->session->get(TokenManager::TOKEN_ACCESS);
         }
 
-        if ($this->checkSession($request)) {
-            return $this->session->get(Manager\Token::TOKEN_ACCESS);
-        }
+        return;
     }
 
     /**
@@ -66,11 +63,12 @@ class Session
      */
     public function isLoggedIn(Request $request = null)
     {
-        if (!$this->checkRequest($request)) {
-            return false;
+        // If we have a cookie, check there is a matching session
+        if ($this->checkRequest($request)) {
+            return $this->checkSession($request);
         }
 
-        return $this->checkSession($request);
+        return false;
     }
 
     /**
@@ -93,7 +91,7 @@ class Session
         }
 
         // If we have a cookie, let's do checks.
-        if ($cookie = $request->cookies->get(Manager\Token::TOKEN_COOKIE_NAME)) {
+        if ($cookie = $request->cookies->get(TokenManager::TOKEN_COOKIE_NAME)) {
             $this->setDebugMessage(sprintf('checkRequest() check found cookie: %s', $cookie));
             return true;
         }
@@ -119,7 +117,7 @@ class Session
         }
 
         // Get the session
-        if (!$sessionToken = $this->session->get(Manager\Token::TOKEN_ACCESS)) {
+        if (!$sessionToken = $this->session->get(TokenManager::TOKEN_ACCESS)) {
             $this->setDebugMessage('checkSession() check found no session key for SessionToken.');
 
             return false;
@@ -131,7 +129,7 @@ class Session
         }
 
         // Check that cookie matches the one stored in session.
-        $cookie = $request->cookies->get(Manager\Token::TOKEN_COOKIE_NAME);
+        $cookie = $request->cookies->get(TokenManager::TOKEN_COOKIE_NAME);
         if ($cookie !== $sessionToken->getAccessTokenId()) {
             $this->setDebugMessage('checkSession() cookie and session mismatch.');
 
@@ -144,6 +142,8 @@ class Session
 
             return true;
         }
+
+        $this->setDebugMessage('checkSession() found no matching session.');
 
         return false;
     }

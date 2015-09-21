@@ -3,13 +3,16 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Application;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\CookieManager;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\SessionToken;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
+use League\OAuth2\Client\Provider\ResourceOwnerInterface;
+use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -22,18 +25,12 @@ abstract class HandlerBase
 {
     /** @var \Bolt\Application */
     protected $app;
-    /** @var AbstractProvider */
-    protected $provider;
-    /** @var string */
-    protected $providerName;
     /** @var \Symfony\Component\HttpFoundation\Request */
     protected $request;
 
     /** @var \Bolt\Extension\Bolt\ClientLogin\Config */
     private $config;
-    /** @var \Symfony\Component\HttpFoundation\Response */
-    private $response;
-    /** @var Manager\Token */
+    /** @var TokenManager */
     private $tm;
 
     /**
@@ -47,55 +44,54 @@ abstract class HandlerBase
 
         $this->app    = $app;
         $this->config = $app['clientlogin.config'];
-        $this->tm     = new Manager\Token($app['session'], $app['randomgenerator'], $app['logger.system']);
+        $this->tm     = new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
     }
 
     /**
      * Check the login.
      *
-     * @return boolean
+     * @throws Exception\DisabledProviderException
+     *
+     * @return Response|null
      */
-    protected function login($returnpage)
+    protected function login()
     {
-        $provider = $this->getConfig()->getProvider($this->getProviderName());
+        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+        $provider = $this->getConfig()->getProvider($providerName);
 
         if ($provider['enabled'] !== true) {
-            throw new Exception\DisabledProviderException();
+            throw new Exception\DisabledProviderException('Invalid provider setting.');
         }
 
-        if (!$this->app['clientlogin.session']->isLoggedIn($this->request)) {
-            return false;
+        if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
+            return new SuccessRedirectResponse('/');
         }
 
         // Get the user object for the event
-        $sessionToken = $this->getTokenManager()->getToken(Manager\Token::TOKEN_ACCESS);
+        $sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
 
         // Event dispatcher
-        $this->dispatchEvent('clientlogin.Login', $sessionToken);
+//$this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $sessionToken);
 
         // Set user feedback messages
-        $this->app['clientlogin.feedback']->set('message', 'Login was successful.');
-
-        return true;
+        $this->app['clientlogin.feedback']->set('message', 'Login was route complete, redirecting for authentication.');
     }
 
     /**
      * Logout a profile.
      *
-     * @param string $returnpage
-     *
      * @return Response
      */
-    protected function logout($returnpage)
+    protected function logout()
     {
         if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
-            $this->getTokenManager()->removeToken(Manager\Token::TOKEN_ACCESS);
+            $this->getTokenManager()->removeToken(TokenManager::TOKEN_ACCESS);
             $this->app['clientlogin.feedback']->set('message', 'Logout was successful.');
         }
 
         $cookiePaths = $this->getConfig()->getCookiePaths();
-        $response = new RedirectResponse($returnpage);
-        Manager\Cookie::clearResponseCookies($response, $cookiePaths);
+        $response = new SuccessRedirectResponse('/');
+        CookieManager::clearResponseCookies($response, $cookiePaths);
 
         return $response;
     }
@@ -103,34 +99,103 @@ abstract class HandlerBase
     /**
      * Proceess a profile login validation attempt.
      *
-     * @param string $returnpage
-     *
      * @return Response
      */
-    protected function process($returnpage)
+    protected function process()
     {
         $accessToken = $this->getAccessToken($this->request);
-        $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
+        $guid = $this->handleAccountTransition($accessToken);
 
-        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
-        if ($profile === false) {
-            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
-            $this->getRecordManager()->writeProfile('insert', $this->getProviderName(), $accessToken, $resourceOwner);
-        } else {
-            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $this->getProviderName(), $resourceOwner->getId()));
-            $this->getRecordManager()->writeProfile($profile['guid'], $this->getProviderName(), $accessToken, $resourceOwner);
-        }
+        // Update the PHP session
+        $this->getTokenManager()->setAuthToken($guid, $accessToken);
 
-        // Update the session record
-        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($this->getProviderName(), $resourceOwner->getId());
-        $this->getRecordManager()->writeSession($profile['guid'], $this->getProviderName(), $accessToken);
-        $this->getTokenManager()->setAuthToken($profile['guid'], $accessToken);
-
-        $response = new RedirectResponse($returnpage);
+        $response = new SuccessRedirectResponse('/');
         $cookiePaths = $this->getConfig()->getCookiePaths();
-        Manager\Cookie::setResponseCookies($response, $accessToken, $cookiePaths);
+        CookieManager::setResponseCookies($response, $accessToken, $cookiePaths);
 
         return $response;
+    }
+
+    /**
+     * Handle a successful account authentication.
+     *
+     * @param AccessToken $accessToken
+     *
+     * @throws Exception\RecordHandlerException
+     *
+     * @return string
+     */
+    protected function handleAccountTransition(AccessToken $accessToken)
+    {
+        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+        $resourceOwner = $this->getResourceOwner($accessToken);
+
+        $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
+        if ($profile === false) {
+            $this->setDebugMessage(sprintf('No profile found for %s ID %s', $providerName, $resourceOwner->getId()));
+            $this->getRecordManager()->insertProvider(null, $providerName, $accessToken, $resourceOwner);
+
+            // Now re-fetch the profile for provider record
+            $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
+            if ($profile === false) {
+                throw new Exception\RecordHandlerException('Unable to re-fetch newly created profile.');
+            }
+
+            $guid = $this->getValidGuid($profile);
+            $account = $this->getRecordManager()->getAccountByGuid($guid);
+            if ($account === false) {
+                $this->setDebugMessage(sprintf('No account found for GUID %s', $guid));
+
+                // Create the account record with a matching GUID
+                $result = $this->getRecordManager()->insertAccount($guid, null, null, null, true);
+                if ($result === false) {
+                    throw new Exception\RecordHandlerException('Unable to re-fetch newly created account.');
+                }
+            }
+        } else {
+            $guid = $this->getValidGuid($profile);
+            $this->setDebugMessage(sprintf('Profile found for %s ID %s', $providerName, $resourceOwner->getId()));
+            // Update the provider record
+            $this->getRecordManager()->updateProvider($guid, $providerName, $resourceOwner);
+        }
+
+        // Update the session token record
+        $this->setDebugMessage(sprintf('Writing session token for %s ID %s', $providerName, $resourceOwner->getId()));
+        $this->getRecordManager()->writeSession($guid, $accessToken);
+
+        return $guid;
+    }
+
+    /**
+     * Check that a GUID we've been given is valid.
+     *
+     * @param array $record
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    protected function getValidGuid($record)
+    {
+        if (!isset($record['guid']) || strlen($record['guid']) !== 36) {
+            throw new \RuntimeException('Invalid GUID value being used!');
+        }
+
+        return $record['guid'];
+    }
+
+    /**
+     * Query the provider for the resrouce owner.
+     *
+     * @param AccessToken $accessToken
+     *
+     * @throws IdentityProviderException
+     *
+     * @return ResourceOwnerInterface
+     */
+    protected function getResourceOwner(AccessToken $accessToken)
+    {
+        return $this->getProvider()->getResourceOwner($accessToken);
     }
 
     /**
@@ -164,25 +229,7 @@ abstract class HandlerBase
     }
 
     /**
-     * Construct the authorisation URL with query parameters.
-     *
-     * @param string $providerName
-     *
-     * @return string
-     */
-    protected function getCallbackUrl($providerName)
-    {
-        $key = $this->config->get('response_noun');
-        $url = $this->app['resources']->getUrl('rooturl') . $this->getConfig()->get('basepath') . "/endpoint?$key=$providerName";
-        $this->setDebugMessage("Setting callback URL: $url");
-
-        return $url;
-    }
-
-    /**
      * Get a provider class object for the request.
-     *
-     * @param string $providerName
      *
      * @throws Exception\InvalidProviderException
      *
@@ -190,50 +237,7 @@ abstract class HandlerBase
      */
     protected function getProvider()
     {
-        if ($this->provider !== null) {
-            return $this->provider;
-        }
-
-        $this->setDebugMessage('Creating provider ' .$this->getProviderName());
-
-        /** @var \League\OAuth2\Client\Provider\AbstractProvider $providerClass */
-        $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $this->getProviderName();
-
-        if (!class_exists($providerClass)) {
-            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
-        }
-
-        $options = $this->getProviderOptions($this->getProviderName());
-        $collaborators = ['httpClient' => $this->app['clientlogin.guzzle']];
-
-        return $this->provider = new $providerClass($options, $collaborators);
-    }
-
-    /**
-     * Get a corrected provider name form a request
-     *
-     * @throws Exception\InvalidProviderException
-     *
-     * @return string
-     */
-    protected function getProviderName()
-    {
-        if ($this->providerName !== null) {
-            return $this->providerName;
-        }
-
-        $provider = $this->request->query->get('provider');
-
-        // Handle BC for old library
-        if (empty($provider)) {
-            $provider = $this->request->query->get('hauth_done');
-        }
-
-        if (empty($provider)) {
-            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
-        }
-
-        return $this->providerName = ucwords(strtolower($provider));
+        return $this->app['clientlogin.provider'];
     }
 
     /**
@@ -259,7 +263,7 @@ abstract class HandlerBase
 
         // Try to get an access token using the authorization code grant.
         $accessToken = $this->getProvider()->getAccessToken('authorization_code', $options);
-        $this->setDebugMessage('OAuth token received', $accessToken->jsonSerialize());
+        $this->setDebugMessage('OAuth token received: ' . $accessToken->jsonSerialize());
 
         return $accessToken;
     }
@@ -278,7 +282,7 @@ abstract class HandlerBase
     /**
      * Dispatch event to any listeners.
      *
-     * @param string       $type    Either 'clientlogin.Login' or 'clientlogin.Logout'
+     * @param string       $type         Either ClientLoginEvent::LOGIN_POST' or ClientLoginEvent::LOGOUT_POST
      * @param SessionToken $sessionToken
      */
     protected function dispatchEvent($type, SessionToken $sessionToken)

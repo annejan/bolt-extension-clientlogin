@@ -122,6 +122,46 @@ class Config
     }
 
     /**
+     * Get the base URI.
+     *
+     * @return string
+     */
+    public function getUriBase()
+    {
+        return $this->config['uris']['base'];
+    }
+
+    /**
+     * Get the authorise URI.
+     *
+     * @return string
+     */
+    public function getUriAuthorise()
+    {
+        return $this->config['uris']['authorise'];
+    }
+
+    /**
+     * Get the access token URI.
+     *
+     * @return string
+     */
+    public function getUriAccessToken()
+    {
+        return $this->config['uris']['token'];
+    }
+
+    /**
+     * Get the resource owners details URI.
+     *
+     * @return string
+     */
+    public function getUriResourceOwnerDetails()
+    {
+        return $this->config['uris']['details'];
+    }
+
+    /**
      * Check if we're running debug mode.
      *
      * @return boolean
@@ -149,7 +189,7 @@ class Config
 
         return [
             'providers' => [
-                'Password' => $options,
+                'Local'    => $options,
                 'Google'   => $options,
                 'Facebook' => $options,
                 'Twitter'  => $options,
@@ -157,13 +197,20 @@ class Config
                 'Generic'  => $options,
             ],
             'allowed_cookie_paths' => null,
-            'basepath' => 'authenticate',
+            'uris'                 => [
+                'base'      => 'authenticate',
+                'authorise' => 'oauth2/authorise',
+                'token'     => 'oauth2/token',
+                'details'   => 'oauth2/details',
+            ],
             'template' => [
                 'button'          => '_button.twig',
                 'feedback'        => '_feedback.twig',
                 'profile'         => '_profile.twig',
                 'password'        => '_password.twig',
-                'password_parent' => 'password.twig'
+                'password_parent' => 'password.twig',
+                'error'           => 'error/_clientlogin_error.twig',
+                'error_parent'    => 'error/clientlogin_error.twig',
             ],
             'label' => array(
                 'logout' => 'Logout'

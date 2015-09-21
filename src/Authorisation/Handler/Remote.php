@@ -2,10 +2,10 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use Bolt\Extension\Bolt\ClientLogin\Database;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
+use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -27,34 +27,41 @@ class Remote extends HandlerBase implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function login($returnpage)
+    public function login()
     {
-        if (parent::login($returnpage)) {
+        $response = parent::login();
+        if ($response instanceof Response) {
             // User is logged in already, from whence they came return them now.
-            return new RedirectResponse($returnpage);
+            return $response;
         }
-        return $this->getAuthorisationRedirectResponse();
+
+        $response = $this->getAuthorisationRedirectResponse();
+        if ($response instanceof Response) {
+            return $response;
+        }
+
+        throw new \RuntimeException('An error occured with the provider redirect handling.');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function process($returnpage)
+    public function process()
     {
-        return parent::process($returnpage);
+        return parent::process();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function logout($returnpage)
+    public function logout()
     {
-        return parent::logout($returnpage);
+        return parent::logout();
     }
 
+/*
     protected function getOauthResourceOwner(Request $request)
     {
-/*
         if ($cookie = $request->cookies->get(Types::TOKEN_COOKIE_NAME)) {
             $profile = $this->getRecordManager()->getProfileByAccessToken($cookie);
 
@@ -77,10 +84,11 @@ class Remote extends HandlerBase implements HandlerInterface
             $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
             // Save the new token data
-            $this->getRecordManager()->updateProfile($this->getProviderName(), $accessToken, $resourceOwner);
+            $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+            $this->getRecordManager()->updateProfile($providerName, $accessToken, $resourceOwner);
         }
-*/
     }
+*/
 
     /**
      * Create a redirect response to fetch an authorisation code.
@@ -92,19 +100,21 @@ class Remote extends HandlerBase implements HandlerInterface
     protected function getAuthorisationRedirectResponse($approvalPrompt = 'auto')
     {
         $provider = $this->getProvider();
+        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
 
-        if ($this->getProviderName() === 'Google' && $approvalPrompt == 'force') {
+        if ($providerName === 'Google' && $approvalPrompt == 'force') {
             $provider->setAccessType('offline');
         }
 
-        $options = array_merge($this->getProviderOptions($this->getProviderName()), ['approval_prompt' => $approvalPrompt]);
+        $providerOptions = $this->app['clientlogin.provider.manager']->getProviderOptions($providerName);
+        $options = array_merge($providerOptions, ['approval_prompt' => $approvalPrompt]);
         $authorizationUrl = $provider->getAuthorizationUrl($options);
 
         // Get the state generated and store it to the session.
         $this->getTokenManager()->setStateToken($provider->getState());
         $this->setDebugMessage('Storing state token: ' . $provider->getState());
 
-        return new RedirectResponse($authorizationUrl);
+        return new SuccessRedirectResponse($authorizationUrl);
     }
 
     /**
@@ -124,36 +134,5 @@ class Remote extends HandlerBase implements HandlerInterface
         }
 
         return $accessToken;
-    }
-
-    /**
-     * Get a provider config for passing to the library.
-     *
-     * @param string $providerName
-     *
-     * @throws Exception\ConfigurationException
-     *
-     * @return array
-     */
-    protected function getProviderOptions($providerName)
-    {
-        $providerConfig = $this->getConfig()->getProvider($providerName);
-
-        if (empty($providerConfig['clientId'])) {
-            throw new Exception\ConfigurationException('Provider client ID required: ' . $providerName);
-        }
-        if (empty($providerConfig['clientSecret'])) {
-            throw new Exception\ConfigurationException('Provider secret key required: ' . $providerName);
-        }
-        if (empty($providerConfig['scopes'])) {
-            throw new Exception\ConfigurationException('Provider scope(s) required: ' . $providerName);
-        }
-
-        return[
-            'clientId'     => $providerConfig['clientId'],
-            'clientSecret' => $providerConfig['clientSecret'],
-            'scope'        => $providerConfig['scopes'],
-            'redirectUri'  => $this->getCallbackUrl($providerName),
-        ];
     }
 }

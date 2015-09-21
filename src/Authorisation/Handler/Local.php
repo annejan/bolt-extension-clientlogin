@@ -3,10 +3,12 @@
 namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
 
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
-use Bolt\Extension\Bolt\ClientLogin\Exception\DisabledProviderException;
+use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
 use Bolt\Extension\Bolt\ClientLogin\FormFields;
 use Bolt\Extension\Bolt\ClientLogin\Profile;
+use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
+use Bolt\Extension\Bolt\ClientLogin\Types;
 use Hautelook\Phpass\PasswordHash;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -20,38 +22,24 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Local extends HandlerBase implements HandlerInterface
 {
-    const FORM_NAME = 'clientlogin_password';
-
     /**
      * {@inheritdoc}
      */
-    public function login($returnpage)
+    public function login()
     {
-        $provider = $this->getConfig()->getProvider('Password');
-        if ($provider['enabled'] !== true) {
-            throw new DisabledProviderException();
-        }
-
-        if ($token = $this->isLoggedIn($request)) {
-            $profile = $this->getRecordManager()->getProfileByProviderId('Password', $token->getResourceOwnerId());
-
-            if (!$profile) {
-                throw new InvalidAuthorisationRequestException('No matching profile record for token: ' . (string) $token);
-            }
-
-            $this->dispatchEvent('clientlogin.Login', $profile);
-
+        $response = parent::login();
+        if ($response instanceof Response) {
             // User is logged in already, from whence they came return them now.
-            return new RedirectResponse($returnpage);
+            return $response;
         }
 
-        return $this->render($request);
+        return $this->render();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function process($returnpage)
+    public function process()
     {
         if (!$token = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS)) {
             throw new InvalidAuthorisationRequestException('No token found for password endpoint.');
@@ -61,88 +49,52 @@ class Local extends HandlerBase implements HandlerInterface
             throw new InvalidAuthorisationRequestException('No matching profile record for token: ' . (string) $token);
         }
 
-        $this->dispatchEvent('clientlogin.Login', $profile);
+        $this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $profile);
 
         // User is logged in already, from whence they came return them now.
-        return new RedirectResponse($returnpage);
+        return new SuccessRedirectResponse('/');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function logout($returnpage)
+    public function logout()
     {
-        if ($token = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS)) {
-            $this->getRecordManager()->deleteSession($sessionId);
-        }
-
-        $this->getTokenManager()->removeToken(TokenManager::TOKEN_ACCESS);
-
-        return new RedirectResponse($returnpage);
-    }
-
-    /**
-     * Create a profile for the provider.
-     *
-     * @param string $userName
-     * @param string $password
-     *
-     * @return integer|null
-     */
-    public function createProfile($userName, $password)
-    {
-        $profile = Profile::createPasswordAuth($userName, $this->getHasher()->HashPassword($password));
-        $token = $this->getTokenManager()->generateAuthToken('Password', $userName, null, null, null, null);
-
-        return $this->getRecordManager()->insertProfile('Password', $userName, $userName, $profile, $token);
+        return parent::logout();
     }
 
     /**
      * Render a password login page.
      *
-     * @param Request $request
-     *
      * @return Response
      */
-    protected function render(Request $request)
+    protected function render()
     {
         $formFields = FormFields::Password();
-        $this->app['boltforms']->makeForm(self::FORM_NAME, 'form', [], []);
-        $this->app['boltforms']->addFieldArray(self::FORM_NAME, $formFields['fields']);
-        $message = '';
+        $this->app['boltforms']->makeForm(Types::FORM_NAME_PASSWORD, 'form', [], []);
+        $this->app['boltforms']->addFieldArray(Types::FORM_NAME_PASSWORD, $formFields['fields']);
 
-        if ($request->isMethod('POST')) {
+        if ($this->request->isMethod('POST')) {
             // Validate the form data
             $form = $this->app['boltforms']
-                ->getForm(self::FORM_NAME)
-                ->handleRequest($request);
+                ->getForm(Types::FORM_NAME_PASSWORD)
+                ->handleRequest($this->request);
 
             // Validate against saved password data
             if ($form->isValid() && $this->check($form->getData())) {
-                $profile = $this->getRecordManager()->getProfileByProviderId('Password', $form->getData()['username']);
+                $profile = $this->getRecordManager()->getAccountByResourceOwnerId($form->getData()['username']);
                 if (!$profile) {
                     throw new InvalidAuthorisationRequestException('No matching profile found');
                 }
 
-                $token = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
-                $cookie = $this->getCookieManager()->create($profile->getId(), $token);
-
-                $response = new RedirectResponse($this->getCallbackUrl('Password'));
-                $response->headers->setCookie($cookie);
+                $response = new RedirectResponse($this->app['clientlogin.provider']->getBaseAuthorizationUrl());
 
                 return $response;
             }
         }
 
-        $fields = $this->app['boltforms']->getForm(self::FORM_NAME)->all();
-        $context = [
-            'parent'  => $this->getConfig()->getTemplate('password_parent'),
-            'fields'  => $fields,
-            'message' => $message
-        ];
-
-        // Render the Twig_Markup
-        $html = $this->app['boltforms']->renderForm(self::FORM_NAME, $this->getConfig()->getTemplate('password'), $context);
+        // Get password prompt
+        $html = $this->app['clientlogin.ui']->displayPasswordPrompt();
 
         return new Response($html, Response::HTTP_OK);
     }
@@ -163,7 +115,7 @@ class Local extends HandlerBase implements HandlerInterface
         }
 
         // Look up a user profile
-        $profile = $this->getRecordManager()->getProfileByProviderId('Password', $formData['username']);
+        $profile = $this->getRecordManager()->getAccountByResourceOwnerId($formData['username']);
 
         // If the profile doesn't exist, then we just want to warn of an invalid combination
         if ($profile === false) {
@@ -171,13 +123,7 @@ class Local extends HandlerBase implements HandlerInterface
         }
 
         // Check the stored hash versus the POSTed one.
-        if ($this->getHasher()->CheckPassword($formData['password'], $profile->getPassword())) {
-            // Calculate the expiry time
-            $expires = strtotime('+' . $this->getConfig()->get('login_expiry') . ' days');
-            // Set the auth token into the session
-            $token = $this->getTokenManager()->generateAuthToken('Password', $formData['username'], null, null, $expires, null);
-            $this->getTokenManager()->setAuthToken($token);
-
+        if ($this->getHasher()->CheckPassword($formData['password'], $profile['password'])) {
             return true;
         }
 
@@ -194,7 +140,7 @@ class Local extends HandlerBase implements HandlerInterface
     protected function getInvaildPassword($formData)
     {
         $this->setDebugMessage(sprintf('No user profile record found for %s', $formData['username']));
-        $this->app['boltforms']->getForm(self::FORM_NAME)->addError(new FormError('Invalid user name or password.'));
+        $this->app['boltforms']->getForm(Types::FORM_NAME_PASSWORD)->addError(new FormError('Invalid user name or password.'));
 
         return false;
     }

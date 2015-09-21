@@ -38,15 +38,37 @@ class Schema
     {
         $tableName = $this->tableName;
 
+        // User/client account table
+        $this->schemaManager->registerExtensionTable(
+            function (DbalSchema $schema) use ($tableName) {
+                // @codingStandardsIgnoreStart
+                $table = $schema->createTable($tableName . '_account');
+                $table->addColumn('guid',              'guid',     []);
+                $table->addColumn('resource_owner_id', 'string',   ['notnull' => false, 'length' => 128]);
+                $table->addColumn('password',          'string',   ['notnull' => false, 'length' => 64]);
+                $table->addColumn('email',             'string',   ['notnull' => false, 'length' => 254]);
+                $table->addColumn('enabled',           'boolean',  ['default' => false]);
+
+                $table->setPrimaryKey(['guid']);
+
+                $table->addUniqueIndex(['resource_owner_id']);
+                $table->addUniqueIndex(['email']);
+                $table->addIndex(['enabled']);
+
+                return $table;
+                // @codingStandardsIgnoreEnd
+            }
+        );
+
         // User/client provider table
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($tableName) {
-                $table = $schema->createTable($tableName);
+                // @codingStandardsIgnoreStart
+                $table = $schema->createTable($tableName . '_provider');
                 $table->addColumn('guid',              'guid',     []);
-                $table->addColumn('enabled',           'boolean',  ['default' => true]);
                 $table->addColumn('provider',          'string',   ['length' => 64]);
                 $table->addColumn('resource_owner_id', 'string',   ['length' => 128]);
-                $table->addColumn('refresh_token',     'string',   ['notnull' => false, 'default' => null, 'length' => 128, ]);
+                $table->addColumn('refresh_token',     'string',   ['notnull' => false, 'default' => null, 'length' => 128]);
                 $table->addColumn('resource_owner',    'text',     ['notnull' => false, 'default' => null]);
                 $table->addColumn('lastupdate',        'datetime', ['notnull' => false, 'default' => null]);
 
@@ -57,12 +79,14 @@ class Schema
                 $table->addIndex(['refresh_token']);
 
                 return $table;
+                // @codingStandardsIgnoreEnd
             }
         );
 
         // User/client provider table
         $this->schemaManager->registerExtensionTable(
             function (DbalSchema $schema) use ($tableName) {
+                // @codingStandardsIgnoreStart
                 $table = $schema->createTable($tableName . '_tokens');
                 $table->addColumn('access_token',      'string',   ['length' => 128]);
                 $table->addColumn('guid',              'guid',     []);
@@ -75,6 +99,7 @@ class Schema
                 $table->addIndex(['expires']);
 
                 return $table;
+                // @codingStandardsIgnoreEnd
             }
         );
     }

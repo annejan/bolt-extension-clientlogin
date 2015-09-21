@@ -1,8 +1,7 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
+namespace Bolt\Extension\Bolt\ClientLogin\Authorisation;
 
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
 use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\Cookie as CookieBase;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class Cookie
+class CookieManager
 {
     /**
      * Create an authentication cookie.
@@ -28,7 +27,7 @@ class Cookie
             $expire = time() + 3600;
         }
 
-        return new CookieBase(Manager\Token::TOKEN_COOKIE_NAME, $accessToken->getToken(), $expire, $path);
+        return new CookieBase(TokenManager::TOKEN_COOKIE_NAME, $accessToken->getToken(), $expire, $path);
     }
 
     /**
@@ -50,12 +49,12 @@ class Cookie
      * Have the response clear browser cookies for given paths.
      *
      * @param Response $response
-     * @param array $cookiePaths
+     * @param array    $cookiePaths
      */
     public static function clearResponseCookies(Response $response, array $cookiePaths)
     {
         foreach ($cookiePaths as $cookiePath) {
-            $response->headers->clearCookie(Manager\Token::TOKEN_COOKIE_NAME, $cookiePath);
+            $response->headers->clearCookie(TokenManager::TOKEN_COOKIE_NAME, $cookiePath);
         }
     }
 }

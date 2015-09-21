@@ -14,6 +14,10 @@ class ClientLoginServiceProviderTest extends BoltUnitTest
 {
     public function testProvider()
     {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+
         $app = $this->getApp();
         $provider = new ServiceProvider($app);
         $app->register($provider);

@@ -7,7 +7,7 @@ namespace Bolt\Extension\Bolt\ClientLogin\Database\Query;
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
-class ProfileRead extends QueryBase
+class ProviderRead extends QueryBase
 {
     /**
      * Query to fetch a profile by GUID.
@@ -20,7 +20,7 @@ class ProfileRead extends QueryBase
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->tableName)
+            ->from($this->tableNameProvider)
             ->where('guid = :guid')
             ->setParameter(':guid', $guid)
         ;
@@ -29,19 +29,19 @@ class ProfileRead extends QueryBase
     /**
      * Query to fetch a profile by provider and ID.
      *
-     * @param string $provider
+     * @param string $providerName
      * @param string $resourceOwnerId
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function queryFetchByResourceOwnerId($provider, $resourceOwnerId)
+    public function queryFetchByResourceOwnerId($providerName, $resourceOwnerId)
     {
         return $this->getQueryBuilder()
             ->select('*')
-            ->from($this->tableName)
+            ->from($this->tableNameProvider)
             ->where('provider = :provider')
             ->andWhere('resource_owner_id = :resource_owner_id')
-            ->setParameter(':provider', $provider)
+            ->setParameter(':provider', $providerName)
             ->setParameter(':resource_owner_id', $resourceOwnerId)
         ;
     }

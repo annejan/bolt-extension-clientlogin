@@ -2,10 +2,13 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\Controller;
 
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\CookieManager;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\Handler;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Manager;
-use Bolt\Extension\Bolt\ClientLogin\Authorisation\Types;
+use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginExceptionEvent as ExceptionEvent;
+use Bolt\Extension\Bolt\ClientLogin\Exception\AccessDeniedException;
 use Bolt\Extension\Bolt\ClientLogin\Exception\InvalidAuthorisationRequestException;
+use Bolt\Extension\Bolt\ClientLogin\Response\FailureResponse;
+use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -51,26 +54,42 @@ class ClientLoginController implements ControllerProviderInterface
             ->method('GET');
 
         // OAuth callback URI
-        $ctr->match('/endpoint', [$this, 'authenticationEndpoint'])
-            ->bind('authenticationEndpoint')
+        $ctr->match('/oauth2/callback', [$this, 'authenticationCallback'])
+            ->bind('authenticationCallback')
             ->method('GET|POST');
+
+        // OAuth authorise URI
+        $ctr->match('/oauth2/authorise', [$this, 'authenticationAuthorise'])
+            ->bind('authenticationAuthorise')
+            ->method('GET|POST');
+
+        // Own the rest of the base route
+        $ctr->match('/{url}', [$this, 'authenticationDefault'])
+            ->bind('authenticationDefault')
+            ->method('GET|POST')
+            ->assert('url', '.+');
 
         return $ctr;
     }
 
     /**
-     * Before middleware to load Guzzle 6.
+     * Before middleware to:
+     * - Add our logging handler during debug mode
+     * - Set the request's provider in the provider manager
      *
      * @param Request     $request
      * @param Application $app
      */
     public function before(Request $request, Application $app)
     {
-        // Debug logger
         if ($this->config->isDebug()) {
             $debuglog = $app['resources']->getPath('cache') . '/authenticate.log';
             $app['logger.system']->pushHandler(new StreamHandler($debuglog, Logger::DEBUG));
         }
+
+        // Fetch the request off the stack so we don't get called out of cycle
+        $request = $app['request_stack']->getCurrentRequest();
+        $app['clientlogin.provider.manager']->setProvider($app, $request);
     }
 
     /**
@@ -90,7 +109,9 @@ class ClientLoginController implements ControllerProviderInterface
         }
         $this->setFinalRedirectUrl($app, $request);
 
-        return $this->getFinalResponse($app, $request, 'login');
+        $response = $this->getFinalResponse($app, 'login');
+
+        return $response;
     }
 
     /**
@@ -103,11 +124,35 @@ class ClientLoginController implements ControllerProviderInterface
      */
     public function authenticationLogout(Application $app, Request $request)
     {
-        if (!$this->getProviderName($app, $request)) {
+        if (!$app['clientlogin.provider.manager']->getProviderName()) {
             $request->query->set('provider', 'Generic');
         }
-        $response = $this->getFinalResponse($app, $request, 'logout');
-        $response->headers->clearCookie(Manager\Token::TOKEN_COOKIE_NAME, $app['resources']->getUrl('root'));
+
+        $response = $this->getFinalResponse($app, 'logout');
+        if ($response instanceof SuccessRedirectResponse) {
+            $response->setTargetUrl($this->getRedirectUrl($app));
+        }
+
+        CookieManager::clearResponseCookies($response, $app['clientlogin.config']->getCookiePaths());
+
+        return $response;
+    }
+
+    /**
+     * Authorisation callback.
+     *
+     * @param \Silex\Application $app
+     * @param Request            $request
+     *
+     * @return Response
+     */
+    public function authenticationCallback(Application $app, Request $request)
+    {
+        $response = $this->getFinalResponse($app, 'process');
+
+        if ($response instanceof SuccessRedirectResponse) {
+            $response->setTargetUrl($this->getRedirectUrl($app));
+        }
 
         return $response;
     }
@@ -115,108 +160,113 @@ class ClientLoginController implements ControllerProviderInterface
     /**
      * Authorisation endpoint.
      *
-     * For OAuth this will be the reply endpoint.
+     * @param \Silex\Application $app
+     * @param Request            $request
+     *
+     * @return Response
+     */
+    public function authenticationAuthorise(Application $app, Request $request)
+    {
+    }
+
+    /**
+     * Default route to throw an error on.
      *
      * @param \Silex\Application $app
      * @param Request            $request
      *
      * @return Response
      */
-    public function authenticationEndpoint(Application $app, Request $request)
+    public function authenticationDefault(Application $app, Request $request)
     {
-        return $this->getFinalResponse($app, $request, 'process');
+        $e = new  AccessDeniedException('Invalid route!');
+
+        return $this->getExceptionResponse($app, $e);
     }
 
     /**
      * Get the required route response.
      *
      * @param Application $app
-     * @param Request     $request
      * @param string      $action
      *
      * @return Response
      */
-    private function getFinalResponse(Application $app, Request $request, $action)
+    private function getFinalResponse(Application $app, $action)
     {
-            $authorise = $this->getAuthoriseClass($app, $request);
-
-            $response = $authorise->{$action}($this->getRedirectUrl($app));
-
-//         try {
-//         }
-//         catch (IdentityProviderException $e) {
-//             // Thrown by the OAuth2 library
-//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
-//             $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
-//             $response = new Response('Access denied!', Response::HTTP_FORBIDDEN);
-//         }
-//         catch (InvalidAuthorisationRequestException $e) {
-//             // Thrown deliberately internally
-//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
-//             $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
-//             $response = new Response('Access denied!', Response::HTTP_FORBIDDEN);
-//             $response = new RedirectResponse($this->getRedirectUrl($app));
-//         }
-//         catch (\Exception $e) {
-//             // Yeah, this can't be good…
-//             $app['clientlogin.feedback']->set('debug', $e->getMessage());
-//             $app['clientlogin.feedback']->set('message', 'A server error occurred, we are very sorry and someone has been notified!');
-//             $response = new RedirectResponse($this->getRedirectUrl($app));
-//         }
+        try {
+            $response = $app['clientlogin.handler']->{$action}();
+        } catch (\Exception $e) {
+            return $this->getExceptionResponse($app, $e);
+        }
+// DEBUG:
+// Check that our response classes are OK
+// $this->isResponseValid($response);
 
         return $response;
     }
 
     /**
-     * Get the Authorisation\AuthorisationInterface class to handle the request.
+     * Get an exception state's HTML response page.
      *
-     * @param \Silex\Application $app
-     * @param Request            $request
+     * @param Application $app
+     * @param \Exception  $e
      *
-     * @throws InvalidAuthorisationRequestException
-     *
-     * @return AuthoriseInterface
+     * @return Response
      */
-    private function getAuthoriseClass(Application $app, Request $request)
+    private function getExceptionResponse(Application $app, \Exception $e)
     {
-        if (!$providerName = $this->getProviderName($app, $request)) {
-            $app['logger.system']->debug('[ClientLogin][Controller]: Request was missing a provider in the GET.', ['event' => 'extensions']);
-            throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
+        if ($e instanceof IdentityProviderException) {
+            // Thrown by the OAuth2 library
+            $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
+            // 'Access denied!'
+            $response = new Response('', Response::HTTP_FORBIDDEN);
+        } elseif ($e instanceof InvalidAuthorisationRequestException) {
+            // Thrown deliberately internally
+            $app['clientlogin.feedback']->set('message', 'An exception occurred authenticating with the provider.');
+            // 'Access denied!'
+            $response = new Response('', Response::HTTP_FORBIDDEN);
+        } else {
+            // Yeah, this can't be good…
+            $app['clientlogin.feedback']->set('message', 'A server error occurred, we are very sorry and someone has been notified!');
+            $response = new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        if ($app['clientlogin.config']->getProvider($providerName) === null) {
-            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider did not match any configured providers.', ['event' => 'extensions']);
-            throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
+        // Dispatch an event so that subscribers can extend exception handling
+        if ($app['dispatcher']->hasListeners(ExceptionEvent::ERROR)) {
+            try {
+                $app['dispatcher']->dispatch(ExceptionEvent::ERROR, new ExceptionEvent($e));
+            } catch (\Exception $e) {
+                $app['logger.system']->critical('[ClientLogin][Controller] Event dispatcher had an error', ['event' => 'exception', 'exception' => $e]);
+            }
         }
 
-        $providerConfig = $app['clientlogin.config']->getProvider($providerName);
-        if ($providerConfig['enabled'] !== true && $providerName !== 'Generic') {
-            $app['logger.system']->debug('[ClientLogin][Controller]: Request provider was disabled.', ['event' => 'extensions']);
-            throw new InvalidAuthorisationRequestException('Authentication configuration error. Unable to proceed!');
-        }
+        $app['clientlogin.feedback']->set('debug', $e->getMessage());
+        $response->setContent($app['clientlogin.ui']->displayExceptionPage($e));
 
-        if ($providerName === 'Password') {
-            return $app['clientlogin.handler.local'];
-        }
-
-        return $app['clientlogin.handler.remote'];
+        return $response;
     }
 
     /**
-     * Get the provider name used.
+     * For now have a fit if the responses are invalid.
      *
-     * @param Application $app
-     * @param Request     $request
+     * @param Response $response
      *
-     * @return string
+     * @throws \Exception
+     *
+     * @internal
      */
-    private function getProviderName(Application $app, Request $request)
+    private function isResponseValid(Response $response)
     {
-        if ($providerName = $request->query->get('provider')) {
-            return $providerName;
-        } elseif ($providerName = $request->query->get(str_replace('.', '_', $app['clientlogin.config']->get('response_noun')))) {
-            return $providerName;
+        if ($response instanceof SuccessRedirectResponse) {
+            return;
         }
+
+        if ($response instanceof FailureResponse) {
+            return;
+        }
+
+        throw new \Exception('ClientLogin handler returned a response of type: ' . get_class($response) . ' and must be either SuccessRedirectResponse or FailureResponse');
     }
 
     /**
