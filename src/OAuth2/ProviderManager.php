@@ -157,9 +157,10 @@ class ProviderManager
         ];
 
         if ($providerName === 'Local') {
-            $options['urlAuthorize'] = $this->config->getUriAuthorise();
-            $options['urlAccessToken'] = $this->config->getUriAccessToken();
-            $options['urlResourceOwnerDetails'] = $this->config->getUriResourceOwnerDetails();
+            $base = $this->config->getUrlRoot() . $this->config->getUriBase() . '/';
+            $options['urlAuthorize'] = $base . $this->config->getUriAuthorise();
+            $options['urlAccessToken'] = $base . $this->config->getUriAccessToken();
+            $options['urlResourceOwnerDetails'] = $base . $this->config->getUriResourceOwnerDetails();
         }
 
         return $options;
