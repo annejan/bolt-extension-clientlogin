@@ -103,8 +103,10 @@ class ServiceProvider implements ServiceProviderInterface
         );
 
         $app['clientlogin.config'] = $app->share(
-            function ($this) {
-                return new Config($this->config);
+            function ($app, $this) {
+                $rooturl = $app['resources']->getUrl('rooturl');
+
+                return new Config($this->config, $rooturl);
             }
         );
 
