@@ -142,7 +142,14 @@ class ServiceProvider implements ServiceProviderInterface
             }
         }
 
-        /** @deprecated Temporary workaround until Bolt core can update to Guzzle 6. */
+        /**
+         * @internal Temporary workaround until Bolt core can update to Guzzle 6.
+         * @deprecated Since 3.0 and will be removed for Bolt v3
+         *
+         * NOTE:
+         * This uses a custom autoloader injected by the activation of the
+         * $app['clientlogin.guzzle.loader'] Pimple.
+         */
         $app['clientlogin.guzzle'] = $app->share(
             function ($app) {
                 // We're needed, pop the pimple.
