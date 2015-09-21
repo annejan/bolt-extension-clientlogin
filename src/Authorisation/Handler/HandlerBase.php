@@ -275,7 +275,7 @@ abstract class HandlerBase
 
         // Try to get an access token using the authorization code grant.
         $accessToken = $this->getProvider()->getAccessToken('authorization_code', $options);
-        $this->setDebugMessage('OAuth token received: ' . (array) $accessToken);
+        $this->setDebugMessage('OAuth token received: ' . json_encode($accessToken));
 
         return $accessToken;
     }
