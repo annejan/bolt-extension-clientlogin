@@ -46,7 +46,7 @@ class ServiceProvider implements ServiceProviderInterface
         );
 
         $app['clientlogin.handler'] = $app->share(
-            function ($app) {
+            function () {
                 throw new \RuntimeException('ClientLogin authentication handler not set up!');
             }
         );
@@ -175,32 +175,5 @@ class ServiceProvider implements ServiceProviderInterface
                 $loader->register(true);
             }
         );
-    }
-
-    /**
-     * Get a provider class object for the request.
-     *
-     * @param Application $app
-     * @param string      $providerName
-     *
-     * @throws Exception\InvalidProviderException
-     *
-     * @return AbstractProvider
-     */
-    protected function getProvider(Application $app, $providerName)
-    {
-        $app['logger.system']->debug('[ClientLogin] Creating provider ' . $providerName);
-
-        /** @var \League\OAuth2\Client\Provider\AbstractProvider $providerClass */
-        $providerClass = '\\Bolt\\Extension\\Bolt\\ClientLogin\\OAuth2\\Provider\\' . $providerName;
-
-        if (!class_exists($providerClass)) {
-            throw new Exception\InvalidProviderException(Exception\InvalidProviderException::INVALID_PROVIDER);
-        }
-
-        $options = $this->getProviderOptions($providerName);
-        $collaborators = ['httpClient' => $app['clientlogin.guzzle']];
-
-        return $this->provider = new $providerClass($options, $collaborators);
     }
 }
