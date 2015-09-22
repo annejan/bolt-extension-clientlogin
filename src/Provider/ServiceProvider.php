@@ -33,9 +33,52 @@ class ServiceProvider implements ServiceProviderInterface
 
     public function register(Application $app)
     {
-        $tablePrefix = rtrim($app['config']->get('general/database/prefix', 'bolt_'), '_') . '_';
-        $app['clientlogin.db.table'] = $tablePrefix . 'clientlogin';
+        $this->registerServicesBase($app);
 
+        $this->registerServicesSession($app);
+
+        $this->registerServicesDatabase($app);
+
+        $this->registerServicesHandlers($app);
+
+        $this->registerServicesProviders($app);
+
+        $this->registerServicesServer($app);
+
+        $this->registerServicesDeprecated($app);
+    }
+
+    protected function registerServicesBase(Application $app)
+    {
+        // Configuration service
+        $app['clientlogin.config'] = $app->share(
+            function ($this) use ($app) {
+                $rooturl = $app['resources']->getUrl('rooturl');
+
+                return new Config($this->config, $rooturl);
+            }
+        );
+
+        // Twig user interface service
+        $app['clientlogin.ui'] = $app->share(
+            function ($app) {
+                return new UserInterface($app);
+            }
+        );
+
+        // Feedback message handling service
+        $app['clientlogin.feedback'] = $app->share(
+            function ($app) {
+                $feedback = new Feedback($app['session']);
+                $app->after([$feedback, 'after']);
+
+                return $feedback;
+            }
+        );
+    }
+
+    protected function registerServicesSession(Application $app)
+    {
         // Authenticated session handling service
         $app['clientlogin.session'] = $app->share(
             function ($app) {
@@ -54,6 +97,12 @@ class ServiceProvider implements ServiceProviderInterface
                 return new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
             }
         );
+    }
+
+    protected function registerServicesDatabase(Application $app)
+    {
+        $tablePrefix = rtrim($app['config']->get('general/database/prefix', 'bolt_'), '_') . '_';
+        $app['clientlogin.db.table'] = $tablePrefix . 'clientlogin';
 
         // Database record handling service
         $app['clientlogin.records'] = $app->share(
@@ -69,32 +118,31 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
-        // Feedback message handling service
-        $app['clientlogin.feedback'] = $app->share(
+        // Schema for ClientLogin tables
+        $app['clientlogin.db.schema'] = $app->share(
             function ($app) {
-                $feedback = new Feedback($app['session']);
-                $app->after([$feedback, 'after']);
+                $schema = new Schema(
+                    $app['integritychecker'],
+                    $app['clientlogin.db.table']
+                );
 
-                return $feedback;
+                return $schema;
             }
         );
+    }
 
-        // Twig user interface service
-        $app['clientlogin.ui'] = $app->share(
+    protected function registerServicesServer(Application $app)
+    {
+        // Local OAuth2 server service
+        $app['clientlogin.server'] = $app->share(
             function ($app) {
-                return new UserInterface($app);
+                return new Server($app);
             }
         );
+    }
 
-        // Configuration service
-        $app['clientlogin.config'] = $app->share(
-            function ($this) use ($app) {
-                $rooturl = $app['resources']->getUrl('rooturl');
-
-                return new Config($this->config, $rooturl);
-            }
-        );
-
+    protected function registerServicesHandlers(Application $app)
+    {
         // Authentication handler service. Will be chosen, and set, inside a request cycle
         $app['clientlogin.handler'] = $app->share(
             function () {
@@ -115,7 +163,10 @@ class ServiceProvider implements ServiceProviderInterface
                 return new Handler\Remote($app, $app['request_stack']);
             }
         );
+    }
 
+    protected function registerServicesProviders(Application $app)
+    {
         // Provider manager
         $app['clientlogin.provider.manager'] = $app->share(
             function ($app) {
@@ -149,34 +200,20 @@ class ServiceProvider implements ServiceProviderInterface
                 );
             }
         }
+    }
 
-        // Local OAuth2 server service
-        $app['clientlogin.server'] = $app->share(
-            function ($app) {
-                return new Server($app);
-            }
-        );
-
-        // Schema for ClientLogin tables
-        $app['clientlogin.db.schema'] = $app->share(
-            function ($app) {
-                $schema = new Schema(
-                    $app['integritychecker'],
-                    $app['clientlogin.db.table']
-                );
-
-                return $schema;
-            }
-        );
-
-        /**
-         * @internal Temporary workaround until Bolt core can update to Guzzle 6.
-         * @deprecated Since 3.0 and will be removed for Bolt v3
-         *
-         * NOTE:
-         * This uses a custom autoloader injected by the activation of the
-         * $app['clientlogin.guzzle.loader'] Pimple.
-         */
+    /**
+     * @internal Temporary workaround until Bolt core can update to Guzzle 6.
+     * @deprecated Since 3.0 and will be removed for Bolt v3
+     *
+     * NOTE:
+     * This uses a custom autoloader injected by the activation of the
+     * $app['clientlogin.guzzle.loader'] Pimple.
+     *
+     * @param Application $app
+     */
+    protected function registerServicesDeprecated(Application $app)
+    {
         $app['clientlogin.guzzle'] = $app->share(
             function ($app) {
                 // We're needed, pop the pimple.
