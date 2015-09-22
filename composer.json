@@ -36,6 +36,7 @@
 			],
 			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
 			"League\\OAuth2\\Client\\" : "lib/League/OAuth2/Client/",
+			"League\\OAuth2\\Server\\" : "lib/League/OAuth2/Server/",
 			"Stevenmaguire\\OAuth2\\Client\\" : "lib/League/OAuth2/Client/"
 		}
 	},
