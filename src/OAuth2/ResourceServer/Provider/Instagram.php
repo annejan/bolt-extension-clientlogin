@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
+namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\ResourceServer\Provider;
 
 use League\OAuth2\Client\Provider\Instagram as LeagueInstagram;
 use League\OAuth2\Client\Provider\InstagramResourceOwner;

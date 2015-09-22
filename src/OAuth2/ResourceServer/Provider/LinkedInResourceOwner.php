@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
+namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\ResourceServer\Provider;
 
 use League\OAuth2\Client\Provider\LinkedInResourceOwner as LeagueLinkedInResourceOwner;
 

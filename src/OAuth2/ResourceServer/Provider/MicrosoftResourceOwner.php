@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
+namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\ResourceServer\Provider;
 
 use Stevenmaguire\OAuth2\Client\Provider\MicrosoftResourceOwner as LeagueMicrosoftResourceOwner;
 

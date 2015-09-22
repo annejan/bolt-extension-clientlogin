@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
+namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\ResourceServer\Provider;
 
 trait ClientLoginTrait
 {

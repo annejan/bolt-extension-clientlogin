@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bolt\ClientLogin\OAuth2;
+namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\ResourceServer;
 
 use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Exception;

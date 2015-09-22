@@ -10,7 +10,7 @@ use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
-use Bolt\Extension\Bolt\ClientLogin\OAuth2\ProviderManager;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\ResourceServer\ProviderManager;
 use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
