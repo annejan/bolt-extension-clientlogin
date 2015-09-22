@@ -35,6 +35,7 @@ class ServiceProvider implements ServiceProviderInterface
         $tablePrefix = rtrim($app['config']->get('general/database/prefix', 'bolt_'), '_') . '_';
         $app['clientlogin.db.table'] = $tablePrefix . 'clientlogin';
 
+        // Authenticated session handling service
         $app['clientlogin.session'] = $app->share(
             function ($app) {
                 return new SessionManager(
@@ -46,30 +47,14 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $app['clientlogin.handler'] = $app->share(
-            function () {
-                throw new \RuntimeException('ClientLogin authentication handler not set up!');
-            }
-        );
-
-        $app['clientlogin.handler.local'] = $app->protect(
-            function ($app) use ($app) {
-                return new Handler\Local($app, $app['request_stack']);
-            }
-        );
-
-        $app['clientlogin.handler.remote'] = $app->protect(
-            function ($app) use ($app) {
-                return new Handler\Remote($app, $app['request_stack']);
-            }
-        );
-
+        // Token manager service
         $app['clientlogin.manager.token'] = $app->share(
             function ($app) {
                 return new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
             }
         );
 
+        // Database record handling service
         $app['clientlogin.records'] = $app->share(
             function ($app) {
                 $records = new RecordManager(
@@ -83,6 +68,88 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
+        // Feedback message handling service
+        $app['clientlogin.feedback'] = $app->share(
+            function ($app) {
+                $feedback = new Feedback($app['session']);
+                $app->after([$feedback, 'after']);
+
+                return $feedback;
+            }
+        );
+
+        // Twig user interface service
+        $app['clientlogin.ui'] = $app->share(
+            function ($app) {
+                return new UserInterface($app);
+            }
+        );
+
+        // Configuration service
+        $app['clientlogin.config'] = $app->share(
+            function ($this) use ($app) {
+                $rooturl = $app['resources']->getUrl('rooturl');
+
+                return new Config($this->config, $rooturl);
+            }
+        );
+
+        // Authentication handler service. Will be chosen, and set, inside a request cycle
+        $app['clientlogin.handler'] = $app->share(
+            function () {
+                throw new \RuntimeException('ClientLogin authentication handler not set up!');
+            }
+        );
+
+        // Handler object for local authentication processing
+        $app['clientlogin.handler.local'] = $app->protect(
+            function ($app) use ($app) {
+                return new Handler\Local($app, $app['request_stack']);
+            }
+        );
+
+        // Handler object for remote authentication processing
+        $app['clientlogin.handler.remote'] = $app->protect(
+            function ($app) use ($app) {
+                return new Handler\Remote($app, $app['request_stack']);
+            }
+        );
+
+        // Provider manager
+        $app['clientlogin.provider.manager'] = $app->share(
+            function ($app) {
+                $rootUrl = $app['resources']->getUrl('rooturl');
+
+                return new ProviderManager($app['clientlogin.config'], $app['clientlogin.guzzle'], $app['logger.system'], $rootUrl);
+            }
+        );
+
+        // OAuth provider service. Will be chosen, and set, inside a request cycle
+        $app['clientlogin.provider'] = $app->share(
+            function () {
+                throw new \RuntimeException('ClientLogin authentication provider not set up!');
+            }
+        );
+
+        // Generic OAuth provider object
+        $app['clientlogin.provider.generic'] = $app->protect(
+            function () {
+                return new Provider\Generic([]);
+            }
+        );
+
+        // Provider objects for each enabled provider
+        foreach ($this->config['providers'] as $providerName => $providerConfig) {
+            if ($providerConfig['enabled'] === true) {
+                $app['clientlogin.provider.' . strtolower($providerName)] = $app->protect(
+                    function ($app) use ($app, $providerName) {
+                        return $app['clientlogin.provider.manager']->getProvider($providerName);
+                    }
+                );
+            }
+        }
+
+        // Schema for ClientLogin tables
         $app['clientlogin.db.schema'] = $app->share(
             function ($app) {
                 $schema = new Schema(
@@ -93,63 +160,6 @@ class ServiceProvider implements ServiceProviderInterface
                 return $schema;
             }
         );
-
-        $app['clientlogin.feedback'] = $app->share(
-            function ($app) {
-                $feedback = new Feedback($app['session']);
-                $app->after([$feedback, 'after']);
-
-                return $feedback;
-            }
-        );
-
-        $app['clientlogin.ui'] = $app->share(
-            function ($app) {
-                return new UserInterface($app);
-            }
-        );
-
-        $app['clientlogin.config'] = $app->share(
-            function ($this) use ($app) {
-                $rooturl = $app['resources']->getUrl('rooturl');
-
-                return new Config($this->config, $rooturl);
-            }
-        );
-
-        //
-        $app['clientlogin.provider.manager'] = $app->share(
-            function ($app) {
-                $rootUrl = $app['resources']->getUrl('rooturl');
-
-                return new ProviderManager($app['clientlogin.config'], $app['clientlogin.guzzle'], $app['logger.system'], $rootUrl);
-            }
-        );
-
-        // This will become the active provider during the request cycle
-        $app['clientlogin.provider'] = $app->share(
-            function () {
-                throw new \RuntimeException('ClientLogin authentication provider not set up!');
-            }
-        );
-
-        // A generic provider
-        $app['clientlogin.provider.generic'] = $app->protect(
-            function () {
-                return new Provider\Generic([]);
-            }
-        );
-
-        // Build provider closures for each enabled provider
-        foreach ($this->config['providers'] as $providerName => $providerConfig) {
-            if ($providerConfig['enabled'] === true) {
-                $app['clientlogin.provider.' . strtolower($providerName)] = $app->protect(
-                    function ($app) use ($app, $providerName) {
-                        return $app['clientlogin.provider.manager']->getProvider($providerName);
-                    }
-                );
-            }
-        }
 
         /**
          * @internal Temporary workaround until Bolt core can update to Guzzle 6.
