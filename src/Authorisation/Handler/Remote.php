@@ -48,7 +48,7 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     public function process()
     {
-        return parent::process();
+        return parent::process('authorization_code');
     }
 
     /**

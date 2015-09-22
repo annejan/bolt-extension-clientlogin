@@ -103,9 +103,9 @@ abstract class HandlerBase
      *
      * @return Response
      */
-    protected function process()
+    protected function process($grantType)
     {
-        $accessToken = $this->getAccessToken($this->request);
+        $accessToken = $this->getAccessToken($this->request, $grantType);
         $guid = $this->handleAccountTransition($accessToken);
 
         // Update the PHP session
@@ -256,13 +256,17 @@ abstract class HandlerBase
      * Get an access token from the OAuth provider.
      *
      * @param Request $request
+     * @param string  $grantType One of the following:
+     *                           - 'authorization_code'
+     *                           - 'password'
+     *                           - 'refresh_token'
      *
      * @throws IdentityProviderException
      * @throws Exception\InvalidAuthorisationRequestException
      *
      * @return AccessToken
      */
-    protected function getAccessToken(Request $request)
+    protected function getAccessToken(Request $request, $grantType)
     {
         $code = $request->query->get('code');
 
@@ -274,7 +278,7 @@ abstract class HandlerBase
         $options = ['code' => $code];
 
         // Try to get an access token using the authorization code grant.
-        $accessToken = $this->getProvider()->getAccessToken('authorization_code', $options);
+        $accessToken = $this->getProvider()->getAccessToken($grantType, $options);
         $this->setDebugMessage('OAuth token received: ' . json_encode($accessToken));
 
         return $accessToken;
