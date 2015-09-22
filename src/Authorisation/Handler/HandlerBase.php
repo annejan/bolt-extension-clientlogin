@@ -69,12 +69,6 @@ abstract class HandlerBase
             return new SuccessRedirectResponse('/');
         }
 
-        // Get the user object for the event
-        $sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
-
-        // Event dispatcher
-//$this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $sessionToken);
-
         // Set user feedback messages
         $this->app['clientlogin.feedback']->set('message', 'Login was route complete, redirecting for authentication.');
     }
@@ -110,6 +104,10 @@ abstract class HandlerBase
 
         // Update the PHP session
         $this->getTokenManager()->setAuthToken($guid, $accessToken);
+
+        // Fetch the newly set session token and dispatch the event
+        $sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
+//$this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $sessionToken);
 
         $response = new SuccessRedirectResponse('/');
         $cookiePaths = $this->getConfig()->getCookiePaths();
