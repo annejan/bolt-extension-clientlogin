@@ -35,8 +35,8 @@
 				"src/"
 			],
 			"Bolt\\Extension\\Bolt\\ClientLogin\\Tests\\" : "tests/",
-			"League\\OAuth2\\Client\\" : "lib/League/OAuth2/",
-			"Stevenmaguire\\OAuth2\\Client\\" : "lib/League/OAuth2/"
+			"League\\OAuth2\\Client\\" : "lib/League/OAuth2/Client/",
+			"Stevenmaguire\\OAuth2\\Client\\" : "lib/League/OAuth2/Client/"
 		}
 	},
 	"autoload-dev" : {
