@@ -15,6 +15,7 @@ use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\Service\Server;
 
 class ServiceProvider implements ServiceProviderInterface
 {
@@ -148,6 +149,13 @@ class ServiceProvider implements ServiceProviderInterface
                 );
             }
         }
+
+        // Local OAuth2 server service
+        $app['clientlogin.server'] = $app->share(
+            function ($app) {
+                return new Server($app);
+            }
+        );
 
         // Schema for ClientLogin tables
         $app['clientlogin.db.schema'] = $app->share(
