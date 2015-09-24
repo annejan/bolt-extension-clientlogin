@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use League\OAuth2\Server\Event\ClientAuthenticationFailedEvent;
 use League\OAuth2\Server\Event\UserAuthenticationFailedEvent;
 use League\OAuth2\Server\Event\SessionOwnerEvent;
+use League\OAuth2\Server\Grant\RefreshTokenGrant;
 
 /**
  * Local OAuth server manager.
@@ -161,18 +162,19 @@ class Server
      */
     protected function setAuthorizationServer()
     {
-        $sessionStorage = new Storage\SessionStorage();
-        $accessTokenStorage = new Storage\AccessTokenStorage();
-        $clientStorage = new Storage\ClientStorage();
-        $scopeStorage = new Storage\ScopeStorage();
+        $this->authorisationServer = new AuthorizationServer();
 
-        $this->authorisationServer = new AuthorizationServer(
-            $sessionStorage,
-            $accessTokenStorage,
-            $clientStorage,
-            $scopeStorage
-        );
+        // Storage
+        $this->authorisationServer->setSessionStorage(new Storage\SessionStorage());
+        $this->authorisationServer->setAccessTokenStorage(new Storage\AccessTokenStorage());
+        $this->authorisationServer->setClientStorage(new Storage\ClientStorage());
+        $this->authorisationServer->setScopeStorage(new Storage\ScopeStorage());
+        $this->authorisationServer->setRefreshTokenStorage(new Storage\RefreshTokenStorage());
 
+        // Grants
+        $this->authorisationServer->addGrantType(new RefreshTokenGrant());
+
+        // Events
         $this->authorisationServer->addEventListener('error.auth.client', [$this, 'eventErrorAuthClient']);
         $this->authorisationServer->addEventListener('error.auth.user', [$this, 'eventErrorAuthUser']);
         $this->authorisationServer->addEventListener('session.owner', [$this, 'eventSessionOwner']);
