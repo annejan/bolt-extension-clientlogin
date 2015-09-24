@@ -75,7 +75,7 @@ class Server
                 ]);
             }
 
-            return $this->getExceptionResponse($e);
+            return $this->getResponseException($e);
         }
     }
 
@@ -103,7 +103,7 @@ class Server
                 ]
             );
         } catch (OAuthException $e) {
-            return $this->getExceptionResponse($e);
+            return $this->getResponseException($e);
         }
     }
 
@@ -131,7 +131,7 @@ class Server
                 ]
             );
         } catch (OAuthException $e) {
-            return $this->getExceptionResponse($e);
+            return $this->getResponseException($e);
         }
     }
 
@@ -142,7 +142,7 @@ class Server
      *
      * @return Response
      */
-    protected function getExceptionResponse(OAuthException $e)
+    protected function getResponseException(OAuthException $e)
     {
         return new Response(
             json_encode([
