@@ -3,6 +3,7 @@
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\AuthorisationServer;
 
 use Doctrine\DBAL\Driver\Connection;
+use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\ResourceServer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -20,6 +21,8 @@ class Server
     protected $session;
     /** @var \League\OAuth2\Server\ResourceServer */
     protected $resourceServer;
+    /** @var \League\OAuth2\Server\AuthorizationServer */
+    protected $authorisationServer;
 
     /**
      * Constructor.
@@ -33,6 +36,24 @@ class Server
         $this->session = $session;
 
         $this->setResourceServer();
+    }
+
+    /**
+     * Set up an OAuth2 Authorization Server.
+     */
+    protected function setAuthorizationServer()
+    {
+        $sessionStorage = new Storage\SessionStorage();
+        $accessTokenStorage = new Storage\AccessTokenStorage();
+        $clientStorage = new Storage\ClientStorage();
+        $scopeStorage = new Storage\ScopeStorage();
+
+        $this->authorisationServer = new AuthorizationServer(
+            $sessionStorage,
+            $accessTokenStorage,
+            $clientStorage,
+            $scopeStorage
+        );
     }
 
     /**
