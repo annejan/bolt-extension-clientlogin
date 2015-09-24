@@ -87,6 +87,41 @@ class Server
     }
 
     /**
+     * Client credentials grant.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function grantClientCredentials(Request $request)
+    {
+        $this->authorisationServer->setRequest($request);
+
+        try {
+            $response = $this->authorisationServer->issueAccessToken();
+
+            return new Response(
+                json_encode($response),
+                200,
+                [
+                    'Content-type'  =>  'application/json',
+                    'Cache-Control' =>  'no-store',
+                    'Pragma'        =>  'no-store'
+                ]
+            );
+        } catch (OAuthException $e) {
+            return new Response(
+                json_encode([
+                    'error'     =>  $e->errorType,
+                    'message'   =>  $e->getMessage()
+                ]),
+                $e->httpStatusCode,
+                $e->getHttpHeaders()
+            );
+        }
+    }
+
+    /**
      * Resource owner password credentials grant.
      *
      * @param Request $request
