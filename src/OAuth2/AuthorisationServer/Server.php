@@ -93,15 +93,7 @@ class Server
         try {
             $response = $this->authorisationServer->issueAccessToken();
 
-            return new Response(
-                json_encode($response),
-                200,
-                [
-                    'Content-type'  => 'application/json',
-                    'Cache-Control' => 'no-store',
-                    'Pragma'        => 'no-store'
-                ]
-            );
+            return $this->getResponseAuthorisation($response);
         } catch (OAuthException $e) {
             return $this->getResponseException($e);
         }
@@ -121,18 +113,30 @@ class Server
         try {
             $response = $this->authorisationServer->issueAccessToken();
 
-            return new Response(
-                json_encode($response),
-                200,
-                [
-                    'Content-type'  => 'application/json',
-                    'Cache-Control' => 'no-store',
-                    'Pragma'        => 'no-store'
-                ]
-            );
+            return $this->getResponseAuthorisation($response);
         } catch (OAuthException $e) {
             return $this->getResponseException($e);
         }
+    }
+
+    /**
+     * Get a response object for a successful authorisation.
+     *
+     * @param array $response
+     *
+     * @return Response
+     */
+    protected function getResponseAuthorisation(array $response)
+    {
+        return new Response(
+            json_encode($response),
+            200,
+            [
+                'Content-type'  => 'application/json',
+                'Cache-Control' => 'no-store',
+                'Pragma'        => 'no-store'
+            ]
+        );
     }
 
     /**
