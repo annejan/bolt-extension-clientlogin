@@ -45,6 +45,48 @@ class Server
     }
 
     /**
+     * Authorization code grant.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function grantAuthorisationCode(Request $request)
+    {
+        $this->authorisationServer->setRequest($request);
+
+        try {
+            // Ensure the parameters in the query string are correct
+            $authParams = $this->authorisationServer
+                ->getGrantType('authorization_code')
+                ->checkAuthorizeParams();
+
+            // Everything is okay, save $authParams to the a session and
+            // redirect the user to sign-in
+            $this->storeAuthParams($authParams);
+
+            return new Response('', 302, [
+                'Location'  =>  '/signin'
+            ]);
+        } catch (OAuthException $e) {
+            if ($e->shouldRedirect()) {
+                return new Response('', 302, [
+                    'Location'  =>  $e->getRedirectUri()
+                ]);
+            }
+
+            return new Response(
+                json_encode([
+                    'error'     =>  $e->errorType,
+                    'message'   =>  $e->getMessage()
+                ]),
+                $e->httpStatusCode,
+                $e->getHttpHeaders()
+            );
+        }
+    }
+
+    /**
      * Resource owner password credentials grant.
      *
      * @param Request $request
