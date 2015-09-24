@@ -76,14 +76,7 @@ class Server
                 ]);
             }
 
-            return new Response(
-                json_encode([
-                    'error'     =>  $e->errorType,
-                    'message'   =>  $e->getMessage()
-                ]),
-                $e->httpStatusCode,
-                $e->getHttpHeaders()
-            );
+            return $this->getExceptionResponse($e);
         }
     }
 
@@ -111,14 +104,7 @@ class Server
                 ]
             );
         } catch (OAuthException $e) {
-            return new Response(
-                json_encode([
-                    'error'     =>  $e->errorType,
-                    'message'   =>  $e->getMessage()
-                ]),
-                $e->httpStatusCode,
-                $e->getHttpHeaders()
-            );
+            return $this->getExceptionResponse($e);
         }
     }
 
@@ -146,15 +132,27 @@ class Server
                 ]
             );
         } catch (OAuthException $e) {
-            return new Response(
-                json_encode([
-                    'error'     =>  $e->errorType,
-                    'message'   =>  $e->getMessage()
-                ]),
-                $e->httpStatusCode,
-                $e->getHttpHeaders()
-            );
+            return $this->getExceptionResponse($e);
         }
+    }
+
+    /**
+     * Get a response object for an OAuthException.
+     *
+     * @param OAuthException $e
+     *
+     * @return Response
+     */
+    protected function getExceptionResponse(OAuthException $e)
+    {
+        return new Response(
+            json_encode([
+                'error'     =>  $e->errorType,
+                'message'   =>  $e->getMessage()
+            ]),
+            $e->httpStatusCode,
+            $e->getHttpHeaders()
+        );
     }
 
     /**
