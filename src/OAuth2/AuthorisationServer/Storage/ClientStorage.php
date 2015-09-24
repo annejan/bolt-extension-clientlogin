@@ -2,6 +2,7 @@
 
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\AuthorisationServer\Storage;
 
+use League\OAuth2\Server\Entity\SessionEntity;
 use League\OAuth2\Server\Storage\ClientInterface;
 
 /**
@@ -11,5 +12,17 @@ use League\OAuth2\Server\Storage\ClientInterface;
  */
 class ClientStorage implements ClientInterface
 {
-}
+    /**
+     * {@inheritdoc}
+     */
+    public function get($clientId, $clientSecret = null, $redirectUri = null, $grantType = null)
+    {
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getBySession(SessionEntity $session)
+    {
+    }
+}
