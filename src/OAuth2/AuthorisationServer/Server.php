@@ -3,17 +3,16 @@
 namespace Bolt\Extension\Bolt\ClientLogin\OAuth2\AuthorisationServer;
 
 use Doctrine\DBAL\Driver\Connection;
-use League\Event\EventInterface;
 use League\OAuth2\Server\AuthorizationServer;
-use League\OAuth2\Server\ResourceServer;
+use League\OAuth2\Server\Event\ClientAuthenticationFailedEvent;
+use League\OAuth2\Server\Event\SessionOwnerEvent;
+use League\OAuth2\Server\Event\UserAuthenticationFailedEvent;
 use League\OAuth2\Server\Exception\OAuthException;
+use League\OAuth2\Server\Grant\RefreshTokenGrant;
+use League\OAuth2\Server\ResourceServer;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Request;
-use League\OAuth2\Server\Event\ClientAuthenticationFailedEvent;
-use League\OAuth2\Server\Event\UserAuthenticationFailedEvent;
-use League\OAuth2\Server\Event\SessionOwnerEvent;
-use League\OAuth2\Server\Grant\RefreshTokenGrant;
 
 /**
  * Local OAuth server manager.
@@ -67,12 +66,12 @@ class Server
             $this->storeAuthParams($authParams);
 
             return new Response('', 302, [
-                'Location'  =>  '/signin'
+                'Location'  => '/signin'
             ]);
         } catch (OAuthException $e) {
             if ($e->shouldRedirect()) {
                 return new Response('', 302, [
-                    'Location'  =>  $e->getRedirectUri()
+                    'Location'  => $e->getRedirectUri()
                 ]);
             }
 
@@ -98,9 +97,9 @@ class Server
                 json_encode($response),
                 200,
                 [
-                    'Content-type'  =>  'application/json',
-                    'Cache-Control' =>  'no-store',
-                    'Pragma'        =>  'no-store'
+                    'Content-type'  => 'application/json',
+                    'Cache-Control' => 'no-store',
+                    'Pragma'        => 'no-store'
                 ]
             );
         } catch (OAuthException $e) {
@@ -126,9 +125,9 @@ class Server
                 json_encode($response),
                 200,
                 [
-                    'Content-type'  =>  'application/json',
-                    'Cache-Control' =>  'no-store',
-                    'Pragma'        =>  'no-store'
+                    'Content-type'  => 'application/json',
+                    'Cache-Control' => 'no-store',
+                    'Pragma'        => 'no-store'
                 ]
             );
         } catch (OAuthException $e) {
@@ -147,8 +146,8 @@ class Server
     {
         return new Response(
             json_encode([
-                'error'     =>  $e->errorType,
-                'message'   =>  $e->getMessage()
+                'error'     => $e->errorType,
+                'message'   => $e->getMessage()
             ]),
             $e->httpStatusCode,
             $e->getHttpHeaders()
