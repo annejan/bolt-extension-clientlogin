@@ -44,13 +44,39 @@ class Server
         $this->setResourceServer();
     }
 
-    public function grantAuthorisationCode(Request $request)
+    /**
+     * Resource owner password credentials grant.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function grantPasswordCredentials(Request $request)
     {
-        try {
-        } catch (OAuthException $e) {
-        }
+        $this->authorisationServer->setRequest($request);
 
-        return new Response();
+        try {
+            $response = $this->authorisationServer->issueAccessToken();
+
+            return new Response(
+                json_encode($response),
+                200,
+                [
+                    'Content-type'  =>  'application/json',
+                    'Cache-Control' =>  'no-store',
+                    'Pragma'        =>  'no-store'
+                ]
+            );
+        } catch (OAuthException $e) {
+            return new Response(
+                json_encode([
+                    'error'     =>  $e->errorType,
+                    'message'   =>  $e->getMessage()
+                ]),
+                $e->httpStatusCode,
+                $e->getHttpHeaders()
+            );
+        }
     }
 
     /**
