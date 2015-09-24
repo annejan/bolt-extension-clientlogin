@@ -10,7 +10,9 @@ use Bolt\Extension\Bolt\ClientLogin\Config;
 use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Event\ClientLoginEvent;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\ResourceServer\ProviderManager;
 use Bolt\Extension\Bolt\ClientLogin\Response\SuccessRedirectResponse;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,7 +46,7 @@ abstract class HandlerBase
 
         $this->app    = $app;
         $this->config = $app['clientlogin.config'];
-        $this->tm     = new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
+        $this->tm     = $app['clientlogin.manager.token'];
     }
 
     /**
@@ -56,7 +58,7 @@ abstract class HandlerBase
      */
     protected function login()
     {
-        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+        $providerName = $this->getProviderManager()->getProviderName();
         $provider = $this->getConfig()->getProvider($providerName);
 
         if ($provider['enabled'] !== true) {
@@ -66,12 +68,6 @@ abstract class HandlerBase
         if ($this->app['clientlogin.session']->isLoggedIn($this->request)) {
             return new SuccessRedirectResponse('/');
         }
-
-        // Get the user object for the event
-        $sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
-
-        // Event dispatcher
-//$this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $sessionToken);
 
         // Set user feedback messages
         $this->app['clientlogin.feedback']->set('message', 'Login was route complete, redirecting for authentication.');
@@ -101,13 +97,17 @@ abstract class HandlerBase
      *
      * @return Response
      */
-    protected function process()
+    protected function process($grantType)
     {
-        $accessToken = $this->getAccessToken($this->request);
+        $accessToken = $this->getAccessToken($this->request, $grantType);
         $guid = $this->handleAccountTransition($accessToken);
 
         // Update the PHP session
         $this->getTokenManager()->setAuthToken($guid, $accessToken);
+
+        // Fetch the newly set session token and dispatch the event
+        $sessionToken = $this->getTokenManager()->getToken(TokenManager::TOKEN_ACCESS);
+//$this->dispatchEvent(ClientLoginEvent::LOGIN_POST, $sessionToken);
 
         $response = new SuccessRedirectResponse('/');
         $cookiePaths = $this->getConfig()->getCookiePaths();
@@ -127,7 +127,7 @@ abstract class HandlerBase
      */
     protected function handleAccountTransition(AccessToken $accessToken)
     {
-        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+        $providerName = $this->getProviderManager()->getProviderName();
         $resourceOwner = $this->getResourceOwner($accessToken);
 
         $profile = $this->getRecordManager()->getProfileByResourceOwnerId($providerName, $resourceOwner->getId());
@@ -221,7 +221,7 @@ abstract class HandlerBase
     /**
      * Get the token manager instance.
      *
-     * @return Manager\Token
+     * @return TokenManager
      */
     protected function getTokenManager()
     {
@@ -241,16 +241,30 @@ abstract class HandlerBase
     }
 
     /**
+     * Get the provider manager.
+     *
+     * @return ProviderManager
+     */
+    protected function getProviderManager()
+    {
+        return $this->app['clientlogin.provider.manager'];
+    }
+
+    /**
      * Get an access token from the OAuth provider.
      *
      * @param Request $request
+     * @param string  $grantType One of the following:
+     *                           - 'authorization_code'
+     *                           - 'password'
+     *                           - 'refresh_token'
      *
      * @throws IdentityProviderException
      * @throws Exception\InvalidAuthorisationRequestException
      *
      * @return AccessToken
      */
-    protected function getAccessToken(Request $request)
+    protected function getAccessToken(Request $request, $grantType)
     {
         $code = $request->query->get('code');
 
@@ -262,8 +276,8 @@ abstract class HandlerBase
         $options = ['code' => $code];
 
         // Try to get an access token using the authorization code grant.
-        $accessToken = $this->getProvider()->getAccessToken('authorization_code', $options);
-        $this->setDebugMessage('OAuth token received: ' . $accessToken->jsonSerialize());
+        $accessToken = $this->getProvider()->getAccessToken($grantType, $options);
+        $this->setDebugMessage('OAuth token received: ' . json_encode($accessToken));
 
         return $accessToken;
     }
@@ -293,7 +307,7 @@ abstract class HandlerBase
             try {
                 $this->app['dispatcher']->dispatch($type, $event);
             } catch (\Exception $e) {
-                if ($this->config->get('debug_mode')) {
+                if ($this->getConfig()->get('debug_mode')) {
                     dump($e);
                 }
 

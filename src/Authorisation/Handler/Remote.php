@@ -48,7 +48,7 @@ class Remote extends HandlerBase implements HandlerInterface
      */
     public function process()
     {
-        return parent::process();
+        return parent::process('authorization_code');
     }
 
     /**
@@ -84,7 +84,7 @@ class Remote extends HandlerBase implements HandlerInterface
             $resourceOwner = $this->getProvider()->getResourceOwner($accessToken);
 
             // Save the new token data
-            $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+            $providerName = $this->getProviderManager()->getProviderName();
             $this->getRecordManager()->updateProfile($providerName, $accessToken, $resourceOwner);
         }
     }
@@ -100,13 +100,13 @@ class Remote extends HandlerBase implements HandlerInterface
     protected function getAuthorisationRedirectResponse($approvalPrompt = 'auto')
     {
         $provider = $this->getProvider();
-        $providerName = $this->app['clientlogin.provider.manager']->getProviderName();
+        $providerName = $this->getProviderManager()->getProviderName();
 
         if ($providerName === 'Google' && $approvalPrompt == 'force') {
             $provider->setAccessType('offline');
         }
 
-        $providerOptions = $this->app['clientlogin.provider.manager']->getProviderOptions($providerName);
+        $providerOptions = $this->getProviderManager()->getProviderOptions($providerName);
         $options = array_merge($providerOptions, ['approval_prompt' => $approvalPrompt]);
         $authorizationUrl = $provider->getAuthorizationUrl($options);
 

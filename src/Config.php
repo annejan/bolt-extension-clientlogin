@@ -13,14 +13,17 @@ class Config
 {
     /** @var array */
     private $config;
+    /** @var string */
+    private $rooturl;
 
     /**
      * Constructor.
      *
      * @param array $config
      */
-    public function __construct(array $config)
+    public function __construct(array $config, $rooturl)
     {
+        $this->rooturl = $rooturl;
         $default = $this->getDefaultConfig();
         $this->config = Arr::mergeRecursiveDistinct($default, $config);
         $this->setupProviderConfig();
@@ -122,6 +125,16 @@ class Config
     }
 
     /**
+     * Get the site root URL.
+     *
+     * @return string
+     */
+    public function getUrlRoot()
+    {
+        return $this->rooturl;
+    }
+
+    /**
      * Get the base URI.
      *
      * @return string
@@ -129,6 +142,16 @@ class Config
     public function getUriBase()
     {
         return $this->config['uris']['base'];
+    }
+
+    /**
+     * Get the callback URI.
+     *
+     * @return string
+     */
+    public function getUriCallback()
+    {
+        return $this->config['uris']['callback'];
     }
 
     /**
@@ -199,6 +222,7 @@ class Config
             'allowed_cookie_paths' => null,
             'uris'                 => [
                 'base'      => 'authenticate',
+                'callback'  => 'oauth2/callback',
                 'authorise' => 'oauth2/authorise',
                 'token'     => 'oauth2/token',
                 'details'   => 'oauth2/details',

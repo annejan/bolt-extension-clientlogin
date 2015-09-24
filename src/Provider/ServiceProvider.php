@@ -9,11 +9,13 @@ use Bolt\Extension\Bolt\ClientLogin\Database\RecordManager;
 use Bolt\Extension\Bolt\ClientLogin\Database\Schema;
 use Bolt\Extension\Bolt\ClientLogin\Exception;
 use Bolt\Extension\Bolt\ClientLogin\Feedback;
-use Bolt\Extension\Bolt\ClientLogin\OAuth2\Provider;
-use Bolt\Extension\Bolt\ClientLogin\OAuth2\ProviderManager;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\ResourceServer\Provider;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\ResourceServer\ProviderManager;
 use Bolt\Extension\Bolt\ClientLogin\Twig\Helper\UserInterface;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
+use Bolt\Extension\Bolt\ClientLogin\Authorisation\TokenManager;
+use Bolt\Extension\Bolt\ClientLogin\OAuth2\Service\Server;
 
 class ServiceProvider implements ServiceProviderInterface
 {
@@ -31,9 +33,53 @@ class ServiceProvider implements ServiceProviderInterface
 
     public function register(Application $app)
     {
-        $tablePrefix = rtrim($app['config']->get('general/database/prefix', 'bolt_'), '_') . '_';
-        $app['clientlogin.db.table'] = $tablePrefix . 'clientlogin';
+        $this->registerServicesBase($app);
 
+        $this->registerServicesSession($app);
+
+        $this->registerServicesDatabase($app);
+
+        $this->registerServicesHandlers($app);
+
+        $this->registerServicesProviders($app);
+
+        $this->registerServicesServer($app);
+
+        $this->registerServicesDeprecated($app);
+    }
+
+    protected function registerServicesBase(Application $app)
+    {
+        // Configuration service
+        $app['clientlogin.config'] = $app->share(
+            function ($this) use ($app) {
+                $rooturl = $app['resources']->getUrl('rooturl');
+
+                return new Config($this->config, $rooturl);
+            }
+        );
+
+        // Twig user interface service
+        $app['clientlogin.ui'] = $app->share(
+            function ($app) {
+                return new UserInterface($app);
+            }
+        );
+
+        // Feedback message handling service
+        $app['clientlogin.feedback'] = $app->share(
+            function ($app) {
+                $feedback = new Feedback($app['session']);
+                $app->after([$feedback, 'after']);
+
+                return $feedback;
+            }
+        );
+    }
+
+    protected function registerServicesSession(Application $app)
+    {
+        // Authenticated session handling service
         $app['clientlogin.session'] = $app->share(
             function ($app) {
                 return new SessionManager(
@@ -45,24 +91,20 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $app['clientlogin.handler'] = $app->share(
-            function () {
-                throw new \RuntimeException('ClientLogin authentication handler not set up!');
-            }
-        );
-
-        $app['clientlogin.handler.local'] = $app->protect(
+        // Token manager service
+        $app['clientlogin.manager.token'] = $app->share(
             function ($app) {
-                return new Handler\Local($app, $app['request_stack']);
+                return new TokenManager($app['session'], $app['randomgenerator'], $app['logger.system']);
             }
         );
+    }
 
-        $app['clientlogin.handler.remote'] = $app->protect(
-            function ($app) {
-                return new Handler\Remote($app, $app['request_stack']);
-            }
-        );
+    protected function registerServicesDatabase(Application $app)
+    {
+        $tablePrefix = rtrim($app['config']->get('general/database/prefix', 'bolt_'), '_') . '_';
+        $app['clientlogin.db.table'] = $tablePrefix . 'clientlogin';
 
+        // Database record handling service
         $app['clientlogin.records'] = $app->share(
             function ($app) {
                 $records = new RecordManager(
@@ -76,6 +118,7 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
+        // Schema for ClientLogin tables
         $app['clientlogin.db.schema'] = $app->share(
             function ($app) {
                 $schema = new Schema(
@@ -86,29 +129,45 @@ class ServiceProvider implements ServiceProviderInterface
                 return $schema;
             }
         );
+    }
 
-        $app['clientlogin.feedback'] = $app->share(
+    protected function registerServicesServer(Application $app)
+    {
+        // Local OAuth2 server service
+        $app['clientlogin.server'] = $app->share(
             function ($app) {
-                $feedback = new Feedback($app['session']);
-                $app->after([$feedback, 'after']);
+                return new Server($app);
+            }
+        );
+    }
 
-                return $feedback;
+    protected function registerServicesHandlers(Application $app)
+    {
+        // Authentication handler service. Will be chosen, and set, inside a request cycle
+        $app['clientlogin.handler'] = $app->share(
+            function () {
+                throw new \RuntimeException('ClientLogin authentication handler not set up!');
             }
         );
 
-        $app['clientlogin.ui'] = $app->share(
-            function ($app) {
-                return new UserInterface($app);
+        // Handler object for local authentication processing
+        $app['clientlogin.handler.local'] = $app->protect(
+            function ($app) use ($app) {
+                return new Handler\Local($app, $app['request_stack']);
             }
         );
 
-        $app['clientlogin.config'] = $app->share(
-            function ($this) {
-                return new Config($this->config);
+        // Handler object for remote authentication processing
+        $app['clientlogin.handler.remote'] = $app->protect(
+            function ($app) use ($app) {
+                return new Handler\Remote($app, $app['request_stack']);
             }
         );
+    }
 
-        //
+    protected function registerServicesProviders(Application $app)
+    {
+        // Provider manager
         $app['clientlogin.provider.manager'] = $app->share(
             function ($app) {
                 $rootUrl = $app['resources']->getUrl('rooturl');
@@ -117,32 +176,44 @@ class ServiceProvider implements ServiceProviderInterface
             }
         );
 
-        // This will become the active provider during the request cycle
+        // OAuth provider service. Will be chosen, and set, inside a request cycle
         $app['clientlogin.provider'] = $app->share(
             function () {
                 throw new \RuntimeException('ClientLogin authentication provider not set up!');
             }
         );
 
-        // A generic provider
+        // Generic OAuth provider object
         $app['clientlogin.provider.generic'] = $app->protect(
             function () {
                 return new Provider\Generic([]);
             }
         );
 
-        // Build provider closures for each enabled provider
+        // Provider objects for each enabled provider
         foreach ($this->config['providers'] as $providerName => $providerConfig) {
             if ($providerConfig['enabled'] === true) {
                 $app['clientlogin.provider.' . strtolower($providerName)] = $app->protect(
-                    function ($app) use ($providerName) {
+                    function ($app) use ($app, $providerName) {
                         return $app['clientlogin.provider.manager']->getProvider($providerName);
                     }
                 );
             }
         }
+    }
 
-        /** @deprecated Temporary workaround until Bolt core can update to Guzzle 6. */
+    /**
+     * @internal Temporary workaround until Bolt core can update to Guzzle 6.
+     * @deprecated Since 3.0 and will be removed for Bolt v3
+     *
+     * NOTE:
+     * This uses a custom autoloader injected by the activation of the
+     * $app['clientlogin.guzzle.loader'] Pimple.
+     *
+     * @param Application $app
+     */
+    protected function registerServicesDeprecated(Application $app)
+    {
         $app['clientlogin.guzzle'] = $app->share(
             function ($app) {
                 // We're needed, pop the pimple.
