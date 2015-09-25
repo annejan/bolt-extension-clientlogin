@@ -56,7 +56,7 @@ class Extension extends BaseExtension
      */
     public function cronDaily(CronEvent $event)
     {
-        $event->output->writeln("<comment>ClientLogin: Clearing old sessions</comment>");
+        $event->output->writeln('<comment>ClientLogin: Clearing old sessions</comment>');
         $this->app['clientlogin.db']->doRemoveExpiredSessions();
     }
 
