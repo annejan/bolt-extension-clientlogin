@@ -24,9 +24,6 @@ class Extension extends BaseExtension
     /** @var string Extension's container */
     const CONTAINER = 'extensions.ClientLogin';
 
-    /** @var ClientLogin\Controller */
-    private $controller;
-
     public function getName()
     {
         return Extension::NAME;
