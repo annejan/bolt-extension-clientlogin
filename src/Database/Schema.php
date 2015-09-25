@@ -88,15 +88,19 @@ class Schema
             function (DbalSchema $schema) use ($tableName) {
                 // @codingStandardsIgnoreStart
                 $table = $schema->createTable($tableName . '_tokens');
-                $table->addColumn('access_token',      'string',   ['length' => 128]);
                 $table->addColumn('guid',              'guid',     []);
-                $table->addColumn('access_token_data', 'text',     ['notnull' => false, 'default' => null]);
+                $table->addColumn('token_type',        'string',   ['length' => 32]);
+                $table->addColumn('token',             'string',   ['length' => 128]);
+                $table->addColumn('token_data',        'text',     ['notnull' => false, 'default' => null]);
                 $table->addColumn('expires',           'integer',  ['notnull' => false, 'default' => null]);
+                $table->addColumn('cookie',            'string',   ['notnull' => false, 'default' => null, 'length' => 128]);
 
-                $table->setPrimaryKey(['access_token']);
+                $table->setPrimaryKey(['guid']);
 
-                $table->addIndex(['guid']);
+                $table->addIndex(['type']);
+                $table->addIndex(['token']);
                 $table->addIndex(['expires']);
+                $table->addIndex(['cookie']);
 
                 return $table;
                 // @codingStandardsIgnoreEnd
