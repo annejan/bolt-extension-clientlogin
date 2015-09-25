@@ -65,9 +65,15 @@ class Extension extends BaseExtension
      */
     private function addNutCommands()
     {
-        $this->app['nut.commands.add'](new Nut\AccountCreate($this->app));
-        $this->app['nut.commands.add'](new Nut\AccountDisable($this->app));
-        $this->app['nut.commands.add'](new Nut\AccountEnable($this->app));
-        $this->app['nut.commands.add'](new Nut\PasswordReset($this->app));
+        $nut = $this->app['nut.commands.add'];
+
+        $nut(function ($app) {
+            return [
+                new Nut\AccountCreate($app),
+                new Nut\AccountDisable($app),
+                new Nut\AccountEnable($app),
+                new Nut\PasswordReset($app),
+            ];
+        });
     }
 }
